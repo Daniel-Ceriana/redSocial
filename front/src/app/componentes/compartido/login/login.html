@@ -1,0 +1,63 @@
+<div class="pagina-centrada">
+  <div class="marca">
+    <img src="favicon.svg" alt="" />
+    La Trochita
+  </div>
+  <p class="lema">La red social del ferromodelismo</p>
+
+  <section class="tarjeta">
+    <h1>Iniciar sesión</h1>
+
+    <form (submit)="onSubmit($event)" novalidate>
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <input
+          id="correo"
+          type="email"
+          autocomplete="email"
+          [formField]="loginForm.correo"
+          [attr.aria-invalid]="loginForm.correo().touched() && loginForm.correo().invalid()"
+        />
+        @if (loginForm.correo().touched() && loginForm.correo().invalid()) {
+          <small class="error" role="alert">{{ loginForm.correo().errors()[0].message }}</small>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="contrasena">Contraseña</label>
+        <input
+          id="contrasena"
+          type="password"
+          autocomplete="current-password"
+          [formField]="loginForm.contrasena"
+          [attr.aria-invalid]="loginForm.contrasena().touched() && loginForm.contrasena().invalid()"
+        />
+        @if (loginForm.contrasena().touched() && loginForm.contrasena().invalid()) {
+          <small class="error" role="alert">{{ loginForm.contrasena().errors()[0].message }}</small>
+        }
+      </div>
+
+      @if (errorMsg()) {
+        <p class="aviso-error" role="alert">{{ errorMsg() }}</p>
+      }
+
+      <button type="submit" class="btn btn-bloque" [disabled]="loginForm().submitting()">
+        {{ loginForm().submitting() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <div class="acceso-rapido">
+      <p>Acceso rápido</p>
+      <div>
+        <button type="button" class="btn btn-secundario" (click)="completar('usuario')">
+          Usuario
+        </button>
+        <button type="button" class="btn btn-secundario" (click)="completar('administrador')">
+          Administrador
+        </button>
+      </div>
+    </div>
+
+    <p class="pie-form">¿No tenés cuenta? <a routerLink="/registro">Registrate</a></p>
+  </section>
+</div>

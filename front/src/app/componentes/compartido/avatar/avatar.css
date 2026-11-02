@@ -1,0 +1,23 @@
+:host {
+  display: inline-flex;
+}
+
+img,
+.inicial {
+  border-radius: 50%;
+  border: 2px solid var(--ocre);
+}
+
+img {
+  object-fit: cover;
+}
+
+.inicial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  color: #fff;
+  background: var(--verde);
+}

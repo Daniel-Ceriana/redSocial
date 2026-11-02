@@ -1,1 +1,276 @@
-/* You can add global styles to this file, and also import other style files */
+/* La Trochita — identidad "Estación antigua": crema, verde locomotora y ocre */
+:root {
+  --crema: #f6f0e4;
+  --papel: #fffbf2;
+  --verde: #1f4b3a;
+  --verde-oscuro: #153629;
+  --ocre: #b8862b;
+  --ocre-claro: #f1e3c2;
+  --carbon: #2b2118;
+  --gris: #6b5e50;
+  --borde: #d9cdb6;
+  --error: #a63d2f;
+  --error-fondo: #f8e3df;
+  --sombra: 0 2px 10px rgb(43 33 24 / 12%);
+  --radio: 10px;
+  --fuente-titulo: 'Playfair Display', Georgia, serif;
+  --fuente-texto: 'Inter', system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--crema);
+  color: var(--carbon);
+  font-family: var(--fuente-texto);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.75rem;
+  font-family: var(--fuente-titulo);
+  color: var(--verde);
+  line-height: 1.2;
+}
+
+a {
+  color: var(--verde);
+  font-weight: 500;
+}
+
+/* ---------- Estructura ---------- */
+.contenido {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.pagina-centrada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--fuente-titulo);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--verde);
+}
+
+.marca img {
+  width: 44px;
+  height: 44px;
+}
+
+.lema {
+  margin: -0.5rem 0 0;
+  color: var(--gris);
+  text-align: center;
+}
+
+.tarjeta {
+  width: 100%;
+  max-width: 520px;
+  padding: 1.5rem;
+  background: var(--papel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.tarjeta-ancha {
+  max-width: 720px;
+}
+
+/* ---------- Formularios ---------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+
+.campo label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  color: var(--carbon);
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.campo input:focus,
+.campo textarea:focus,
+.btn:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 1px;
+}
+
+.campo input.invalido,
+.campo textarea.invalido,
+.campo input[aria-invalid='true'],
+.campo textarea[aria-invalid='true'] {
+  border-color: var(--error);
+}
+
+.ayuda {
+  font-size: 0.8rem;
+  color: var(--gris);
+}
+
+.error {
+  font-size: 0.85rem;
+  color: var(--error);
+}
+
+.aviso-error {
+  padding: 0.6rem 0.8rem;
+  margin: 0 0 1rem;
+  background: var(--error-fondo);
+  border-left: 4px solid var(--error);
+  border-radius: 6px;
+}
+
+.fila-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+
+@media (max-width: 600px) {
+  .fila-campos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  background: var(--verde);
+  border: 2px solid var(--verde);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--verde-oscuro);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secundario {
+  color: var(--verde);
+  background: transparent;
+}
+
+.btn-secundario:hover:not(:disabled) {
+  color: #fff;
+}
+
+.btn-ocre {
+  color: var(--carbon);
+  background: var(--ocre);
+  border-color: var(--ocre);
+}
+
+.btn-ocre:hover:not(:disabled) {
+  background: #9c7022;
+}
+
+.btn-bloque {
+  width: 100%;
+}
+
+.pie-form {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* ---------- Acceso rápido ---------- */
+.acceso-rapido {
+  margin-top: 1.25rem;
+  padding: 0.9rem;
+  background: var(--ocre-claro);
+  border: 1px dashed var(--ocre);
+  border-radius: var(--radio);
+}
+
+.acceso-rapido p {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.acceso-rapido div {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.acceso-rapido .btn {
+  flex: 1;
+  padding: 0.45rem 0.6rem;
+}
+
+/* ---------- Mensajes de pantalla ---------- */
+.mensaje-pagina {
+  max-width: 480px;
+  margin: 3rem auto;
+  text-align: center;
+}
+
+.mensaje-pagina .codigo {
+  font-family: var(--fuente-titulo);
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--ocre);
+  line-height: 1;
+}
+
+/* ---------- Vista previa de imagen ---------- */
+.vista-previa {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.vista-previa img {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border: 2px solid var(--ocre);
+  border-radius: 50%;
+}

@@ -1,0 +1,17 @@
+@if (usuario().imagenPerfil) {
+  <img
+    [src]="usuario().imagenPerfil"
+    [alt]="'Foto de ' + usuario().nombreUsuario"
+    [style.width.px]="tamano()"
+    [style.height.px]="tamano()"
+  />
+} @else {
+  <span
+    class="inicial"
+    aria-hidden="true"
+    [style.width.px]="tamano()"
+    [style.height.px]="tamano()"
+    [style.font-size.px]="tamano() * 0.45"
+    >{{ inicial() }}</span
+  >
+}

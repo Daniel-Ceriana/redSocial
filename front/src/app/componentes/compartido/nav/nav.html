@@ -1,0 +1,32 @@
+<header class="barra">
+  <a class="logo" routerLink="/publicaciones" (click)="menuAbierto.set(false)">
+    <img src="favicon.svg" alt="" width="32" height="32" />
+    La Trochita
+  </a>
+
+  <button
+    type="button"
+    class="hamburguesa"
+    aria-label="Abrir o cerrar el menú"
+    [attr.aria-expanded]="menuAbierto()"
+    (click)="menuAbierto.set(!menuAbierto())"
+  >
+    ☰
+  </button>
+
+  <nav class="enlaces" [class.abierto]="menuAbierto()" aria-label="Principal">
+    <a routerLink="/publicaciones" routerLinkActive="activo" (click)="menuAbierto.set(false)">
+      Publicaciones
+    </a>
+    <a routerLink="/perfil" routerLinkActive="activo" (click)="menuAbierto.set(false)">
+      Mi perfil
+    </a>
+    @if (usuario(); as u) {
+      <span class="usuario">
+        <app-avatar [usuario]="u" [tamano]="32" />
+        {{ u.nombreUsuario }}
+      </span>
+    }
+    <button type="button" class="btn btn-ocre" (click)="cerrarSesion()">Cerrar sesión</button>
+  </nav>
+</header>

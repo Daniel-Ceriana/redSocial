@@ -1,0 +1,24 @@
+<h1>Mi perfil</h1>
+
+@if (usuario(); as u) {
+  <section class="tarjeta tarjeta-ancha perfil">
+    <app-avatar [usuario]="u" [tamano]="120" />
+
+    <div class="datos">
+      <h2>{{ u.nombre }} {{ u.apellido }}</h2>
+      <p class="usuario">&#64;{{ u.nombreUsuario }}</p>
+      @if (u.descripcion) {
+        <p class="descripcion">{{ u.descripcion }}</p>
+      }
+
+      <dl>
+        <dt>Correo</dt>
+        <dd>{{ u.correo }}</dd>
+        <dt>Fecha de nacimiento</dt>
+        <dd>{{ formatearFecha(u.fechaNacimiento) }}</dd>
+        <dt>Perfil</dt>
+        <dd>{{ u.perfil === 'administrador' ? 'Administrador' : 'Usuario' }}</dd>
+      </dl>
+    </div>
+  </section>
+}

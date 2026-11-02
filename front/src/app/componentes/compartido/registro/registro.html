@@ -1,0 +1,161 @@
+<div class="pagina-centrada">
+  <div class="marca">
+    <img src="favicon.svg" alt="" />
+    La Trochita
+  </div>
+
+  <section class="tarjeta tarjeta-ancha">
+    <h1>Crear cuenta</h1>
+
+    <form (submit)="onSubmit($event)" novalidate>
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input
+            id="nombre"
+            type="text"
+            autocomplete="given-name"
+            [formField]="registroForm.nombre"
+            [attr.aria-invalid]="registroForm.nombre().touched() && registroForm.nombre().invalid()"
+          />
+          @if (registroForm.nombre().touched() && registroForm.nombre().invalid()) {
+            <small class="error" role="alert">{{ registroForm.nombre().errors()[0].message }}</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="apellido">Apellido</label>
+          <input
+            id="apellido"
+            type="text"
+            autocomplete="family-name"
+            [formField]="registroForm.apellido"
+            [attr.aria-invalid]="registroForm.apellido().touched() && registroForm.apellido().invalid()"
+          />
+          @if (registroForm.apellido().touched() && registroForm.apellido().invalid()) {
+            <small class="error" role="alert">{{ registroForm.apellido().errors()[0].message }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="correo">Correo</label>
+          <input
+            id="correo"
+            type="email"
+            autocomplete="email"
+            [formField]="registroForm.correo"
+            [attr.aria-invalid]="registroForm.correo().touched() && registroForm.correo().invalid()"
+          />
+          @if (registroForm.correo().touched() && registroForm.correo().invalid()) {
+            <small class="error" role="alert">{{ registroForm.correo().errors()[0].message }}</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="nombreUsuario">Nombre de usuario</label>
+          <input
+            id="nombreUsuario"
+            type="text"
+            autocomplete="username"
+            [formField]="registroForm.nombreUsuario"
+            [attr.aria-invalid]="registroForm.nombreUsuario().touched() && registroForm.nombreUsuario().invalid()"
+          />
+          @if (registroForm.nombreUsuario().touched() && registroForm.nombreUsuario().invalid()) {
+            <small class="error" role="alert">{{ registroForm.nombreUsuario().errors()[0].message }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="contrasena">Contraseña</label>
+          <input
+            id="contrasena"
+            type="password"
+            autocomplete="new-password"
+            [formField]="registroForm.contrasena"
+            [attr.aria-invalid]="registroForm.contrasena().touched() && registroForm.contrasena().invalid()"
+          />
+          @if (registroForm.contrasena().touched() && registroForm.contrasena().invalid()) {
+            <small class="error" role="alert">{{ registroForm.contrasena().errors()[0].message }}</small>
+          } @else {
+            <small class="ayuda">Mínimo 8 caracteres, una mayúscula y un número.</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="repetirContrasena">Repetir contraseña</label>
+          <input
+            id="repetirContrasena"
+            type="password"
+            autocomplete="new-password"
+            [formField]="registroForm.repetirContrasena"
+            [attr.aria-invalid]="registroForm.repetirContrasena().touched() && registroForm.repetirContrasena().invalid()"
+          />
+          @if (registroForm.repetirContrasena().touched() && registroForm.repetirContrasena().invalid()) {
+            <small class="error" role="alert">{{ registroForm.repetirContrasena().errors()[0].message }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="fechaNacimiento">Fecha de nacimiento</label>
+        <input
+          id="fechaNacimiento"
+          type="date"
+          autocomplete="bday"
+          [max]="fechaMaxima"
+          [formField]="registroForm.fechaNacimiento"
+          [attr.aria-invalid]="registroForm.fechaNacimiento().touched() && registroForm.fechaNacimiento().invalid()"
+        />
+        @if (registroForm.fechaNacimiento().touched() && registroForm.fechaNacimiento().invalid()) {
+          <small class="error" role="alert">{{ registroForm.fechaNacimiento().errors()[0].message }}</small>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="descripcion">Descripción breve (opcional)</label>
+        <textarea
+          id="descripcion"
+          rows="3"
+          [formField]="registroForm.descripcion"
+          [attr.aria-invalid]="registroForm.descripcion().touched() && registroForm.descripcion().invalid()"
+        ></textarea>
+        @if (registroForm.descripcion().touched() && registroForm.descripcion().invalid()) {
+          <small class="error" role="alert">{{ registroForm.descripcion().errors()[0].message }}</small>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="imagen">Imagen de perfil (opcional)</label>
+        <input
+          #inputImagen
+          id="imagen"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          (change)="onImagen($event)"
+        />
+        <small class="ayuda">JPG, PNG o WEBP, hasta 2 MB.</small>
+        @if (errorImagen()) {
+          <small class="error" role="alert">{{ errorImagen() }}</small>
+        }
+        @if (vistaPrevia()) {
+          <div class="vista-previa">
+            <img [src]="vistaPrevia()" alt="Vista previa de la imagen de perfil" />
+            <button type="button" class="btn btn-secundario" (click)="quitarImagen(inputImagen)">
+              Quitar imagen
+            </button>
+          </div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-bloque" [disabled]="registroForm().submitting()">
+        {{ registroForm().submitting() ? 'Creando cuenta...' : 'Crear cuenta' }}
+      </button>
+    </form>
+
+    <p class="pie-form">¿Ya tenés cuenta? <a routerLink="/login">Iniciá sesión</a></p>
+  </section>
+</div>

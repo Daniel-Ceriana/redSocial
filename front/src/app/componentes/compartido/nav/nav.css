@@ -1,0 +1,79 @@
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.6rem 1.25rem;
+  color: #fff;
+  background: var(--verde);
+  border-bottom: 4px solid var(--ocre);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--fuente-titulo);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+
+.enlaces {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.enlaces a {
+  padding: 0.25rem 0;
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.enlaces a:hover,
+.enlaces a.activo {
+  border-bottom-color: var(--ocre);
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.hamburguesa {
+  display: none;
+  padding: 0.2rem 0.6rem;
+  font-size: 1.4rem;
+  color: #fff;
+  background: transparent;
+  border: 2px solid var(--ocre);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .hamburguesa {
+    display: block;
+  }
+
+  .enlaces {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding-bottom: 0.5rem;
+  }
+
+  .enlaces.abierto {
+    display: flex;
+  }
+}
