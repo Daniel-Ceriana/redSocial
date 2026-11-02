@@ -10,9 +10,7 @@ import {
   Validate,
 } from 'class-validator';
 import { EdadMinima } from '../../common/edad-minima.validator.js';
-
-const recortar = ({ value }: { value: unknown }) =>
-  typeof value === 'string' ? value.trim() : value;
+import { recortar } from '../../common/recortar.js';
 
 export class RegistroDto {
   @Transform(recortar)

@@ -15,7 +15,7 @@ Estado de los requerimientos: ver `REQUERIMIENTOS.md`.
 cd back
 npm install
 cp .env.example .env      # completar MONGO_URI, JWT_SECRET y las claves de Cloudinary
-npm run seed              # crea las cuentas de acceso rápido (se puede repetir sin problema)
+npm run seed              # crea las cuentas de acceso rápido y publicaciones de ejemplo (se puede repetir sin problema)
 npm run start:dev         # http://localhost:3000/api
 ```
 
@@ -32,13 +32,20 @@ npm run start:dev         # http://localhost:3000/api
 - Imágenes de perfil en Cloudinary (JPG/PNG/WEBP, máx. 2 MB); solo se guarda la URL.
 - Solo hay tres módulos, los del TP: `autenticacion`, `usuarios` y `publicaciones`. Las utilidades compartidas (subida a Cloudinary, validador de edad) están en `src/common/`, sin módulo.
 
-### Rutas (S1)
+### Rutas
 
 | Método y ruta | Quién | Respuestas |
 |---------------|-------|------------|
 | `POST /api/autenticacion/registro` (multipart) | público | 201 · 400 · 409 |
 | `POST /api/autenticacion/login` (JSON) | público | 200 · 400 · 401 |
 | `GET /api/usuarios/yo` | con token | 200 · 401 |
+| `POST /api/publicaciones` (multipart) | con token | 201 · 400 · 401 |
+| `GET /api/publicaciones?orden=&usuario=&offset=&limit=` | con token | 200 · 400 · 401 |
+| `DELETE /api/publicaciones/:id` (baja lógica) | autor o administrador | 204 · 400 · 403 · 404 |
+| `POST` y `DELETE /api/publicaciones/:id/me-gusta` | con token | 201 / 200 · 400 · 404 · 409 |
+| `GET /api/publicaciones/:id/comentarios?offset=&limit=` | con token | 200 · 400 · 404 |
+
+Los listados devuelven `{ datos, total, offset, limit }` (`limit` 5 por defecto, máximo 20).
 
 ### Origen de las tecnologías
 
@@ -76,3 +83,17 @@ La URL de la API está en `front/src/environments/environment.ts`.
 | `/publicaciones`, `/perfil` | con sesión | Publicaciones (mínima) y Mi perfil |
 | `/sin-permiso` | — | Falta de permiso |
 | `**` | — | 404 |
+
+## Despliegue
+
+Front y back están en **Vercel** (dos proyectos del mismo repositorio), la base en **MongoDB Atlas** y las imágenes en **Cloudinary**.
+
+| Parte | URL | Root Directory |
+|-------|-----|----------------|
+| Front | https://front-taupe-six.vercel.app | `front` |
+| Back (API) | https://red-social-nu-five.vercel.app/api | `back` |
+
+- **Back:** Vercel detecta NestJS por `src/main.ts`. Variables de entorno en el panel del proyecto: `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `IMAGEN_PERFIL_DEFECTO` y `FRONT_URL` (la URL del front; admite varias separadas por coma). Atlas tiene que permitir `0.0.0.0/0`, porque Vercel no tiene IP fija.
+- **Front:** el build de producción reemplaza `environment.ts` por `environment.production.ts` (URL del back). `front/vercel.json` manda todas las rutas a `index.html` para que recargar una ruta no dé 404. *Output Directory*: `dist/front/browser`.
+- Se despliega solo con cada `git push`. Como el token viaja en el header `Authorization`, front y back pueden estar en dominios distintos.
+- El seed (`npm run seed`) se corre una vez desde la computadora, con el `MONGO_URI` de la base de producción.
