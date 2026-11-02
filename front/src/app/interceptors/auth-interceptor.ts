@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Auth } from './auth';
+import { Auth } from '../services/auth';
 
 // Se rechaza en el navegador, sin llegar a la API, con la misma forma que un 401 real
 function sesionVencida(url: string) {
