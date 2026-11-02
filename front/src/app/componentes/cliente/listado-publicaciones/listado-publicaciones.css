@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.orden {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.orden .btn {
+  padding: 0.35rem 0.9rem;
+}
+
+.orden .btn.activo {
+  color: #fff;
+  background: var(--verde);
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}

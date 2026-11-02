@@ -66,6 +66,14 @@ export class Auth {
     this.guardarSesion(res);
   }
 
+  // Edita el perfil (multipart) y deja los datos nuevos en la sesión. El token sigue siendo el mismo.
+  async actualizarPerfil(cuerpo: FormData) {
+    const usuario = await firstValueFrom(
+      this.http.patch<Usuario>(`${environment.apiUrl}/usuarios/yo`, cuerpo),
+    );
+    this._usuario.set(usuario);
+  }
+
   // Vuelve a leer los datos del usuario logueado desde el back
   async refrescarUsuario() {
     this._usuario.set(await this.pedirUsuario());

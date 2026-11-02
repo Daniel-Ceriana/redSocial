@@ -1,24 +1,84 @@
 <h1>Mi perfil</h1>
 
-@if (usuario(); as u) {
-  <section class="tarjeta tarjeta-ancha perfil">
-    <app-avatar [usuario]="u" [tamano]="120" />
-
-    <div class="datos">
-      <h2>{{ u.nombre }} {{ u.apellido }}</h2>
-      <p class="usuario">&#64;{{ u.nombreUsuario }}</p>
-      @if (u.descripcion) {
-        <p class="descripcion">{{ u.descripcion }}</p>
-      }
-
-      <dl>
-        <dt>Correo</dt>
-        <dd>{{ u.correo }}</dd>
-        <dt>Fecha de nacimiento</dt>
-        <dd>{{ formatearFecha(u.fechaNacimiento) }}</dd>
-        <dt>Perfil</dt>
-        <dd>{{ u.perfil === 'administrador' ? 'Administrador' : 'Usuario' }}</dd>
-      </dl>
-    </div>
-  </section>
+@if (aviso()) {
+  <p class="aviso-ok" role="status">{{ aviso() }}</p>
 }
+
+@if (usuario(); as u) {
+  @if (editando()) {
+    <app-editar-perfil (guardado)="alGuardar()" (cancelado)="editando.set(false)" />
+  } @else {
+    <section class="tarjeta tarjeta-ancha perfil">
+      <app-avatar [usuario]="u" [tamano]="120" />
+
+      <div class="datos">
+        <h2>{{ u.nombre }} {{ u.apellido }}</h2>
+        <p class="usuario">&#64;{{ u.nombreUsuario }}</p>
+        @if (u.descripcion) {
+          <p class="descripcion">{{ u.descripcion }}</p>
+        }
+
+        <dl>
+          <dt>Correo</dt>
+          <dd>{{ u.correo }}</dd>
+          <dt>Fecha de nacimiento</dt>
+          <dd>{{ formatearFecha(u.fechaNacimiento) }}</dd>
+          <dt>Perfil</dt>
+          <dd>{{ u.perfil === 'administrador' ? 'Administrador' : 'Usuario' }}</dd>
+        </dl>
+
+        <button type="button" class="btn btn-secundario" (click)="editando.set(true)">
+          Editar perfil
+        </button>
+      </div>
+    </section>
+  }
+}
+
+<section class="publicaciones">
+  <h2>Mis últimas publicaciones</h2>
+
+  @switch (estado()) {
+    @case ('cargando') {
+      <div class="estado" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        Cargando tus publicaciones...
+      </div>
+    }
+    @case ('error') {
+      <div class="estado">
+        <p class="error">No se pudieron cargar tus publicaciones.</p>
+        <button type="button" class="btn" (click)="cargarPublicaciones()">Reintentar</button>
+      </div>
+    }
+    @default {
+      @if (items().length === 0) {
+        <p class="estado">Todavía no hiciste ninguna publicación</p>
+      } @else {
+        @for (item of items(); track item.publicacion.id) {
+          <app-tarjeta-publicacion
+            [publicacion]="item.publicacion"
+            (cambio)="reemplazar($event)"
+            (eliminada)="cargarPublicaciones()"
+            (desactualizada)="cargarPublicaciones()"
+          />
+          <section class="comentarios" [attr.aria-label]="'Comentarios de ' + item.publicacion.titulo">
+            @if (item.comentarios.length === 0) {
+              <p class="sin-comentarios">Todavía no hay comentarios</p>
+            } @else {
+              @for (comentario of item.comentarios; track comentario.id) {
+                <app-comentario [comentario]="comentario" />
+              }
+              @if (item.totalComentarios > item.comentarios.length) {
+                <p class="sin-comentarios">
+                  Mostrando los últimos {{ item.comentarios.length }} de
+                  {{ item.totalComentarios }} comentarios
+                </p>
+              }
+            }
+          </section>
+        }
+      }
+    }
+  }
+</section>

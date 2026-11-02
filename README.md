@@ -39,6 +39,8 @@ npm run start:dev         # http://localhost:3000/api
 | `POST /api/autenticacion/registro` (multipart) | público | 201 · 400 · 409 |
 | `POST /api/autenticacion/login` (JSON) | público | 200 · 400 · 401 |
 | `GET /api/usuarios/yo` | con token | 200 · 401 |
+| `PATCH /api/usuarios/yo` (multipart; no admite correo, perfil ni activo) | el propio usuario | 200 · 400 · 401 · 409 |
+| `GET /api/usuarios/:id` (perfil público) | con token | 200 · 400 · 404 |
 | `POST /api/publicaciones` (multipart) | con token | 201 · 400 · 401 |
 | `GET /api/publicaciones?orden=&usuario=&offset=&limit=` | con token | 200 · 400 · 401 |
 | `DELETE /api/publicaciones/:id` (baja lógica) | autor o administrador | 204 · 400 · 403 · 404 |
@@ -51,7 +53,7 @@ Los listados devuelven `{ datos, total, offset, limit }` (`limit` 5 por defecto,
 
 | Pieza | Origen |
 |-------|--------|
-| NestJS, Mongoose, `class-validator`, `@nestjs/config`, `@nestjs/jwt`, `PasswordHasher`, Cloudinary + Multer | clase |
+| NestJS, Mongoose, `class-validator`, `@nestjs/config`, `@nestjs/jwt`, `PasswordHasher`, `@nestjs/mapped-types`, Cloudinary + Multer | clase |
 | Guard que lee el header `Authorization` (en clase leía la cookie) | clase, con cambios |
 | Excepciones HTTP de Nest en lugar de `throw new Error` | clase, con cambios |
 | Script de seed | nuevo |
@@ -82,7 +84,8 @@ La URL de la API está en `front/src/environments/environment.ts`.
 | Ruta | Guard | Pantalla |
 |------|-------|----------|
 | `/login`, `/registro` | solo sin sesión | Login (con acceso rápido) y registro |
-| `/publicaciones`, `/perfil` | con sesión | Publicaciones (listado, orden, paginación, crear, me gusta y eliminar) y Mi perfil |
+| `/publicaciones`, `/perfil` | con sesión | Publicaciones (listado, orden, paginación, crear, me gusta y eliminar) y Mi perfil (ver, editar y mis últimas publicaciones con comentarios) |
+| `/usuarios/:id` | con sesión | Perfil público de otro usuario y sus publicaciones |
 | `/sin-permiso` | — | Falta de permiso |
 | `**` | — | 404 |
 

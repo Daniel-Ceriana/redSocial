@@ -16,6 +16,17 @@
   gap: 0 0.5rem;
 }
 
+.nombre {
+  color: var(--carbon);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nombre:hover {
+  color: var(--verde);
+  text-decoration: underline;
+}
+
 .usuario,
 .fecha {
   font-size: 0.85rem;

@@ -37,7 +37,9 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | 2.F4 | Dar y quitar me gusta según corresponda | 🟨 ídem |
 | 2.F5 | Eliminar mis publicaciones (con modal de confirmación) | 🟨 ídem |
 | 2.F8 | Formulario para crear una publicación (título, descripción, imagen con vista previa) | 🟨 ídem |
-| 2.F6, 2.F7, 2.F9 | Mi perfil completo y edición | ⬜ (S6) |
+| 2.F6 | Mi perfil: todos los datos y la foto | 🟨 compilado; falta probarlo en el navegador |
+| 2.F7 | Mi perfil: mis últimas 3 publicaciones con sus comentarios | 🟨 ídem |
+| 2.F9 | Editar mi perfil (`PATCH /api/usuarios/yo` + formulario). El correo no se puede cambiar. | ✔ back · 🟨 front |
 
 ## Agregados aprobados
 
@@ -55,3 +57,4 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | X4 | Datos para la tarjeta: `yoMeGusta`, `cantidadMeGusta`, `cantidadComentarios` | ✔ back · 🟨 front |
 | X6 | Comentarios adelantados al sprint 2 (esquema y lectura) | ✔ |
 | X19 | La publicación usa `descripcion`; los comentarios usan `mensaje` | ✔ |
+| X11 | Ver el perfil público de otro usuario (`GET /api/usuarios/:id` + `/usuarios/:id`) | ✔ back · 🟨 front |

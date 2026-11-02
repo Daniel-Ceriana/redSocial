@@ -1,0 +1,37 @@
+.comentario {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+}
+
+.cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+time,
+.editado {
+  font-size: 0.8rem;
+  color: var(--gris);
+}
+
+time {
+  cursor: help;
+}
+
+.mensaje {
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}

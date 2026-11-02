@@ -1,0 +1,24 @@
+.foto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.foto .btn {
+  padding: 0.35rem 0.9rem;
+}
+
+.vista {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border: 2px solid var(--ocre);
+  border-radius: 50%;
+}
+
+.botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}

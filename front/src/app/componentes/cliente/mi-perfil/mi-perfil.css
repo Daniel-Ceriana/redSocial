@@ -1,7 +1,14 @@
+:host {
+  display: block;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 .perfil {
   display: flex;
   align-items: flex-start;
   gap: 1.5rem;
+  margin: 0 auto 1.5rem;
 }
 
 .datos {
@@ -21,7 +28,7 @@ dl {
   display: grid;
   grid-template-columns: max-content 1fr;
   gap: 0.4rem 1rem;
-  margin: 1rem 0 0;
+  margin: 1rem 0;
 }
 
 dt {
@@ -31,6 +38,26 @@ dt {
 
 dd {
   margin: 0;
+}
+
+.publicaciones h2 {
+  margin-top: 0.5rem;
+}
+
+/* Los comentarios quedan pegados a la tarjeta de su publicación */
+.comentarios {
+  margin: -0.75rem auto 1.5rem;
+  padding: 0.25rem 1.5rem;
+  background: var(--papel);
+  border: 1px solid var(--borde);
+  border-top: 0;
+  border-radius: 0 0 var(--radio) var(--radio);
+}
+
+.sin-comentarios {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--gris);
 }
 
 @media (max-width: 600px) {

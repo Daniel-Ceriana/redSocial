@@ -3,7 +3,9 @@
   <header class="autor">
     <app-avatar [usuario]="p.autor" [tamano]="44" />
     <div>
-      <strong>{{ p.autor.nombre }} {{ p.autor.apellido }}</strong>
+      <a class="nombre" [routerLink]="esPropia() ? '/perfil' : ['/usuarios', p.autor.id]">
+        {{ p.autor.nombre }} {{ p.autor.apellido }}
+      </a>
       <span class="usuario">&#64;{{ p.autor.nombreUsuario }}</span>
       <time class="fecha" [attr.datetime]="p.fecha" [title]="p.fecha | fechaArgentina">
         {{ p.fecha | tiempoRelativo }}
@@ -24,9 +26,9 @@
       type="button"
       class="btn"
       [class.btn-secundario]="!p.yoMeGusta"
-      [disabled]="ocupada()"
+      [disabled]="acciones.estaOcupada(p.id)"
       [attr.aria-pressed]="p.yoMeGusta"
-      (click)="alternarMeGusta.emit(p)"
+      (click)="alternarMeGusta()"
     >
       {{ p.yoMeGusta ? 'Quitar me gusta' : 'Me gusta' }}
     </button>
@@ -35,7 +37,12 @@
       {{ p.cantidadComentarios }} {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
     </span>
     @if (esPropia()) {
-      <button type="button" class="btn btn-peligro" [disabled]="ocupada()" (click)="eliminar.emit(p)">
+      <button
+        type="button"
+        class="btn btn-peligro"
+        [disabled]="acciones.estaOcupada(p.id)"
+        (click)="eliminar()"
+      >
         Eliminar
       </button>
     }

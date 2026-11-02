@@ -12,6 +12,16 @@ export interface Usuario {
   perfil: Perfil;
 }
 
+// Lo que se ve del perfil de otro usuario (sin correo ni fecha de nacimiento)
+export interface PerfilPublico {
+  id: string;
+  nombre: string;
+  apellido: string;
+  nombreUsuario: string;
+  descripcion: string;
+  imagenPerfil: string;
+}
+
 // Lo que devuelven el login y el registro
 export interface RespuestaSesion {
   token: string;

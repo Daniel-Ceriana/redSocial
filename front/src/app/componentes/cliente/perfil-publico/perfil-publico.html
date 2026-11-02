@@ -1,0 +1,38 @@
+@switch (estado()) {
+  @case ('cargando') {
+    <div class="estado" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      Cargando perfil...
+    </div>
+  }
+  @case ('noExiste') {
+    <section class="mensaje-pagina">
+      <div class="codigo">404</div>
+      <h1>Este usuario no existe</h1>
+      <a class="btn" routerLink="/publicaciones">Volver al inicio</a>
+    </section>
+  }
+  @case ('error') {
+    <div class="estado">
+      <p class="error">No se pudo cargar el perfil.</p>
+      <button type="button" class="btn" (click)="cargar(id())">Reintentar</button>
+    </div>
+  }
+  @case ('listo') {
+    @if (perfil(); as p) {
+      <section class="tarjeta tarjeta-ancha perfil">
+        <app-avatar [usuario]="p" [tamano]="96" />
+        <div>
+          <h1>{{ p.nombre }} {{ p.apellido }}</h1>
+          <p class="usuario">&#64;{{ p.nombreUsuario }}</p>
+          @if (p.descripcion) {
+            <p class="descripcion">{{ p.descripcion }}</p>
+          }
+        </div>
+      </section>
+
+      <h2>Publicaciones de {{ p.nombre }}</h2>
+      <app-listado-publicaciones [usuarioId]="p.id" />
+    }
+  }
+}

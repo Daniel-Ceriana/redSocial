@@ -1,0 +1,16 @@
+@let c = comentario();
+<div class="comentario">
+  <app-avatar [usuario]="c.autor" [tamano]="32" />
+  <div class="cuerpo">
+    <p class="cabecera">
+      <strong>{{ c.autor.nombre }} {{ c.autor.apellido }}</strong>
+      <time [attr.datetime]="c.fecha" [title]="c.fecha | fechaArgentina">
+        {{ c.fecha | tiempoRelativo }}
+      </time>
+      @if (c.modificado) {
+        <span class="editado">(editado)</span>
+      }
+    </p>
+    <p class="mensaje">{{ c.mensaje }}</p>
+  </div>
+</div>

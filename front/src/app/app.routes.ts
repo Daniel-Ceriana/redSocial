@@ -25,6 +25,12 @@ export const routes: Routes = [
     loadComponent: () => import('./componentes/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
   },
   {
+    path: 'usuarios/:id',
+    canMatch: [sesionMatch],
+    loadComponent: () =>
+      import('./componentes/cliente/perfil-publico/perfil-publico').then((m) => m.PerfilPublico),
+  },
+  {
     path: 'sin-permiso',
     loadComponent: () =>
       import('./componentes/compartido/sin-permiso/sin-permiso').then((m) => m.SinPermiso),

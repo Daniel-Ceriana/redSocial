@@ -1,0 +1,75 @@
+@if (aviso()) {
+  <p class="aviso-ok" role="status">{{ aviso() }}</p>
+}
+
+<div class="orden" role="group" aria-label="Ordenar publicaciones">
+  <button
+    type="button"
+    class="btn btn-secundario"
+    [class.activo]="orden() === 'fecha'"
+    [attr.aria-pressed]="orden() === 'fecha'"
+    (click)="cambiarOrden('fecha')"
+  >
+    Más recientes
+  </button>
+  <button
+    type="button"
+    class="btn btn-secundario"
+    [class.activo]="orden() === 'meGusta'"
+    [attr.aria-pressed]="orden() === 'meGusta'"
+    (click)="cambiarOrden('meGusta')"
+  >
+    Más me gusta
+  </button>
+</div>
+
+@switch (estado()) {
+  @case ('cargando') {
+    <div class="estado" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      Cargando publicaciones...
+    </div>
+  }
+  @case ('error') {
+    <div class="estado">
+      <p class="error">No se pudieron cargar las publicaciones.</p>
+      <button type="button" class="btn" (click)="cargar()">Reintentar</button>
+    </div>
+  }
+  @default {
+    @if (publicaciones().length === 0) {
+      <p class="estado">Todavía no hay publicaciones</p>
+    } @else {
+      @for (publicacion of publicaciones(); track publicacion.id) {
+        <app-tarjeta-publicacion
+          [publicacion]="publicacion"
+          (cambio)="reemplazar($event)"
+          (eliminada)="alEliminar()"
+          (desactualizada)="cargar()"
+        />
+      }
+
+      @if (totalPaginas() > 1) {
+        <nav class="paginacion" aria-label="Paginación">
+          <button
+            type="button"
+            class="btn btn-secundario"
+            [disabled]="pagina() <= 1"
+            (click)="irAPagina(pagina() - 1)"
+          >
+            ‹ Anterior
+          </button>
+          <span>Página {{ pagina() }} de {{ totalPaginas() }}</span>
+          <button
+            type="button"
+            class="btn btn-secundario"
+            [disabled]="pagina() >= totalPaginas()"
+            (click)="irAPagina(pagina() + 1)"
+          >
+            Siguiente ›
+          </button>
+        </nav>
+      }
+    }
+  }
+}

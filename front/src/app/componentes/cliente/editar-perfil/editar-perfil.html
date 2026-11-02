@@ -1,0 +1,165 @@
+@if (usuario(); as u) {
+  <section class="tarjeta tarjeta-ancha">
+    <h2>Editar perfil</h2>
+
+    <form novalidate (submit)="onSubmit($event, inputImagen)">
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <input id="correo" type="email" [value]="u.correo" disabled />
+        <small class="ayuda">El correo no se puede cambiar.</small>
+      </div>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input
+            id="nombre"
+            type="text"
+            autocomplete="given-name"
+            [formField]="perfilForm.nombre"
+            [attr.aria-invalid]="perfilForm.nombre().touched() && perfilForm.nombre().invalid()"
+          />
+          @if (perfilForm.nombre().touched() && perfilForm.nombre().invalid()) {
+            <small class="error" role="alert">{{ perfilForm.nombre().errors()[0].message }}</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="apellido">Apellido</label>
+          <input
+            id="apellido"
+            type="text"
+            autocomplete="family-name"
+            [formField]="perfilForm.apellido"
+            [attr.aria-invalid]="perfilForm.apellido().touched() && perfilForm.apellido().invalid()"
+          />
+          @if (perfilForm.apellido().touched() && perfilForm.apellido().invalid()) {
+            <small class="error" role="alert">{{ perfilForm.apellido().errors()[0].message }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="nombreUsuario">Nombre de usuario</label>
+          <input
+            id="nombreUsuario"
+            type="text"
+            autocomplete="username"
+            [formField]="perfilForm.nombreUsuario"
+            [attr.aria-invalid]="perfilForm.nombreUsuario().touched() && perfilForm.nombreUsuario().invalid()"
+          />
+          @if (perfilForm.nombreUsuario().touched() && perfilForm.nombreUsuario().invalid()) {
+            <small class="error" role="alert">{{ perfilForm.nombreUsuario().errors()[0].message }}</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="fechaNacimiento">Fecha de nacimiento</label>
+          <input
+            id="fechaNacimiento"
+            type="date"
+            [max]="fechaMaxima"
+            [formField]="perfilForm.fechaNacimiento"
+            [attr.aria-invalid]="perfilForm.fechaNacimiento().touched() && perfilForm.fechaNacimiento().invalid()"
+          />
+          @if (perfilForm.fechaNacimiento().touched() && perfilForm.fechaNacimiento().invalid()) {
+            <small class="error" role="alert">{{ perfilForm.fechaNacimiento().errors()[0].message }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="descripcion">Descripción breve</label>
+        <textarea
+          id="descripcion"
+          rows="3"
+          [formField]="perfilForm.descripcion"
+          [attr.aria-invalid]="perfilForm.descripcion().touched() && perfilForm.descripcion().invalid()"
+        ></textarea>
+        <small class="ayuda">{{ model().descripcion.length }}/200</small>
+        @if (perfilForm.descripcion().touched() && perfilForm.descripcion().invalid()) {
+          <small class="error" role="alert">{{ perfilForm.descripcion().errors()[0].message }}</small>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="imagen">Imagen de perfil</label>
+        <div class="foto">
+          @if (vistaPrevia()) {
+            <img [src]="vistaPrevia()" alt="Vista previa de la nueva imagen" class="vista" />
+          } @else if (quitarActual()) {
+            <app-avatar [usuario]="{ nombre: u.nombre, nombreUsuario: u.nombreUsuario, imagenPerfil: '' }" [tamano]="72" />
+          } @else {
+            <app-avatar [usuario]="u" [tamano]="72" />
+          }
+          @if (u.imagenPerfil && !quitarActual() && !vistaPrevia()) {
+            <button type="button" class="btn btn-secundario" (click)="quitarActual.set(true)">
+              Quitar foto actual
+            </button>
+          }
+          @if (quitarActual()) {
+            <button type="button" class="btn btn-secundario" (click)="quitarActual.set(false)">
+              Conservar foto actual
+            </button>
+          }
+          @if (vistaPrevia()) {
+            <button type="button" class="btn btn-secundario" (click)="descartarImagenNueva(inputImagen)">
+              Descartar la nueva
+            </button>
+          }
+        </div>
+        <input
+          #inputImagen
+          id="imagen"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          (change)="onImagen($event)"
+        />
+        <small class="ayuda">JPG, PNG o WEBP, hasta 2 MB.</small>
+        @if (errorImagen()) {
+          <small class="error" role="alert">{{ errorImagen() }}</small>
+        }
+      </div>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="contrasena">Contraseña nueva (opcional)</label>
+          <input
+            id="contrasena"
+            type="password"
+            autocomplete="new-password"
+            [formField]="perfilForm.contrasena"
+            [attr.aria-invalid]="perfilForm.contrasena().touched() && perfilForm.contrasena().invalid()"
+          />
+          @if (perfilForm.contrasena().touched() && perfilForm.contrasena().invalid()) {
+            <small class="error" role="alert">{{ perfilForm.contrasena().errors()[0].message }}</small>
+          } @else {
+            <small class="ayuda">Si la dejás vacía, no cambia.</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="repetirContrasena">Repetir contraseña nueva</label>
+          <input
+            id="repetirContrasena"
+            type="password"
+            autocomplete="new-password"
+            [formField]="perfilForm.repetirContrasena"
+            [attr.aria-invalid]="perfilForm.repetirContrasena().touched() && perfilForm.repetirContrasena().invalid()"
+          />
+          @if (perfilForm.repetirContrasena().touched() && perfilForm.repetirContrasena().invalid()) {
+            <small class="error" role="alert">{{ perfilForm.repetirContrasena().errors()[0].message }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="botones">
+        <button type="button" class="btn btn-secundario" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="btn" [disabled]="perfilForm().submitting()">
+          {{ perfilForm().submitting() ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  </section>
+}
