@@ -41,6 +41,14 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | 2.F7 | Mi perfil: mis últimas 3 publicaciones con sus comentarios | 🟨 ídem |
 | 2.F9 | Editar mi perfil (`PATCH /api/usuarios/yo` + formulario). El correo no se puede cambiar. | ✔ back · 🟨 front |
 
+## Sprint 3 (adelantado)
+
+| ID | Requerimiento | Estado |
+|----|---------------|--------|
+| 3.F8 | Cualquier respuesta 401 lleva al login | 🟨 adelantado; falta probarlo en el navegador |
+| X13 | Aviso y cierre de sesión cuando vence el token | 🟨 adelantado; falta probarlo en el navegador |
+| 3.B5–3.B7, 3.F5–3.F7 | Autorizar, refrescar, spinner inicial y contador de 10 minutos | ⬜ (S7 y S9) |
+
 ## Agregados aprobados
 
 | ID | Agregado | Estado |

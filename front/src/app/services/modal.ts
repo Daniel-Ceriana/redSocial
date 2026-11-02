@@ -4,6 +4,8 @@ export interface EstadoModal {
   titulo: string;
   mensajes: string[];
   conCancelar: boolean;
+  // Mientras está abierto, ningún otro modal lo reemplaza (por ejemplo, "Tu sesión venció")
+  prioritario: boolean;
 }
 
 // Modal propio: reemplaza a alert() y confirm(). El componente <app-modal> lo dibuja.
@@ -13,13 +15,15 @@ export class Modal {
   private resolver: ((aceptado: boolean) => void) | null = null;
 
   // Aviso con un solo botón "Entendido"
-  avisar(titulo: string, mensajes: string | string[]): Promise<void> {
-    return this.abrir({ titulo, mensajes: [mensajes].flat(), conCancelar: false }).then(() => undefined);
+  avisar(titulo: string, mensajes: string | string[], prioritario = false): Promise<void> {
+    return this.abrir({ titulo, mensajes: [mensajes].flat(), conCancelar: false, prioritario }).then(
+      () => undefined,
+    );
   }
 
   // Pregunta con "Aceptar" y "Cancelar"; devuelve lo que eligió la persona
   confirmar(titulo: string, mensajes: string | string[]): Promise<boolean> {
-    return this.abrir({ titulo, mensajes: [mensajes].flat(), conCancelar: true });
+    return this.abrir({ titulo, mensajes: [mensajes].flat(), conCancelar: true, prioritario: false });
   }
 
   cerrar(aceptado: boolean) {
@@ -29,7 +33,9 @@ export class Modal {
   }
 
   private abrir(estado: EstadoModal): Promise<boolean> {
-    this.resolver?.(false); // si había uno abierto, se descarta
+    // Si hay uno prioritario abierto, el nuevo no se muestra
+    if (this.estado()?.prioritario) return Promise.resolve(false);
+    this.resolver?.(false); // si había otro abierto, se descarta
     this.estado.set(estado);
     return new Promise((resolve) => (this.resolver = resolve));
   }

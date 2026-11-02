@@ -73,6 +73,7 @@ La URL de la API está en `front/src/environments/environment.ts`.
 
 - Angular standalone con signals, Signal Forms, `@if/@for`, guards `canMatch` y carga diferida por ruta (igual que el TP 1).
 - CSS propio con variables (`src/styles.css`). Identidad "Estación antigua": crema, verde locomotora y ocre; Playfair Display e Inter.
+- Cuando el token vence (según `venceEn`) o la API responde 401 con la sesión abierta, se cierra la sesión, se lleva al login y se avisa con el modal «Tu sesión venció».
 - El token y su vencimiento se guardan en `localStorage`; un interceptor lo manda en `Authorization: Bearer`. Al abrir la app se valida con `GET /api/usuarios/yo`.
 - Sin `alert()`: los avisos y confirmaciones usan el modal propio (`services/modal.ts`).
 - Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo` y `fechaArgentina`.
