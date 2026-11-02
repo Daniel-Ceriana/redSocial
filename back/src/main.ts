@@ -9,7 +9,12 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: process.env.FRONT_URL ?? 'http://localhost:4200' });
+  // FRONT_URL puede traer varias URLs separadas por coma; se les saca la barra final
+  // porque el navegador manda el origen sin ella y tienen que coincidir exactas
+  const origenes = (process.env.FRONT_URL ?? 'http://localhost:4200')
+    .split(',')
+    .map((url) => url.trim().replace(/\/+$/, ''));
+  app.enableCors({ origin: origenes });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
