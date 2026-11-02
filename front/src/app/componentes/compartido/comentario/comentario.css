@@ -27,10 +27,6 @@ time,
   color: var(--gris);
 }
 
-time {
-  cursor: help;
-}
-
 .mensaje {
   overflow-wrap: anywhere;
   white-space: pre-line;
