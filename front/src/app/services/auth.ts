@@ -26,9 +26,6 @@ export class Auth {
 
   // Se resuelve cuando ya se sabe si hay sesión válida al abrir la aplicación
   private inicio: Promise<void>;
-  // Avisa cuando llega la hora en que vence el token
-  private temporizadorVencimiento?: ReturnType<typeof setTimeout>;
-
   constructor() {
     // Se difiere un instante: el interceptor necesita esta instancia ya construida
     this.inicio = Promise.resolve().then(() => this.restaurar());
@@ -53,7 +50,6 @@ export class Auth {
       this._token.set(token);
       this._venceEn.set(venceEn);
       this._usuario.set(await this.pedirUsuario());
-      this.programarVencimiento(venceEn);
     } catch (error) {
       this.limpiarEnMemoria();
       // Token inválido o vencido: se borra. Si solo falló la red, queda guardado para la próxima.
@@ -94,16 +90,22 @@ export class Auth {
   }
 
   cerrarSesion() {
-    clearTimeout(this.temporizadorVencimiento);
     this.limpiarEnMemoria();
     localStorage.removeItem(CLAVE_SESION);
   }
 
-  // La sesión ya no sirve (venció el token o la API lo rechazó): se cierra, se lleva al login y se avisa
-  alVencer() {
+  // ¿Ya pasó la hora de vencimiento del token? Se chequea en cada acción del usuario.
+  tokenVencido(): boolean {
+    const venceEn = this._venceEn();
+    return venceEn !== null && new Date(venceEn).getTime() <= Date.now();
+  }
+
+  // La sesión ya no sirve (venció el token o la API lo rechazó): se cierra, se lleva al login
+  // (salvo que quien llama ya lo esté redirigiendo) y se avisa
+  alVencer(irAlLogin = true) {
     if (!this.haySesion()) return; // ya se cerró (por ejemplo, otra petición también dio 401)
     this.cerrarSesion();
-    void this.router.navigate(['/login']);
+    if (irAlLogin) void this.router.navigate(['/login']);
     this.avisarVencimiento();
   }
 
@@ -114,12 +116,6 @@ export class Auth {
       'Por seguridad, la sesión dura un tiempo limitado. Iniciá sesión de nuevo para seguir.',
       true,
     );
-  }
-
-  private programarVencimiento(venceEn: string) {
-    clearTimeout(this.temporizadorVencimiento);
-    const falta = new Date(venceEn).getTime() - Date.now();
-    this.temporizadorVencimiento = setTimeout(() => this.alVencer(), Math.max(0, falta));
   }
 
   private pedirUsuario() {
@@ -134,7 +130,6 @@ export class Auth {
       CLAVE_SESION,
       JSON.stringify({ token: res.token, venceEn: res.venceEn }),
     );
-    this.programarVencimiento(res.venceEn);
   }
 
   private limpiarEnMemoria() {
