@@ -1,0 +1,72 @@
+<section class="tarjeta tarjeta-ancha nueva">
+  <button
+    type="button"
+    class="btn btn-ocre cabecera"
+    aria-controls="form-nueva-publicacion"
+    [attr.aria-expanded]="abierto()"
+    (click)="abierto.set(!abierto())"
+  >
+    {{ abierto() ? 'Cerrar' : 'Nueva publicación' }}
+  </button>
+
+  <form
+    id="form-nueva-publicacion"
+    [hidden]="!abierto()"
+    novalidate
+    (submit)="onSubmit($event, inputImagen)"
+  >
+    <div class="campo">
+      <label for="titulo">Título</label>
+      <input
+        id="titulo"
+        type="text"
+        [formField]="nuevaForm.titulo"
+        [attr.aria-invalid]="nuevaForm.titulo().touched() && nuevaForm.titulo().invalid()"
+      />
+      @if (nuevaForm.titulo().touched() && nuevaForm.titulo().invalid()) {
+        <small class="error" role="alert">{{ nuevaForm.titulo().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="descripcion">Descripción (opcional)</label>
+      <textarea
+        id="descripcion"
+        rows="3"
+        [formField]="nuevaForm.descripcion"
+        [attr.aria-invalid]="nuevaForm.descripcion().touched() && nuevaForm.descripcion().invalid()"
+      ></textarea>
+      <small class="ayuda">{{ model().descripcion.length }}/500</small>
+      @if (nuevaForm.descripcion().touched() && nuevaForm.descripcion().invalid()) {
+        <small class="error" role="alert">{{ nuevaForm.descripcion().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="imagen-publicacion">Imagen (opcional)</label>
+      <input
+        #inputImagen
+        id="imagen-publicacion"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        (change)="onImagen($event)"
+      />
+      <small class="ayuda">JPG, PNG o WEBP, hasta 2 MB.</small>
+      @if (errorImagen()) {
+        <small class="error" role="alert">{{ errorImagen() }}</small>
+      }
+      @if (vistaPrevia()) {
+        <div class="vista-previa-publicacion">
+          <img [src]="vistaPrevia()" alt="Vista previa de la imagen" />
+          <button type="button" class="btn btn-secundario" (click)="quitarImagen(inputImagen)">
+            Quitar imagen
+          </button>
+        </div>
+      }
+    </div>
+
+    <button type="submit" class="btn" [disabled]="nuevaForm().submitting()">
+      {{ nuevaForm().submitting() ? 'Publicando...' : 'Publicar' }}
+    </button>
+  </form>
+</section>

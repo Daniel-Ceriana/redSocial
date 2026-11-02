@@ -1,0 +1,77 @@
+.publicacion {
+  margin: 0 auto 1.25rem;
+}
+
+.autor {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.autor div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.5rem;
+}
+
+.usuario,
+.fecha {
+  font-size: 0.85rem;
+  color: var(--gris);
+}
+
+.fecha {
+  flex-basis: 100%;
+  cursor: help;
+}
+
+h2 {
+  margin-bottom: 0.4rem;
+}
+
+.descripcion {
+  margin: 0 0 0.75rem;
+  white-space: pre-line;
+}
+
+.imagen {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  margin-bottom: 0.75rem;
+  object-fit: cover;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--borde);
+}
+
+.acciones .btn {
+  padding: 0.35rem 0.9rem;
+}
+
+.contador {
+  font-size: 0.9rem;
+  color: var(--gris);
+}
+
+.btn-peligro {
+  margin-left: auto;
+  color: var(--error);
+  background: transparent;
+  border-color: var(--error);
+}
+
+.btn-peligro:hover:not(:disabled) {
+  color: #fff;
+  background: var(--error);
+}

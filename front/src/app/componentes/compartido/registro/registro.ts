@@ -15,10 +15,9 @@ import { Auth } from '../../../services/auth';
 import { Modal } from '../../../services/modal';
 import { mensajesDeError } from '../../../utilidades/errores';
 import { aTextoFecha, fechaHaceAnios } from '../../../utilidades/fechas';
+import { validarImagen } from '../../../utilidades/imagen';
 
 const EDAD_MINIMA = 13;
-const TIPOS_IMAGEN = ['image/jpeg', 'image/png', 'image/webp'];
-const TAMANO_MAXIMO_IMAGEN = 2 * 1024 * 1024; // 2 MB
 
 @Component({
   imports: [FormField, RouterLink],
@@ -103,13 +102,9 @@ export class Registro {
     this.quitarImagen();
     if (!archivo) return;
 
-    if (!TIPOS_IMAGEN.includes(archivo.type)) {
-      this.errorImagen.set('La imagen debe ser JPG, PNG o WEBP');
-      input.value = '';
-      return;
-    }
-    if (archivo.size > TAMANO_MAXIMO_IMAGEN) {
-      this.errorImagen.set('La imagen no puede pesar más de 2 MB');
+    const error = validarImagen(archivo);
+    if (error) {
+      this.errorImagen.set(error);
       input.value = '';
       return;
     }

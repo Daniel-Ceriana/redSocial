@@ -73,6 +73,8 @@ La URL de la API está en `front/src/environments/environment.ts`.
 - CSS propio con variables (`src/styles.css`). Identidad "Estación antigua": crema, verde locomotora y ocre; Playfair Display e Inter.
 - El token y su vencimiento se guardan en `localStorage`; un interceptor lo manda en `Authorization: Bearer`. Al abrir la app se valida con `GET /api/usuarios/yo`.
 - Sin `alert()`: los avisos y confirmaciones usan el modal propio (`services/modal.ts`).
+- Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo` y `fechaArgentina`.
+- Paginación con «Anterior» / «Siguiente»; después de crear o eliminar se vuelve a pedir la página a la API para que el total siempre coincida.
 - Las validaciones del front son las mismas que las del back (el back es la que manda).
 
 ### Rutas del front
@@ -80,7 +82,7 @@ La URL de la API está en `front/src/environments/environment.ts`.
 | Ruta | Guard | Pantalla |
 |------|-------|----------|
 | `/login`, `/registro` | solo sin sesión | Login (con acceso rápido) y registro |
-| `/publicaciones`, `/perfil` | con sesión | Publicaciones (mínima) y Mi perfil |
+| `/publicaciones`, `/perfil` | con sesión | Publicaciones (listado, orden, paginación, crear, me gusta y eliminar) y Mi perfil |
 | `/sin-permiso` | — | Falta de permiso |
 | `**` | — | 404 |
 

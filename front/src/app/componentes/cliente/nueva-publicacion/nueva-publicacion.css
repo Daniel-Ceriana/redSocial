@@ -1,0 +1,30 @@
+.nueva {
+  margin: 0 auto 1.25rem;
+}
+
+.cabecera {
+  width: 100%;
+}
+
+form {
+  margin-top: 1rem;
+}
+
+form[hidden] {
+  display: none;
+}
+
+.vista-previa-publicacion {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.vista-previa-publicacion img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border: 2px solid var(--ocre);
+  border-radius: 8px;
+}

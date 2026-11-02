@@ -1,0 +1,43 @@
+@let p = publicacion();
+<article class="tarjeta tarjeta-ancha publicacion">
+  <header class="autor">
+    <app-avatar [usuario]="p.autor" [tamano]="44" />
+    <div>
+      <strong>{{ p.autor.nombre }} {{ p.autor.apellido }}</strong>
+      <span class="usuario">&#64;{{ p.autor.nombreUsuario }}</span>
+      <time class="fecha" [attr.datetime]="p.fecha" [title]="p.fecha | fechaArgentina">
+        {{ p.fecha | tiempoRelativo }}
+      </time>
+    </div>
+  </header>
+
+  <h2>{{ p.titulo }}</h2>
+  @if (p.descripcion) {
+    <p class="descripcion">{{ p.descripcion }}</p>
+  }
+  @if (p.imagen) {
+    <img class="imagen" [src]="p.imagen" [alt]="'Imagen de la publicación: ' + p.titulo" loading="lazy" />
+  }
+
+  <footer class="acciones">
+    <button
+      type="button"
+      class="btn"
+      [class.btn-secundario]="!p.yoMeGusta"
+      [disabled]="ocupada()"
+      [attr.aria-pressed]="p.yoMeGusta"
+      (click)="alternarMeGusta.emit(p)"
+    >
+      {{ p.yoMeGusta ? 'Quitar me gusta' : 'Me gusta' }}
+    </button>
+    <span class="contador">{{ p.cantidadMeGusta }} me gusta</span>
+    <span class="contador">
+      {{ p.cantidadComentarios }} {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
+    </span>
+    @if (esPropia()) {
+      <button type="button" class="btn btn-peligro" [disabled]="ocupada()" (click)="eliminar.emit(p)">
+        Eliminar
+      </button>
+    }
+  </footer>
+</article>
