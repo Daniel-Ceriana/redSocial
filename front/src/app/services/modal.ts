@@ -1,8 +1,12 @@
-import { Service, signal } from '@angular/core';
+import { isSignal, Service, Signal, signal } from '@angular/core';
+
+// Los mensajes pueden ser fijos o una señal que cambia mientras el modal está abierto
+// (por ejemplo, la cuenta regresiva de "¿Extender la sesión?")
+export type MensajesModal = string | string[] | Signal<string[]>;
 
 export interface EstadoModal {
   titulo: string;
-  mensajes: string[];
+  mensajes: Signal<string[]>;
   conCancelar: boolean;
   // Texto del botón principal ("Entendido" en los avisos, "Aceptar" o el que se pida en las preguntas)
   textoAceptar: string;
@@ -17,10 +21,10 @@ export class Modal {
   private resolver: ((aceptado: boolean) => void) | null = null;
 
   // Aviso con un solo botón "Entendido"
-  avisar(titulo: string, mensajes: string | string[], prioritario = false): Promise<void> {
+  avisar(titulo: string, mensajes: MensajesModal, prioritario = false): Promise<void> {
     return this.abrir({
       titulo,
-      mensajes: [mensajes].flat(),
+      mensajes: aSenal(mensajes),
       conCancelar: false,
       textoAceptar: 'Entendido',
       prioritario,
@@ -28,10 +32,10 @@ export class Modal {
   }
 
   // Pregunta con "Aceptar" (o el texto que se pase) y "Cancelar"; devuelve lo que eligió la persona
-  confirmar(titulo: string, mensajes: string | string[], textoAceptar = 'Aceptar'): Promise<boolean> {
+  confirmar(titulo: string, mensajes: MensajesModal, textoAceptar = 'Aceptar'): Promise<boolean> {
     return this.abrir({
       titulo,
-      mensajes: [mensajes].flat(),
+      mensajes: aSenal(mensajes),
       conCancelar: true,
       textoAceptar,
       prioritario: false,
@@ -51,4 +55,8 @@ export class Modal {
     this.estado.set(estado);
     return new Promise((resolve) => (this.resolver = resolve));
   }
+}
+
+function aSenal(mensajes: MensajesModal): Signal<string[]> {
+  return isSignal(mensajes) ? mensajes : signal([mensajes].flat()).asReadonly();
 }

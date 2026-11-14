@@ -8,11 +8,12 @@
       (click)="$event.stopPropagation()"
     >
       <h2 id="modal-titulo">{{ m.titulo }}</h2>
-      @if (m.mensajes.length === 1) {
-        <p>{{ m.mensajes[0] }}</p>
+      @let mensajes = m.mensajes();
+      @if (mensajes.length === 1) {
+        <p>{{ mensajes[0] }}</p>
       } @else {
         <ul>
-          @for (mensaje of m.mensajes; track $index) {
+          @for (mensaje of mensajes; track $index) {
             <li>{{ mensaje }}</li>
           }
         </ul>

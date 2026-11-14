@@ -3,10 +3,11 @@ import { computed, inject, Service, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { RespuestaSesion, Usuario } from '../modelos/usuario';
+import { RespuestaAutorizar, RespuestaSesion, Usuario } from '../modelos/usuario';
 import { Modal } from './modal';
 
 const CLAVE_SESION = 'trochita.sesion';
+const TIEMPO_MINIMO_CARGANDO = 5000; // ms (D9.2)
 
 interface SesionGuardada {
   token: string;
@@ -27,6 +28,8 @@ export class Auth {
   // A la mitad de la vida del token se ofrece extenderla; al vencer se cierra la sesión
   private temporizadorAviso?: ReturnType<typeof setTimeout>;
   private temporizadorVencimiento?: ReturnType<typeof setTimeout>;
+  // Actualiza cada segundo la cuenta regresiva del modal de extender
+  private temporizadorCuenta?: ReturnType<typeof setInterval>;
   private _usuario = signal<Usuario | null>(null);
 
   readonly token = this._token.asReadonly();
@@ -35,33 +38,45 @@ export class Auth {
   readonly haySesion = computed(() => this._usuario() !== null);
   readonly esAdministrador = computed(() => this._usuario()?.perfil === 'administrador');
 
+  // Mientras es true, la app muestra la pantalla de cargando (3.F6) en vez de las pantallas
+  private _iniciando = signal(true);
+  readonly iniciando = this._iniciando.asReadonly();
+
   // Se resuelve cuando ya se sabe si hay sesión válida al abrir la aplicación
   private inicio: Promise<void>;
   constructor() {
-    // Se difiere un instante: el interceptor necesita esta instancia ya construida
-    this.inicio = Promise.resolve().then(() => this.restaurar());
+    // Se difiere un instante: el interceptor necesita esta instancia ya construida.
+    // La pantalla de cargando dura al menos TIEMPO_MINIMO_CARGANDO, aunque el back responda antes (D9.2).
+    this.inicio = Promise.all([
+      Promise.resolve().then(() => this.restaurar()),
+      new Promise((resolve) => setTimeout(resolve, TIEMPO_MINIMO_CARGANDO)),
+    ]).then(() => this._iniciando.set(false));
   }
 
   esperarInicio() {
     return this.inicio;
   }
 
-  // Si hay un token guardado, lo valida pidiendo los datos del usuario al back
+  // Si hay un token guardado, lo valida con autorizar (3.F6, D9.3): si sirve, deja la sesión abierta con
+  // los datos del usuario y las fechas del token; si no, la borra y avisa.
   private async restaurar() {
     const guardado = localStorage.getItem(CLAVE_SESION);
     if (!guardado) return;
     try {
-      const { token, emitidoEn, venceEn } = JSON.parse(guardado) as SesionGuardada;
+      const { token, venceEn } = JSON.parse(guardado) as SesionGuardada;
       if (new Date(venceEn).getTime() <= Date.now()) {
         // Ya venció mientras la app estaba cerrada: ni hace falta preguntarle al back
         this.cerrarSesion();
         this.avisarVencimiento();
         return;
       }
-      this._token.set(token);
-      this._emitidoEn.set(emitidoEn ?? null);
-      this._venceEn.set(venceEn);
-      this._usuario.set(await this.pedirUsuario());
+      this._token.set(token); // el interceptor lo manda en el header
+      const res = await firstValueFrom(
+        this.http.post<RespuestaAutorizar>(`${environment.apiUrl}/autenticacion/autorizar`, {}),
+      );
+      this._emitidoEn.set(res.emitidoEn);
+      this._venceEn.set(res.venceEn);
+      this._usuario.set(res.usuario);
       this.programarTemporizadores();
     } catch (error) {
       this.limpiarEnMemoria();
@@ -191,24 +206,33 @@ export class Auth {
     }
   }
 
+  // Modal con cuenta regresiva (D9.1): los segundos que quedan se recalculan cada segundo desde venceEn
   private async ofrecerExtender() {
-    const segundos = Math.max(1, Math.round((new Date(this._venceEn()!).getTime() - Date.now()) / 1000));
-    const extender = await this.modal.confirmar(
-      '¿Extender la sesión?',
-      [
-        `Tu sesión vence en ${segundos} segundos.`,
-        'Si la extendés, vas a tener 30 segundos más desde ahora.',
-      ],
-      'Extender',
-    );
+    const segundos = signal(this.segundosRestantes());
+    this.temporizadorCuenta = setInterval(() => segundos.set(this.segundosRestantes()), 1000);
+    const mensajes = computed(() => [
+      `Tu sesión vence en ${segundos()} ${segundos() === 1 ? 'segundo' : 'segundos'}.`,
+      'Si la extendés, vas a tener 30 segundos más desde ahora.',
+    ]);
+
+    const extender = await this.modal.confirmar('¿Extender la sesión?', mensajes, 'Extender');
+    clearInterval(this.temporizadorCuenta);
+
     // Si eligió "Cancelar", no hay otro aviso: al vencer se cierra la sesión.
     // Si mientras tanto venció (el modal de vencimiento reemplaza a este), tampoco se hace nada.
     if (extender && this.haySesion() && !this.tokenVencido()) await this.extenderSesion();
   }
 
+  private segundosRestantes(): number {
+    const venceEn = this._venceEn();
+    if (!venceEn) return 0;
+    return Math.max(0, Math.ceil((new Date(venceEn).getTime() - Date.now()) / 1000));
+  }
+
   private cancelarTemporizadores() {
     clearTimeout(this.temporizadorAviso);
     clearTimeout(this.temporizadorVencimiento);
+    clearInterval(this.temporizadorCuenta);
   }
 
   private limpiarEnMemoria() {

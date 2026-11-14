@@ -3,9 +3,10 @@ import { RouterOutlet } from '@angular/router';
 import { Auth } from './services/auth';
 import { Nav } from './componentes/compartido/nav/nav';
 import { ModalComponent } from './componentes/compartido/modal/modal';
+import { Cargando } from './componentes/compartido/cargando/cargando';
 
 @Component({
-  imports: [RouterOutlet, Nav, ModalComponent],
+  imports: [RouterOutlet, Nav, ModalComponent, Cargando],
   selector: 'app-root',
   templateUrl: './app.html',
 })

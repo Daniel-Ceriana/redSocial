@@ -54,13 +54,14 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | 3.B6 | POST autorizar | ✔ S7 |
 | 3.B7 | Refrescar el token (`POST /api/autenticacion/refrescar`) | ✔ con token de 30 s |
 | X17 | GET una publicación por id | ✔ S7 |
-| 3.F1 | Página de la publicación en grande con sus comentarios | ✔ S8 (`/publicaciones/:id`); falta probarlo en el navegador |
-| 3.F2 | Escribir comentarios | ✔ S8; falta probarlo |
-| 3.F3 | Comentarios uno debajo del otro, de a 3 con «cargar más» | ✔ S8; falta probarlo |
-| 3.F4 | El autor edita su comentario; se marca «editado» | ✔ S8; falta probarlo |
-| 3.F7 | Ofrecer extender la sesión antes de que venza | 🟨 adelantado: a la mitad de los 30 s; falta probarlo en el navegador |
+| 3.F1 | Página de la publicación en grande con sus comentarios | ✔ S8 (`/publicaciones/:id`) |
+| 3.F2 | Escribir comentarios | ✔ S8 |
+| 3.F3 | Comentarios uno debajo del otro, de a 3 con «cargar más» | ✔ S8 |
+| 3.F4 | El autor edita su comentario; se marca «editado» | ✔ S8 |
+| 3.F7 | Ofrecer extender la sesión antes de que venza | 🟨 a la mitad de los 30 s, con cuenta regresiva; falta probarlo en el navegador |
 | 3.B5 | El token vence a los 15 minutos | 🟨 decisión: 30 s fijos para la presentación |
-| 3.F5, 3.F6 | Guardar el token y pantalla de cargando que usa autorizar | ⬜ (S9) |
+| 3.F5 | Login y registro guardan el token | ✔ `localStorage` (T9) |
+| 3.F6 | Pantalla de cargando al iniciar que valida con autorizar | ✔ S9 (mínimo 5 s); falta probarlo en el navegador |
 
 ## Agregados aprobados
 

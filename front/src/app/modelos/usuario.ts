@@ -22,6 +22,13 @@ export interface PerfilPublico {
   imagenPerfil: string;
 }
 
+// Lo que devuelve autorizar: los datos del usuario y las fechas del mismo token (no emite uno nuevo)
+export interface RespuestaAutorizar {
+  usuario: Usuario;
+  emitidoEn: string; // fecha ISO
+  venceEn: string; // fecha ISO
+}
+
 // Lo que devuelven el login, el registro y refrescar
 export interface RespuestaSesion {
   token: string;

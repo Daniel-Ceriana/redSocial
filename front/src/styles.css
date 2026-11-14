@@ -91,6 +91,17 @@ a {
   text-align: center;
 }
 
+/* Pantalla de cargando al abrir la app (3.F6) */
+.pantalla-inicio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
 /* Login y registro: la ilustración (E8) va arriba de todo, y el nombre y el lema quedan separados del formulario */
 .pagina-centrada:has(app-escena-tren) {
   padding-top: 0.5rem;

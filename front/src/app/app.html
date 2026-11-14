@@ -1,7 +1,15 @@
-@if (auth.haySesion()) {
-  <app-nav />
+@if (auth.iniciando()) {
+  <!-- Pantalla de cargando al abrir la app (3.F6): mientras se valida el token con autorizar -->
+  <main class="pantalla-inicio">
+    <div class="marca">La Trochita</div>
+    <app-cargando texto="Verificando tu sesión..." />
+  </main>
+} @else {
+  @if (auth.haySesion()) {
+    <app-nav />
+  }
+  <main class="contenido">
+    <router-outlet />
+  </main>
 }
-<main class="contenido">
-  <router-outlet />
-</main>
 <app-modal />
