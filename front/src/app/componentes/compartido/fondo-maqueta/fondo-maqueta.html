@@ -1,0 +1,87 @@
+@let e = escena();
+<svg [attr.viewBox]="'0 0 ' + e.ancho + ' ' + e.alto" preserveAspectRatio="none">
+  <defs>
+    <!-- Pasto con algunas manchas, que se repite -->
+    <pattern id="fondo-pasto" width="14" height="14" patternUnits="userSpaceOnUse">
+      <rect width="14" height="14" fill="#8fa66b" />
+      <circle cx="3" cy="4" r="1.2" fill="#7f9860" />
+      <circle cx="10" cy="9" r="1.4" fill="#9cb377" />
+      <circle cx="6" cy="12" r="1" fill="#7a925a" />
+    </pattern>
+  </defs>
+
+  <rect [attr.width]="e.ancho" [attr.height]="e.alto" fill="url(#fondo-pasto)" />
+
+  @if (e.rio; as rio) {
+    <path [attr.d]="rio" fill="none" stroke="#6f9c9a" stroke-width="34" />
+    <path [attr.d]="rio" fill="none" stroke="#8fbab6" stroke-width="20" />
+  }
+  @if (e.camino; as camino) {
+    <path [attr.d]="camino" fill="none" stroke="#b9a27a" stroke-width="16" stroke-linecap="round" />
+    <path [attr.d]="camino" fill="none" stroke="#c9b48a" stroke-width="11" stroke-linecap="round" />
+  }
+
+  @if (e.via; as via) {
+    <!-- Vía desde arriba: balasto, durmientes y dos rieles -->
+    <path [attr.d]="via.d" fill="none" stroke="#a69d90" stroke-width="20" />
+    <path [attr.d]="via.d" fill="none" stroke="#6e5238" stroke-width="15" stroke-dasharray="3 5" />
+    <path [attr.d]="via.d" fill="none" stroke="#4a3c2e" stroke-width="9" />
+    <path [attr.d]="via.d" fill="none" stroke="#a69d90" stroke-width="6.4" />
+    <path [attr.d]="via.d" fill="none" stroke="#6e5238" stroke-width="6.4" stroke-dasharray="3 5" />
+  }
+
+  @if (e.anden; as anden) {
+    <!-- Andén de la estación, al lado de la vía derecha -->
+    <rect
+      [attr.x]="anden.x"
+      [attr.y]="anden.y"
+      [attr.width]="anden.ancho"
+      [attr.height]="anden.alto"
+      fill="#cbbfa8"
+      stroke="#8a7660"
+    />
+  }
+
+  <!-- Casas (y el edificio de la estación) vistas desde arriba: sombra y techo a dos aguas -->
+  @for (c of e.casas; track $index) {
+    <g [attr.transform]="'rotate(' + c.giro + ' ' + (c.x + c.ancho / 2) + ' ' + (c.y + c.alto / 2) + ')'">
+      <rect [attr.x]="c.x + 3" [attr.y]="c.y + 3" [attr.width]="c.ancho" [attr.height]="c.alto" fill="rgb(30 40 20 / 28%)" />
+      <rect [attr.x]="c.x" [attr.y]="c.y" [attr.width]="c.ancho" [attr.height]="c.alto / 2" [attr.fill]="c.techo" />
+      <rect [attr.x]="c.x" [attr.y]="c.y + c.alto / 2" [attr.width]="c.ancho" [attr.height]="c.alto / 2" [attr.fill]="c.techoSombra" />
+    </g>
+  }
+
+  @for (a of e.arboles; track $index) {
+    <circle [attr.cx]="a.x + a.r * 0.35" [attr.cy]="a.y + a.r * 0.35" [attr.r]="a.r" fill="rgb(30 40 20 / 28%)" />
+    <circle [attr.cx]="a.x" [attr.cy]="a.y" [attr.r]="a.r" [attr.fill]="a.color" />
+    <circle [attr.cx]="a.x - a.r * 0.3" [attr.cy]="a.y - a.r * 0.3" [attr.r]="a.r * 0.45" fill="rgb(255 255 255 / 12%)" />
+  }
+
+  @if (e.via && conTren) {
+    <!-- El tren recorre la vuelta (rotate="auto": cada pieza gira con las curvas) -->
+    @for (p of piezas; track $index) {
+      <g>
+        <rect
+          [attr.x]="-p.largo / 2"
+          y="-6"
+          [attr.width]="p.largo"
+          height="12"
+          rx="2.5"
+          [attr.fill]="p.color"
+          stroke="#1a140e"
+        />
+        <rect [attr.x]="-p.largo / 2 + 3" y="-3" [attr.width]="p.largo - 6" height="6" rx="1.5" [attr.fill]="p.techo" />
+        @if (p.chimenea) {
+          <circle [attr.cx]="p.largo / 2 - 6" cy="0" r="2.2" fill="#2b2118" />
+        }
+        <animateMotion
+          [attr.path]="e.via!.d"
+          [attr.dur]="e.via!.duracion + 's'"
+          [attr.begin]="-p.adelanto + 's'"
+          repeatCount="indefinite"
+          rotate="auto"
+        />
+      </g>
+    }
+  }
+</svg>

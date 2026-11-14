@@ -4,9 +4,10 @@ import { Auth } from './services/auth';
 import { Nav } from './componentes/compartido/nav/nav';
 import { ModalComponent } from './componentes/compartido/modal/modal';
 import { Cargando } from './componentes/compartido/cargando/cargando';
+import { FondoMaqueta } from './componentes/compartido/fondo-maqueta/fondo-maqueta';
 
 @Component({
-  imports: [RouterOutlet, Nav, ModalComponent, Cargando],
+  imports: [RouterOutlet, Nav, ModalComponent, Cargando, FondoMaqueta],
   selector: 'app-root',
   templateUrl: './app.html',
 })

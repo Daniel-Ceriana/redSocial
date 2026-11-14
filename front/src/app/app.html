@@ -1,8 +1,13 @@
+<!-- La maqueta vista desde arriba, fija detrás de todo -->
+<app-fondo-maqueta />
+
 @if (auth.iniciando()) {
   <!-- Pantalla de cargando al abrir la app (3.F6): mientras se valida el token con autorizar -->
   <main class="pantalla-inicio">
-    <div class="marca">La Trochita</div>
-    <app-cargando texto="Verificando tu sesión..." />
+    <div class="tarjeta">
+      <div class="marca">La Trochita</div>
+      <app-cargando texto="Verificando tu sesión..." />
+    </div>
   </main>
 } @else {
   @if (auth.haySesion()) {
