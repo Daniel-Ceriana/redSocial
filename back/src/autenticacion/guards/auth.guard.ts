@@ -11,7 +11,8 @@ export interface PayloadToken {
   sub: string;
   correo: string;
   perfil: 'usuario' | 'administrador';
-  exp: number;
+  iat: number; // cuándo se emitió (segundos)
+  exp: number; // cuándo vence (segundos)
 }
 
 // Guard propio: lee "Authorization: Bearer <token>", lo verifica y deja el payload en request.usuario

@@ -113,6 +113,16 @@ export class PublicacionesService {
     };
   }
 
+  // Una publicación (X17), con la misma forma que cada una del listado. 404 si no existe o está dada de baja.
+  async obtener(id: string, usuarioId: string) {
+    const publicacion = await (await this.buscarActiva(id)).populate('autor', CAMPOS_AUTOR);
+    const cantidadComentarios = await this.modeloComentarios.countDocuments({
+      publicacion: publicacion._id,
+      activo: true,
+    });
+    return aRespuesta(publicacion, usuarioId, cantidadComentarios);
+  }
+
   // Baja lógica: solo el autor o un administrador
   async eliminar(id: string, usuario: PayloadToken) {
     const publicacion = await this.buscarActiva(id);

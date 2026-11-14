@@ -38,14 +38,19 @@ npm run start:dev         # http://localhost:3000/api
 |---------------|-------|------------|
 | `POST /api/autenticacion/registro` (multipart) | público | 201 · 400 · 409 |
 | `POST /api/autenticacion/login` (JSON) | público | 200 · 400 · 401 |
+| `POST /api/autenticacion/autorizar` (devuelve usuario, `emitidoEn` y `venceEn` del mismo token) | con token | 200 · 401 |
+| `POST /api/autenticacion/refrescar` (token nuevo de 30 s) | con token | 200 · 401 |
 | `GET /api/usuarios/yo` | con token | 200 · 401 |
 | `PATCH /api/usuarios/yo` (multipart; no admite correo, perfil ni activo) | el propio usuario | 200 · 400 · 401 · 409 |
 | `GET /api/usuarios/:id` (perfil público) | con token | 200 · 400 · 404 |
 | `POST /api/publicaciones` (multipart) | con token | 201 · 400 · 401 |
 | `GET /api/publicaciones?orden=&usuario=&offset=&limit=` | con token | 200 · 400 · 401 |
+| `GET /api/publicaciones/:id` | con token | 200 · 400 · 401 · 404 |
 | `DELETE /api/publicaciones/:id` (baja lógica) | autor o administrador | 204 · 400 · 403 · 404 |
 | `POST` y `DELETE /api/publicaciones/:id/me-gusta` | con token | 201 / 200 · 400 · 404 · 409 |
-| `GET /api/publicaciones/:id/comentarios?offset=&limit=` | con token | 200 · 400 · 404 |
+| `GET /api/publicaciones/:id/comentarios?offset=&limit=` (más recientes primero) | con token | 200 · 400 · 401 · 404 |
+| `POST /api/publicaciones/:id/comentarios` (JSON `{ mensaje }`, 1 a 300 caracteres) | con token | 201 · 400 · 401 · 404 |
+| `PUT /api/publicaciones/:id/comentarios/:comentarioId` (marca `modificado` si el mensaje cambió) | el autor | 200 · 400 · 401 · 403 · 404 |
 
 Los listados devuelven `{ datos, total, offset, limit }` (`limit` 5 por defecto, máximo 20).
 

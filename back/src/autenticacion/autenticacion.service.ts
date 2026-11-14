@@ -5,6 +5,7 @@ import { ArchivosService } from '../common/archivos.service.js';
 import { UsuarioDocument } from '../usuarios/entities/usuario.entity.js';
 import { UsuariosService, aRespuesta } from '../usuarios/usuarios.service.js';
 import { LoginDto } from './dto/login.dto.js';
+import { PayloadToken } from './guards/auth.guard.js';
 import { RegistroDto } from './dto/registro.dto.js';
 
 @Injectable()
@@ -38,11 +39,27 @@ export class AutenticacionService {
     return this.emitirSesion(usuario);
   }
 
-  // Token nuevo con el mismo payload y la duración completa (30 s), contada desde ahora.
-  // El AuthGuard ya rechazó con 401 un token vencido o inválido; si el usuario ya no existe, también 401.
+  // El token es válido (si no, el AuthGuard ya respondió 401): devuelve los datos del usuario y las
+  // fechas de ese mismo token, sin emitir uno nuevo (3.B6, D7.5)
+  async autorizar(payload: PayloadToken) {
+    const usuario = await this.usuarioDelToken(payload.sub);
+    return {
+      usuario: aRespuesta(usuario),
+      emitidoEn: new Date(payload.iat * 1000).toISOString(),
+      venceEn: new Date(payload.exp * 1000).toISOString(),
+    };
+  }
+
+  // Token nuevo con el mismo payload y la duración completa (30 s), contada desde ahora (3.B7).
+  // El AuthGuard ya rechazó con 401 un token vencido o inválido.
   async refrescar(usuarioId: string) {
+    return this.emitirSesion(await this.usuarioDelToken(usuarioId));
+  }
+
+  // Si el usuario del token ya no existe, el token no sirve: 401 (no 404)
+  private async usuarioDelToken(usuarioId: string) {
     try {
-      return await this.emitirSesion(await this.usuariosService.buscarPorId(usuarioId));
+      return await this.usuariosService.buscarPorId(usuarioId);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('El usuario del token ya no existe');

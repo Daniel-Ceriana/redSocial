@@ -44,6 +44,12 @@ export class PublicacionesController {
     return this.publicacionesService.listar(consulta, req.usuario.sub);
   }
 
+  // Una publicación (X17)
+  @Get(':id')
+  obtener(@Param('id', ParseObjectIdPipe) id: string, @Req() req: Solicitud) {
+    return this.publicacionesService.obtener(id, req.usuario.sub);
+  }
+
   @Delete(':id')
   @HttpCode(204)
   eliminar(@Param('id', ParseObjectIdPipe) id: string, @Req() req: Solicitud) {

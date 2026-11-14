@@ -36,6 +36,14 @@ export class AutenticacionController {
     return this.autenticacionService.login(dto);
   }
 
+  // Header "Authorization: Bearer <token>": 401 si no es válido o venció; si sirve, los datos del usuario (3.B6)
+  @Post('autorizar')
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  autorizar(@Req() req: { usuario: PayloadToken }) {
+    return this.autenticacionService.autorizar(req.usuario);
+  }
+
   // Header "Authorization: Bearer <token>" con un token todavía válido; devuelve uno nuevo (3.B7)
   @Post('refrescar')
   @HttpCode(200)
