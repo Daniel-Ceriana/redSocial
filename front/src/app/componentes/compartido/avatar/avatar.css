@@ -1,11 +1,20 @@
 :host {
   display: inline-flex;
+  flex: none;
+}
+
+.contenedor {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 img,
 .inicial {
+  position: relative;
   border-radius: 50%;
-  border: 2px solid var(--ocre);
+  border: 2px solid var(--avatar-borde, var(--ocre));
 }
 
 img {
@@ -20,4 +29,33 @@ img {
   font-weight: 700;
   color: #fff;
   background: var(--verde);
+}
+
+/* ---------- Reloj de estación (E6) ---------- */
+.esfera {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.esfera circle {
+  fill: var(--papel);
+  stroke: var(--carbon);
+  stroke-width: 1.5;
+}
+
+.esfera line {
+  stroke: var(--carbon);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.esfera line.hora {
+  stroke-width: 2.5;
+}
+
+.reloj img,
+.reloj .inicial {
+  border-color: var(--carbon);
 }

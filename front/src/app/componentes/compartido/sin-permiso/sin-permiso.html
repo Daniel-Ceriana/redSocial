@@ -1,6 +1,22 @@
 <section class="mensaje-pagina">
-  <div class="codigo">403</div>
-  <h1>No tenés permiso para entrar acá</h1>
-  <p>Esta sección es solo para administradores.</p>
+  <!-- Paso a nivel con la barrera baja y las luces titilando (E4) -->
+  <svg class="paso-nivel" viewBox="0 0 190 100" aria-hidden="true">
+    <rect x="20" y="20" width="6" height="74" fill="#2b2118" />
+    <rect x="6" y="10" width="34" height="14" rx="7" fill="#2b2118" />
+    <circle class="luz luz-1" cx="15" cy="17" r="5" />
+    <circle class="luz luz-2" cx="31" cy="17" r="5" />
+    <rect x="26" y="52" width="158" height="9" rx="2" fill="#fffbf2" stroke="#2b2118" stroke-width="1.5" />
+    <g fill="#c8392c">
+      <rect x="44" y="52" width="16" height="9" />
+      <rect x="76" y="52" width="16" height="9" />
+      <rect x="108" y="52" width="16" height="9" />
+      <rect x="140" y="52" width="16" height="9" />
+    </g>
+    <circle cx="26" cy="56" r="6" fill="#2b2118" />
+    <rect x="0" y="94" width="190" height="4" fill="#6d5a45" />
+  </svg>
+  <p class="codigo">ERROR 403</p>
+  <h1>Paso a nivel cerrado</h1>
+  <p>No tenés permiso para entrar acá: esta sección es solo para administradores.</p>
   <a class="btn" routerLink="/publicaciones">Volver al inicio</a>
 </section>

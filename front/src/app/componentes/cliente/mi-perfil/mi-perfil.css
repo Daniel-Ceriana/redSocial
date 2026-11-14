@@ -44,20 +44,36 @@ dd {
   margin-top: 0.5rem;
 }
 
-/* Los comentarios quedan pegados a la tarjeta de su publicación */
+/* Los comentarios de cada publicación: carteles chicos debajo de su diorama */
 .comentarios {
-  margin: -0.75rem auto 1.5rem;
-  padding: 0.25rem 1.5rem;
-  background: var(--papel);
-  border: 1px solid var(--borde);
-  border-top: 0;
-  border-radius: 0 0 var(--radio) var(--radio);
+  display: grid;
+  gap: 0.7rem;
+  margin: -0.75rem 0 2.5rem 1.5rem;
+}
+
+.comentarios h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  font-family: var(--fuente-texto);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gris);
 }
 
 .sin-comentarios {
-  margin: 0.5rem 0;
+  margin: 0;
   font-size: 0.85rem;
   color: var(--gris);
+}
+
+@media (max-width: 600px) {
+  .comentarios {
+    margin-left: 0.5rem;
+  }
 }
 
 @media (max-width: 600px) {

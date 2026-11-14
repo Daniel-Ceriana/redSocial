@@ -14,6 +14,7 @@ import { Auth } from '../../../services/auth';
 import { Modal } from '../../../services/modal';
 import { mensajesDeError } from '../../../utilidades/errores';
 import { correo, obligatorio } from '../../../utilidades/validaciones';
+import { EscenaTren } from '../escena-tren/escena-tren';
 
 // Cuentas creadas por el seed del back (npm run seed)
 const CUENTAS_RAPIDAS = {
@@ -22,7 +23,7 @@ const CUENTAS_RAPIDAS = {
 };
 
 @Component({
-  imports: [FormField, RouterLink],
+  imports: [FormField, RouterLink, EscenaTren],
   selector: 'app-login',
   templateUrl: './login.html',
 })

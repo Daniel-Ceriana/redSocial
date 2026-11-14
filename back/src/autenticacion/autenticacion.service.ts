@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ArchivosService } from '../common/archivos.service.js';
@@ -38,15 +38,30 @@ export class AutenticacionService {
     return this.emitirSesion(usuario);
   }
 
+  // Token nuevo con el mismo payload y la duración completa (30 s), contada desde ahora.
+  // El AuthGuard ya rechazó con 401 un token vencido o inválido; si el usuario ya no existe, también 401.
+  async refrescar(usuarioId: string) {
+    try {
+      return await this.emitirSesion(await this.usuariosService.buscarPorId(usuarioId));
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('El usuario del token ya no existe');
+      }
+      throw error;
+    }
+  }
+
+  // emitidoEn y venceEn salen del propio token (iat y exp): con eso el front calcula la mitad de su vida
   private async emitirSesion(usuario: UsuarioDocument) {
     const token = await this.jwtService.signAsync({
       sub: usuario.id as string,
       correo: usuario.correo,
       perfil: usuario.perfil,
     });
-    const { exp } = this.jwtService.decode<{ exp: number }>(token);
+    const { iat, exp } = this.jwtService.decode<{ iat: number; exp: number }>(token);
     return {
       token,
+      emitidoEn: new Date(iat * 1000).toISOString(),
       venceEn: new Date(exp * 1000).toISOString(),
       usuario: aRespuesta(usuario),
     };

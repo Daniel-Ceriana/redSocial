@@ -8,6 +8,12 @@ import { Modal } from './modal';
 
 const CLAVE_SESION = 'trochita.sesion';
 
+interface SesionGuardada {
+  token: string;
+  emitidoEn?: string; // las sesiones guardadas antes de este cambio no lo tienen
+  venceEn: string;
+}
+
 @Service()
 export class Auth {
   private http = inject(HttpClient);
@@ -15,7 +21,12 @@ export class Auth {
   private modal = inject(Modal);
 
   private _token = signal<string | null>(null);
+  private _emitidoEn = signal<string | null>(null);
   private _venceEn = signal<string | null>(null);
+
+  // A la mitad de la vida del token se ofrece extenderla; al vencer se cierra la sesión
+  private temporizadorAviso?: ReturnType<typeof setTimeout>;
+  private temporizadorVencimiento?: ReturnType<typeof setTimeout>;
   private _usuario = signal<Usuario | null>(null);
 
   readonly token = this._token.asReadonly();
@@ -40,7 +51,7 @@ export class Auth {
     const guardado = localStorage.getItem(CLAVE_SESION);
     if (!guardado) return;
     try {
-      const { token, venceEn } = JSON.parse(guardado) as { token: string; venceEn: string };
+      const { token, emitidoEn, venceEn } = JSON.parse(guardado) as SesionGuardada;
       if (new Date(venceEn).getTime() <= Date.now()) {
         // Ya venció mientras la app estaba cerrada: ni hace falta preguntarle al back
         this.cerrarSesion();
@@ -48,8 +59,10 @@ export class Auth {
         return;
       }
       this._token.set(token);
+      this._emitidoEn.set(emitidoEn ?? null);
       this._venceEn.set(venceEn);
       this._usuario.set(await this.pedirUsuario());
+      this.programarTemporizadores();
     } catch (error) {
       this.limpiarEnMemoria();
       // Token inválido o vencido: se borra. Si solo falló la red, queda guardado para la próxima.
@@ -89,6 +102,26 @@ export class Auth {
     this._usuario.set(await this.pedirUsuario());
   }
 
+  // Pide un token nuevo con 30 segundos más de vida (3.B7). Si el back lo rechaza (401: ya venció),
+  // se cierra la sesión como en cualquier otro vencimiento.
+  async extenderSesion() {
+    try {
+      const res = await firstValueFrom(
+        this.http.post<RespuestaSesion>(`${environment.apiUrl}/autenticacion/refrescar`, {}),
+      );
+      this.guardarSesion(res);
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && error.status === 401) {
+        this.alVencer();
+      } else {
+        await this.modal.avisar(
+          'No se pudo extender la sesión',
+          'Revisá tu conexión. La sesión sigue hasta que venza.',
+        );
+      }
+    }
+  }
+
   cerrarSesion() {
     this.limpiarEnMemoria();
     localStorage.removeItem(CLAVE_SESION);
@@ -124,16 +157,60 @@ export class Auth {
 
   private guardarSesion(res: RespuestaSesion) {
     this._token.set(res.token);
+    this._emitidoEn.set(res.emitidoEn);
     this._venceEn.set(res.venceEn);
     this._usuario.set(res.usuario);
-    localStorage.setItem(
-      CLAVE_SESION,
-      JSON.stringify({ token: res.token, venceEn: res.venceEn }),
-    );
+    const guardada: SesionGuardada = {
+      token: res.token,
+      emitidoEn: res.emitidoEn,
+      venceEn: res.venceEn,
+    };
+    localStorage.setItem(CLAVE_SESION, JSON.stringify(guardada));
+    this.programarTemporizadores();
+  }
+
+  // Programa los dos momentos de la sesión actual (y descarta los de un token anterior):
+  //  - a la mitad de la vida del token, el modal que ofrece extenderla (3.F7);
+  //  - al vencer, cerrar la sesión, ir al login y avisar, aunque la persona no haga nada.
+  private programarTemporizadores() {
+    this.cancelarTemporizadores();
+    const venceEn = this._venceEn();
+    if (!venceEn) return;
+
+    const vence = new Date(venceEn).getTime();
+    const emitido = this._emitidoEn() ? new Date(this._emitidoEn()!).getTime() : null;
+    const ahora = Date.now();
+
+    this.temporizadorVencimiento = setTimeout(() => this.alVencer(), Math.max(0, vence - ahora));
+
+    // Sin la fecha de emisión (sesión guardada antes de este cambio) no se sabe cuál es la mitad
+    if (emitido === null) return;
+    const mitad = emitido + (vence - emitido) / 2;
+    if (mitad > ahora) {
+      this.temporizadorAviso = setTimeout(() => void this.ofrecerExtender(), mitad - ahora);
+    }
+  }
+
+  private async ofrecerExtender() {
+    const segundos = Math.max(1, Math.round((new Date(this._venceEn()!).getTime() - Date.now()) / 1000));
+    const extender = await this.modal.confirmar('¿Extender la sesión?', [
+      `Tu sesión vence en ${segundos} segundos.`,
+      'Si la extendés, vas a tener 30 segundos más desde ahora.',
+    ]);
+    // Si eligió "Cancelar", no hay otro aviso: al vencer se cierra la sesión.
+    // Si mientras tanto venció (el modal de vencimiento reemplaza a este), tampoco se hace nada.
+    if (extender && this.haySesion() && !this.tokenVencido()) await this.extenderSesion();
+  }
+
+  private cancelarTemporizadores() {
+    clearTimeout(this.temporizadorAviso);
+    clearTimeout(this.temporizadorVencimiento);
   }
 
   private limpiarEnMemoria() {
+    this.cancelarTemporizadores();
     this._token.set(null);
+    this._emitidoEn.set(null);
     this._venceEn.set(null);
     this._usuario.set(null);
   }

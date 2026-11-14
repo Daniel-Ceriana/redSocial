@@ -25,10 +25,7 @@
 
 @switch (estado()) {
   @case ('cargando') {
-    <div class="estado" role="status">
-      <span class="spinner" aria-hidden="true"></span>
-      Cargando publicaciones...
-    </div>
+    <app-cargando texto="Cargando publicaciones..." />
   }
   @case ('error') {
     <div class="estado">

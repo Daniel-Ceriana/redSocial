@@ -6,11 +6,12 @@ import { PerfilPublico as PerfilPublicoDatos } from '../../../modelos/usuario';
 import { Auth } from '../../../services/auth';
 import { UsuariosApi } from '../../../services/usuarios-api';
 import { Avatar } from '../../compartido/avatar/avatar';
+import { Cargando } from '../../compartido/cargando/cargando';
 import { ListadoPublicaciones } from '../listado-publicaciones/listado-publicaciones';
 
 // Perfil de otro usuario: lo que él mismo muestra (sin correo ni fecha de nacimiento) y sus publicaciones
 @Component({
-  imports: [Avatar, ListadoPublicaciones, RouterLink],
+  imports: [Avatar, Cargando, ListadoPublicaciones, RouterLink],
   selector: 'app-perfil-publico',
   templateUrl: './perfil-publico.html',
   styleUrl: './perfil-publico.css',

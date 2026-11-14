@@ -1,7 +1,45 @@
-.comentario {
+:host {
+  display: block;
+}
+
+.cartel {
+  display: grid;
+  grid-template-columns: 8px 1fr;
+  gap: 0.6rem;
+}
+
+.poste {
+  background: linear-gradient(90deg, var(--madera-oscura), var(--riel));
+  border-radius: 2px;
+}
+
+.placa {
+  position: relative;
   display: flex;
   gap: 0.6rem;
-  padding: 0.6rem 0;
+  min-width: 0;
+  padding: 0.7rem 0.95rem;
+  background: var(--crema);
+  border: 2px solid var(--verde);
+  border-radius: 8px;
+  outline: 3px solid var(--ocre-claro);
+  outline-offset: -6px;
+  box-shadow: 0 2px 0 #c9b88f;
+}
+
+.placa .remache {
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+}
+
+.r1 {
+  left: 3px;
+}
+
+.r2 {
+  right: 3px;
 }
 
 .cuerpo {
@@ -21,10 +59,18 @@ p {
   font-size: 0.9rem;
 }
 
-time,
-.editado {
+time {
   font-size: 0.8rem;
   color: var(--gris);
+}
+
+.editado {
+  padding: 0 0.3rem;
+  font-family: var(--fuente-maquina);
+  font-size: 0.72rem;
+  color: var(--error);
+  border: 1px solid currentColor;
+  border-radius: 3px;
 }
 
 .mensaje {

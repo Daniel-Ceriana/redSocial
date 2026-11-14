@@ -72,11 +72,15 @@ La URL de la API está en `front/src/environments/environment.ts`.
 ### Decisiones técnicas
 
 - Angular standalone con signals, Signal Forms, `@if/@for`, guards `canMatch` y carga diferida por ruta (igual que el TP 1).
-- CSS propio con variables (`src/styles.css`). Identidad "Estación antigua": crema, verde locomotora y ocre; Playfair Display e Inter.
-- En cada acción del usuario (petición a la API o cambio de pantalla) se revisa si el token ya venció según `venceEn`: si venció, no se hace la petición, se cierra la sesión, se lleva al login y se avisa con el modal «Tu sesión venció». Un 401 de la API hace lo mismo. Sin sesión, tampoco se envían peticiones.
+- CSS propio con variables (`src/styles.css`), sin librerías de estilos. Identidad "Boletería de época": crema, verde locomotora y ocre; Playfair Display e Inter, Rye para los carteles y Courier Prime para fechas y chapas.
+- Temática de ferromodelismo en el propio diseño, aunque una publicación no tenga foto: cada publicación es una placa de estación esmaltada montada en un diorama (postes, pasto, vía y zócalo con la fecha en una chapa de bronce), y cada comentario es un cartel chico con su poste. Todos los dibujos son SVG y CSS propios (`componentes/compartido/locomotora`, `cargando`, `escena-tren`); las animaciones se apagan con `prefers-reduced-motion`.
+- Navegación como una vía con estaciones (la locomotora se para en la pantalla actual), el me gusta como una señal ferroviaria (roja / verde), la insignia del administrador con una gorra de jefe de estación y el avatar de los perfiles dentro de un reloj de estación.
+- El token dura **30 segundos** (fijo, para poder mostrarlo en la presentación; el enunciado pide 15 minutos). Login, registro y `POST /api/autenticacion/refrescar` devuelven `emitidoEn` y `venceEn`. Con eso, `services/auth.ts` programa dos temporizadores: a la mitad de la vida del token, un modal ofrece extender la sesión (si acepta, se llama a refrescar y se vuelve a programar todo); al vencer, se cierra la sesión sola, se lleva al login y se avisa con el modal «Tu sesión venció».
+- Además, en cada acción del usuario (petición a la API o cambio de pantalla) se revisa si el token ya venció según `venceEn`: si venció, no se hace la petición y pasa lo mismo. Un 401 de la API también. Sin sesión, tampoco se envían peticiones.
 - El token y su vencimiento se guardan en `localStorage`; un interceptor lo manda en `Authorization: Bearer`. Al abrir la app se valida con `GET /api/usuarios/yo`.
 - Sin `alert()`: los avisos y confirmaciones usan el modal propio (`services/modal.ts`).
-- Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo` y `fechaArgentina`.
+- Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo`, `fechaArgentina` y `fechaChapa` («14 NOV 2026»).
+- Validaciones compartidas en `utilidades/validaciones.ts`: recortan los espacios igual que el back y usan las mismas reglas y mensajes (correo con la misma exigencia de dominio que `@IsEmail()`, edad mínima con la fecha argentina).
 - Paginación con «Anterior» / «Siguiente»; después de crear o eliminar se vuelve a pedir la página a la API para que el total siempre coincida.
 - Las validaciones del front son las mismas que las del back (el back es la que manda).
 

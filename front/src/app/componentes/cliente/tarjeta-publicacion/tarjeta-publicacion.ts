@@ -2,14 +2,16 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Publicacion } from '../../../modelos/publicacion';
 import { FechaArgentinaPipe } from '../../../pipes/fecha-argentina';
+import { FechaChapaPipe } from '../../../pipes/fecha-chapa';
 import { TiempoRelativoPipe } from '../../../pipes/tiempo-relativo';
 import { AccionesPublicacion } from '../../../services/acciones-publicacion';
 import { Auth } from '../../../services/auth';
 import { Avatar } from '../../compartido/avatar/avatar';
 
-// Una publicación. Dar me gusta y eliminar los hace el servicio compartido; la tarjeta avisa el resultado.
+// Una publicación, dibujada como una placa de estación montada en un diorama (T26 de la hoja de ruta).
+// Dar me gusta y eliminar los hace el servicio compartido; la tarjeta avisa el resultado.
 @Component({
-  imports: [Avatar, RouterLink, TiempoRelativoPipe, FechaArgentinaPipe],
+  imports: [Avatar, RouterLink, TiempoRelativoPipe, FechaArgentinaPipe, FechaChapaPipe],
   selector: 'app-tarjeta-publicacion',
   templateUrl: './tarjeta-publicacion.html',
   styleUrl: './tarjeta-publicacion.css',

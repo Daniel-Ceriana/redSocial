@@ -23,9 +23,10 @@ import {
   obligatorio,
   patron,
 } from '../../../utilidades/validaciones';
+import { EscenaTren } from '../escena-tren/escena-tren';
 
 @Component({
-  imports: [FormField, RouterLink],
+  imports: [FormField, RouterLink, EscenaTren],
   selector: 'app-registro',
   templateUrl: './registro.html',
 })

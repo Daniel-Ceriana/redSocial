@@ -1,0 +1,55 @@
+:host {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 2rem 0;
+  color: var(--gris);
+}
+
+.pista {
+  position: relative;
+  width: min(260px, 100%);
+  height: 48px;
+  overflow: hidden;
+}
+
+/* La vía, de costado */
+.pista::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  height: 7px;
+  background:
+    linear-gradient(var(--riel), var(--riel)) 0 0 / 100% 2px no-repeat,
+    repeating-linear-gradient(90deg, var(--madera) 0 3px, transparent 3px 9px);
+}
+
+app-locomotora {
+  position: absolute;
+  left: 0;
+  bottom: 8px;
+  width: 64px;
+  animation: avanzar 2.6s linear infinite;
+}
+
+p {
+  margin: 0;
+}
+
+@keyframes avanzar {
+  from {
+    transform: translateX(-70px);
+  }
+  to {
+    transform: translateX(270px);
+  }
+}
+
+/* Sin animación, la locomotora queda quieta en el medio */
+@media (prefers-reduced-motion: reduce) {
+  app-locomotora {
+    left: calc(50% - 32px);
+  }
+}

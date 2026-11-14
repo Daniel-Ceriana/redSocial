@@ -45,9 +45,11 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 
 | ID | Requerimiento | Estado |
 |----|---------------|--------|
-| 3.F8 | Cualquier respuesta 401 lleva al login | 🟨 adelantado; falta probarlo en el navegador |
+| 3.F8 | Cualquier respuesta 401 lleva al login | 🟨 adelantado (también al vencer el token, sin esperar una acción); falta probarlo en el navegador |
 | X13 | Aviso y cierre de sesión cuando vence el token | 🟨 adelantado; falta probarlo en el navegador |
-| 3.B5–3.B7, 3.F5–3.F7 | Autorizar, refrescar, spinner inicial y contador de 10 minutos | ⬜ (S7 y S9) |
+| 3.B7 | Refrescar el token (`POST /api/autenticacion/refrescar`) | 🟨 adelantado, con token de 30 s; falta probarlo |
+| 3.F7 | Ofrecer extender la sesión antes de que venza | 🟨 adelantado: a la mitad de los 30 s; falta probarlo en el navegador |
+| 3.B5, 3.B6, 3.F5, 3.F6 | Vencimiento de 15 min, autorizar y spinner inicial | ⬜ (S7 y S9) |
 
 ## Agregados aprobados
 

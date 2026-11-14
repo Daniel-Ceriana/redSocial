@@ -1,17 +1,34 @@
-@if (usuario().imagenPerfil) {
-  <img
-    [src]="usuario().imagenPerfil"
-    [alt]="'Foto de ' + usuario().nombreUsuario"
-    [style.width.px]="tamano()"
-    [style.height.px]="tamano()"
-  />
-} @else {
-  <span
-    class="inicial"
-    aria-hidden="true"
-    [style.width.px]="tamano()"
-    [style.height.px]="tamano()"
-    [style.font-size.px]="tamano() * 0.45"
-    >{{ inicial() }}</span
-  >
-}
+<div
+  class="contenedor"
+  [class.reloj]="reloj()"
+  [style.width.px]="tamanoTotal()"
+  [style.height.px]="tamanoTotal()"
+>
+  @if (reloj()) {
+    <!-- Esfera de reloj de estación alrededor de la foto (E6) -->
+    <svg class="esfera" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="48.5" />
+      @for (m of MARCAS; track $index) {
+        <line [attr.x1]="m.x1" [attr.y1]="m.y1" [attr.x2]="m.x2" [attr.y2]="m.y2" [class.hora]="m.hora" />
+      }
+    </svg>
+  }
+
+  @if (usuario().imagenPerfil) {
+    <img
+      [src]="usuario().imagenPerfil"
+      [alt]="'Foto de ' + usuario().nombreUsuario"
+      [style.width.px]="tamano()"
+      [style.height.px]="tamano()"
+    />
+  } @else {
+    <span
+      class="inicial"
+      aria-hidden="true"
+      [style.width.px]="tamano()"
+      [style.height.px]="tamano()"
+      [style.font-size.px]="tamano() * 0.45"
+      >{{ inicial() }}</span
+    >
+  }
+</div>

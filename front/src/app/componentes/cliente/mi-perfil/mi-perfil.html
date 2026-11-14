@@ -1,4 +1,4 @@
-<h1>Mi perfil</h1>
+<h1 class="cartel-titulo">Mi perfil</h1>
 
 @if (aviso()) {
   <p class="aviso-ok" role="status">{{ aviso() }}</p>
@@ -9,7 +9,7 @@
     <app-editar-perfil (guardado)="alGuardar()" (cancelado)="editando.set(false)" />
   } @else {
     <section class="tarjeta tarjeta-ancha perfil">
-      <app-avatar [usuario]="u" [tamano]="120" />
+      <app-avatar [usuario]="u" [tamano]="110" [reloj]="true" />
 
       <div class="datos">
         <h2>{{ u.nombre }} {{ u.apellido }}</h2>
@@ -35,15 +35,14 @@
   }
 }
 
+<hr class="riel" />
+
 <section class="publicaciones">
   <h2>Mis últimas publicaciones</h2>
 
   @switch (estado()) {
     @case ('cargando') {
-      <div class="estado" role="status">
-        <span class="spinner" aria-hidden="true"></span>
-        Cargando tus publicaciones...
-      </div>
+      <app-cargando texto="Cargando tus publicaciones..." />
     }
     @case ('error') {
       <div class="estado">
@@ -63,6 +62,7 @@
             (desactualizada)="cargarPublicaciones()"
           />
           <section class="comentarios" [attr.aria-label]="'Comentarios de ' + item.publicacion.titulo">
+            <h3>Comentarios</h3>
             @if (item.comentarios.length === 0) {
               <p class="sin-comentarios">Todavía no hay comentarios</p>
             } @else {

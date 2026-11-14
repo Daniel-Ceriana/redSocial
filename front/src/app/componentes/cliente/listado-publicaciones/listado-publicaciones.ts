@@ -5,11 +5,12 @@ import {
   PUBLICACIONES_POR_PAGINA,
 } from '../../../modelos/publicacion';
 import { PublicacionesApi } from '../../../services/publicaciones-api';
+import { Cargando } from '../../compartido/cargando/cargando';
 import { TarjetaPublicacion } from '../tarjeta-publicacion/tarjeta-publicacion';
 
 // Listado de tarjetas con orden y paginación. Con `usuarioId` muestra solo las de ese usuario.
 @Component({
-  imports: [TarjetaPublicacion],
+  imports: [TarjetaPublicacion, Cargando],
   selector: 'app-listado-publicaciones',
   templateUrl: './listado-publicaciones.html',
   styleUrl: './listado-publicaciones.css',

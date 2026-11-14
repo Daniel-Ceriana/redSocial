@@ -1,16 +1,21 @@
 @let c = comentario();
-<div class="comentario">
-  <app-avatar [usuario]="c.autor" [tamano]="32" />
-  <div class="cuerpo">
-    <p class="cabecera">
-      <strong>{{ c.autor.nombre }} {{ c.autor.apellido }}</strong>
-      <time [attr.datetime]="c.fecha" [title]="c.fecha | fechaArgentina">
-        {{ c.fecha | tiempoRelativo }}
-      </time>
-      @if (c.modificado) {
-        <span class="editado">(editado)</span>
-      }
-    </p>
-    <p class="mensaje">{{ c.mensaje }}</p>
+<!-- Cartel chico de estación con su poste: crema, borde verde y dos remaches -->
+<div class="cartel">
+  <span class="poste" aria-hidden="true"></span>
+  <div class="placa">
+    <span class="remache r1"></span><span class="remache r2"></span>
+    <app-avatar [usuario]="c.autor" [tamano]="30" />
+    <div class="cuerpo">
+      <p class="cabecera">
+        <strong>{{ c.autor.nombre }} {{ c.autor.apellido }}</strong>
+        <time [attr.datetime]="c.fecha" [title]="c.fecha | fechaArgentina">
+          {{ c.fecha | tiempoRelativo }}
+        </time>
+        @if (c.modificado) {
+          <span class="editado">editado</span>
+        }
+      </p>
+      <p class="mensaje">{{ c.mensaje }}</p>
+    </div>
   </div>
 </div>

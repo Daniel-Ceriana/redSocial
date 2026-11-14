@@ -5,6 +5,7 @@ import { Auth } from '../../../services/auth';
 import { PublicacionesApi } from '../../../services/publicaciones-api';
 import { formatearFecha } from '../../../utilidades/fechas';
 import { Avatar } from '../../compartido/avatar/avatar';
+import { Cargando } from '../../compartido/cargando/cargando';
 import { Comentario } from '../../compartido/comentario/comentario';
 import { EditarPerfil } from '../editar-perfil/editar-perfil';
 import { TarjetaPublicacion } from '../tarjeta-publicacion/tarjeta-publicacion';
@@ -19,7 +20,7 @@ interface PublicacionConComentarios {
 }
 
 @Component({
-  imports: [Avatar, Comentario, EditarPerfil, TarjetaPublicacion],
+  imports: [Avatar, Cargando, Comentario, EditarPerfil, TarjetaPublicacion],
   selector: 'app-mi-perfil',
   templateUrl: './mi-perfil.html',
   styleUrl: './mi-perfil.css',

@@ -16,12 +16,18 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-family: var(--fuente-titulo);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
+  gap: 0.6rem;
+  font-family: var(--fuente-cartel);
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+  color: var(--crema);
   text-decoration: none;
+}
+
+.logo-loco {
+  width: 46px;
+  color: var(--crema);
+  --ventana: var(--verde);
 }
 
 .enlaces {
@@ -30,16 +36,78 @@
   gap: 1.25rem;
 }
 
-.enlaces a {
-  padding: 0.25rem 0;
-  color: #fff;
-  text-decoration: none;
-  border-bottom: 2px solid transparent;
+/* ---------- La vía con sus estaciones (E1) ---------- */
+.linea {
+  position: relative;
+  display: flex;
+  gap: 2.5rem;
+  padding: 0 0.75rem;
 }
 
-.enlaces a:hover,
-.enlaces a.activo {
-  border-bottom-color: var(--ocre);
+/* Dos rieles con durmientes que pasan por debajo de todas las estaciones */
+.linea::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 8px;
+  background:
+    linear-gradient(var(--ocre-claro), var(--ocre-claro)) 0 1px / 100% 1.5px no-repeat,
+    linear-gradient(var(--ocre-claro), var(--ocre-claro)) 0 5.5px / 100% 1.5px no-repeat,
+    repeating-linear-gradient(90deg, rgb(241 227 194 / 55%) 0 2px, transparent 2px 8px);
+}
+
+.estacion {
+  position: relative;
+  padding: 0.1rem 0 1.5rem;
+  font-size: 0.95rem;
+  color: var(--crema);
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+/* El andén: un círculo sobre la vía */
+.estacion::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  background: var(--verde);
+  border: 3px solid var(--crema);
+  border-radius: 50%;
+}
+
+.estacion:hover,
+.estacion.activo {
+  opacity: 1;
+}
+
+.estacion.activo {
+  font-weight: 600;
+}
+
+.estacion.activo::after {
+  background: var(--ocre);
+}
+
+.estacion:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 3px;
+}
+
+/* La locomotora, parada en la estación actual */
+.tren {
+  position: absolute;
+  left: calc(50% - 38px);
+  bottom: 6px;
+  width: 28px;
+  color: var(--crema);
+  --ventana: var(--verde);
+  --rueda: var(--ocre);
 }
 
 .usuario {
@@ -47,6 +115,29 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
+}
+
+/* ---------- Insignia del administrador (E5) ---------- */
+.insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.6rem 0.1rem 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--verde-oscuro);
+  background: var(--ocre-claro);
+  border-radius: 99px;
+}
+
+.insignia svg {
+  width: 20px;
+  height: 16px;
+  fill: var(--verde);
+}
+
+.insignia .visera {
+  fill: var(--ocre);
 }
 
 .hamburguesa {
@@ -60,7 +151,7 @@
   cursor: pointer;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .hamburguesa {
     display: block;
   }
@@ -75,5 +166,40 @@
 
   .enlaces.abierto {
     display: flex;
+  }
+
+  /* En el celular la vía va vertical, a la izquierda de las estaciones */
+  .linea {
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 0.25rem 0 0.25rem 1.75rem;
+  }
+
+  .linea::before {
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    right: auto;
+    width: 8px;
+    height: auto;
+    background:
+      linear-gradient(var(--ocre-claro), var(--ocre-claro)) 1px 0 / 1.5px 100% no-repeat,
+      linear-gradient(var(--ocre-claro), var(--ocre-claro)) 5.5px 0 / 1.5px 100% no-repeat,
+      repeating-linear-gradient(180deg, rgb(241 227 194 / 55%) 0 2px, transparent 2px 8px);
+  }
+
+  .estacion {
+    padding: 0;
+  }
+
+  .estacion::after {
+    left: -1.75rem;
+    top: 50%;
+    bottom: auto;
+    margin: -7px 0 0 1px;
+  }
+
+  .tren {
+    display: none;
   }
 }

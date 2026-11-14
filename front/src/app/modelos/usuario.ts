@@ -22,9 +22,10 @@ export interface PerfilPublico {
   imagenPerfil: string;
 }
 
-// Lo que devuelven el login y el registro
+// Lo que devuelven el login, el registro y refrescar
 export interface RespuestaSesion {
   token: string;
+  emitidoEn: string; // fecha ISO
   venceEn: string; // fecha ISO
   usuario: Usuario;
 }

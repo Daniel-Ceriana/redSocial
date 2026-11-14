@@ -15,6 +15,27 @@
   --radio: 10px;
   --fuente-titulo: 'Playfair Display', Georgia, serif;
   --fuente-texto: 'Inter', system-ui, sans-serif;
+  /* Carteles de estación (títulos de las placas) y letra de máquina (fechas y chapas) */
+  --fuente-cartel: 'Rye', 'Playfair Display', Georgia, serif;
+  --fuente-maquina: 'Courier Prime', 'Courier New', monospace;
+
+  /* Maqueta: madera de los postes y del zócalo, pasto, balasto y rieles */
+  --madera: #8b6a48;
+  --madera-oscura: #3a2d22;
+  --pasto: #889e66;
+  --pasto-oscuro: #6f8a4e;
+  --balasto: #9a9188;
+  --riel: #5b4a38;
+  --bronce: #e6c77c;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 *,
@@ -63,18 +84,20 @@ a {
 }
 
 .marca {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-family: var(--fuente-titulo);
-  font-size: 2rem;
-  font-weight: 700;
+  font-family: var(--fuente-cartel);
+  font-size: 2.2rem;
+  letter-spacing: 0.03em;
   color: var(--verde);
+  text-align: center;
 }
 
-.marca img {
-  width: 44px;
-  height: 44px;
+/* Login y registro: la ilustración (E8) va arriba de todo, y el nombre y el lema quedan separados del formulario */
+.pagina-centrada:has(app-escena-tren) {
+  padding-top: 0.5rem;
+}
+
+.pagina-centrada .lema {
+  margin-bottom: 0.75rem;
 }
 
 .lema {
@@ -83,14 +106,108 @@ a {
   text-align: center;
 }
 
+/* Cartel crema de estación: borde verde, filete ocre adentro y dos remaches arriba */
 .tarjeta {
+  position: relative;
   width: 100%;
   max-width: 520px;
   padding: 1.5rem;
   background: var(--papel);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra);
+  border: 2px solid var(--verde);
+  border-radius: 12px;
+  outline: 3px solid var(--ocre-claro);
+  outline-offset: -8px;
+  box-shadow: 0 3px 0 var(--borde), var(--sombra);
+}
+
+.tarjeta::before,
+.tarjeta::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--ocre-claro), #8a6420);
+}
+
+.tarjeta::before {
+  left: 4px;
+}
+
+.tarjeta::after {
+  right: 4px;
+}
+
+/* Título de pantalla como cartel de andén: verde, letra de cartel y remaches a los costados */
+.cartel-titulo {
+  position: relative;
+  display: inline-block;
+  margin: 0 0 1.25rem;
+  padding: 0.4rem 1.4rem;
+  font-family: var(--fuente-cartel);
+  font-weight: 400;
+  font-size: 1.5rem;
+  letter-spacing: 0.06em;
+  color: var(--crema);
+  background: var(--verde);
+  border: 3px solid var(--crema);
+  border-radius: 8px;
+  outline: 2px solid var(--verde);
+  box-shadow: 0 3px 0 var(--verde-oscuro);
+}
+
+.cartel-titulo::before,
+.cartel-titulo::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--ocre);
+}
+
+.cartel-titulo::before {
+  left: 6px;
+}
+
+.cartel-titulo::after {
+  right: 6px;
+}
+
+/* ---------- Maqueta (piezas compartidas) ---------- */
+.remache {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--ocre-claro), #8a6420);
+}
+
+/* Vía vista de costado: balasto con piedritas, durmientes y dos rieles */
+.via {
+  height: 18px;
+  background:
+    linear-gradient(var(--riel), var(--riel)) 0 4px / 100% 2.5px no-repeat,
+    linear-gradient(var(--riel), var(--riel)) 0 11px / 100% 2.5px no-repeat,
+    repeating-linear-gradient(90deg, #6e5238 0 5px, transparent 5px 13px) 0 2px / 100% 14px no-repeat,
+    radial-gradient(circle at 30% 40%, #b7aea3 0 1px, transparent 1.5px) 0 0 / 5px 5px,
+    radial-gradient(circle at 70% 70%, #7f776e 0 1px, transparent 1.5px) 0 0 / 6px 6px,
+    var(--balasto);
+}
+
+/* Separador de riel entre secciones (E2) */
+.riel {
+  height: 16px;
+  margin: 1.75rem 0 1.25rem;
+  border: 0;
+  background:
+    linear-gradient(var(--riel), var(--riel)) 0 3px / 100% 3px no-repeat,
+    linear-gradient(var(--riel), var(--riel)) 0 10px / 100% 3px no-repeat,
+    repeating-linear-gradient(90deg, var(--madera) 0 6px, transparent 6px 18px);
+  opacity: 0.85;
 }
 
 .tarjeta-ancha {
@@ -251,12 +368,19 @@ a {
   text-align: center;
 }
 
+.mensaje-pagina svg {
+  display: block;
+  width: min(260px, 100%);
+  height: auto;
+  margin: 0 auto 1rem;
+}
+
 .mensaje-pagina .codigo {
-  font-family: var(--fuente-titulo);
-  font-size: 4rem;
+  font-family: var(--fuente-maquina);
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--ocre);
-  line-height: 1;
+  letter-spacing: 0.15em;
+  color: var(--gris);
 }
 
 /* ---------- Vista previa de imagen ---------- */
@@ -289,22 +413,4 @@ a {
   padding: 2rem 0;
   color: var(--gris);
   text-align: center;
-}
-
-.spinner {
-  display: inline-block;
-  width: 1.1rem;
-  height: 1.1rem;
-  margin-right: 0.5rem;
-  vertical-align: middle;
-  border: 3px solid var(--borde);
-  border-top-color: var(--verde);
-  border-radius: 50%;
-  animation: girar 0.8s linear infinite;
-}
-
-@keyframes girar {
-  to {
-    transform: rotate(360deg);
-  }
 }
