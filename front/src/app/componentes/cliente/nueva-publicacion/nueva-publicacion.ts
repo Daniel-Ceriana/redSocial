@@ -1,9 +1,10 @@
 import { Component, inject, output, signal } from '@angular/core';
-import { form, FormField, maxLength, required, submit } from '@angular/forms/signals';
+import { form, FormField, submit } from '@angular/forms/signals';
 import { Modal } from '../../../services/modal';
 import { PublicacionesApi } from '../../../services/publicaciones-api';
 import { mensajesDeError } from '../../../utilidades/errores';
 import { validarImagen } from '../../../utilidades/imagen';
+import { largoMaximo, obligatorio } from '../../../utilidades/validaciones';
 
 // Formulario plegable para crear una publicación. Avisa con `creada` cuando la API la guardó.
 @Component({
@@ -23,9 +24,9 @@ export class NuevaPublicacion {
   protected model = signal({ titulo: '', descripcion: '' });
 
   protected nuevaForm = form(this.model, (p) => {
-    required(p.titulo, { message: 'El título es obligatorio' });
-    maxLength(p.titulo, 100, { message: 'El título puede tener hasta 100 caracteres' });
-    maxLength(p.descripcion, 500, { message: 'La descripción puede tener hasta 500 caracteres' });
+    obligatorio(p.titulo, 'El título es obligatorio');
+    largoMaximo(p.titulo, 100, 'El título puede tener hasta 100 caracteres');
+    largoMaximo(p.descripcion, 500, 'La descripción puede tener hasta 500 caracteres');
   });
 
   // La imagen (opcional) va aparte del formulario, porque un archivo no es un valor de texto

@@ -26,7 +26,7 @@ export const invitadoMatch: CanMatchFn = async () => {
   return haySesionVigente(auth) ? router.createUrlTree(['/publicaciones']) : true;
 };
 
-// Solo administradores (se usa desde el sprint 4). Sin sesión va al login; con otro perfil, a "sin permiso".
+// Solo administradores (me queda para el sprint 4). Sin sesión va al login; con otro perfil, a "sin permiso".
 export const adminMatch: CanMatchFn = async () => {
   const auth = inject(Auth);
   const router = inject(Router);

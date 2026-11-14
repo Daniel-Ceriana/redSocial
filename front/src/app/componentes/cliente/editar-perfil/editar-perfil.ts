@@ -1,21 +1,18 @@
 import { Component, inject, output, signal } from '@angular/core';
-import {
-  form,
-  FormField,
-  maxLength,
-  pattern,
-  required,
-  submit,
-  validate,
-} from '@angular/forms/signals';
+import { form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
 import { Modal } from '../../../services/modal';
 import { mensajesDeError } from '../../../utilidades/errores';
-import { aTextoFecha, fechaHaceAnios } from '../../../utilidades/fechas';
+import { fechaHaceAnios } from '../../../utilidades/fechas';
 import { validarImagen } from '../../../utilidades/imagen';
+import {
+  EDAD_MINIMA,
+  fechaNacimiento,
+  largoMaximo,
+  obligatorio,
+  patron,
+} from '../../../utilidades/validaciones';
 import { Avatar } from '../../compartido/avatar/avatar';
-
-const EDAD_MINIMA = 13;
 
 // Formulario para editar el propio perfil. El correo se ve pero no se puede cambiar.
 @Component({
@@ -48,34 +45,23 @@ export class EditarPerfil {
   });
 
   protected perfilForm = form(this.model, (p) => {
-    required(p.nombre, { message: 'El nombre es obligatorio' });
-    maxLength(p.nombre, 50, { message: 'El nombre puede tener hasta 50 caracteres' });
+    obligatorio(p.nombre, 'El nombre es obligatorio');
+    largoMaximo(p.nombre, 50, 'El nombre puede tener hasta 50 caracteres');
 
-    required(p.apellido, { message: 'El apellido es obligatorio' });
-    maxLength(p.apellido, 50, { message: 'El apellido puede tener hasta 50 caracteres' });
+    obligatorio(p.apellido, 'El apellido es obligatorio');
+    largoMaximo(p.apellido, 50, 'El apellido puede tener hasta 50 caracteres');
 
-    required(p.nombreUsuario, { message: 'El nombre de usuario es obligatorio' });
-    pattern(p.nombreUsuario, /^[A-Za-z0-9_.]{3,20}$/, {
-      message: 'Entre 3 y 20 caracteres: letras, números, "_" o "."',
-    });
+    obligatorio(p.nombreUsuario, 'El nombre de usuario es obligatorio');
+    patron(
+      p.nombreUsuario,
+      /^[A-Za-z0-9_.]{3,20}$/,
+      'El nombre de usuario debe tener entre 3 y 20 caracteres: letras, números, "_" o "."',
+    );
 
     required(p.fechaNacimiento, { message: 'La fecha de nacimiento es obligatoria' });
-    validate(p.fechaNacimiento, ({ value }) => {
-      const fecha = value();
-      if (!fecha) return null; // ya lo cubre required
-      if (fecha > aTextoFecha(new Date())) {
-        return { kind: 'futura', message: 'La fecha de nacimiento no puede ser futura' };
-      }
-      if (fecha > this.fechaMaxima) {
-        return {
-          kind: 'menor',
-          message: `Tenés que tener al menos ${EDAD_MINIMA} años para registrarte`,
-        };
-      }
-      return null;
-    });
+    fechaNacimiento(p.fechaNacimiento);
 
-    maxLength(p.descripcion, 200, { message: 'La descripción puede tener hasta 200 caracteres' });
+    largoMaximo(p.descripcion, 200, 'La descripción puede tener hasta 200 caracteres');
 
     // La contraseña nueva es opcional: solo se valida si se escribió algo
     validate(p.contrasena, ({ value }) => {

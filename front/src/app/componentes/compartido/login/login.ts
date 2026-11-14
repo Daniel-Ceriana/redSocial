@@ -4,7 +4,6 @@ import {
   form,
   FormField,
   required,
-  email,
   minLength,
   maxLength,
   pattern,
@@ -14,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Auth } from '../../../services/auth';
 import { Modal } from '../../../services/modal';
 import { mensajesDeError } from '../../../utilidades/errores';
+import { correo, obligatorio } from '../../../utilidades/validaciones';
 
 // Cuentas creadas por el seed del back (npm run seed)
 const CUENTAS_RAPIDAS = {
@@ -36,9 +36,11 @@ export class Login {
   private model = signal({ correo: '', contrasena: '' });
 
   loginForm = form(this.model, (p) => {
-    required(p.correo, { message: 'El correo es obligatorio' });
-    email(p.correo, { message: 'El correo no tiene un formato válido' });
+    obligatorio(p.correo, 'El correo es obligatorio');
+    correo(p.correo);
 
+    // Excepción acordada a la regla 8: el back del login solo pide que la contraseña no esté vacía, para que una
+    // contraseña equivocada siempre dé 401 "Correo o contraseña incorrectos" y no un 400 de formato.
     required(p.contrasena, { message: 'La contraseña es obligatoria' });
     minLength(p.contrasena, 8, { message: 'La contraseña debe tener al menos 8 caracteres' });
     maxLength(p.contrasena, 64, { message: 'La contraseña puede tener hasta 64 caracteres' });

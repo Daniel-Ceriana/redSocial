@@ -4,15 +4,16 @@ export function formatearFecha(fecha: string): string {
   return `${dia}/${mes}/${anio}`;
 }
 
-// Fecha de hoy menos `anios` años, como AAAA-MM-DD (hora local de Argentina en el navegador)
-export function fechaHaceAnios(anios: number): string {
-  const hoy = new Date();
-  const fecha = new Date(hoy.getFullYear() - anios, hoy.getMonth(), hoy.getDate());
-  return aTextoFecha(fecha);
+const ZONA_ARGENTINA = 'America/Argentina/Buenos_Aires';
+
+// Fecha de hoy en Argentina como AAAA-MM-DD, sin importar la zona horaria del navegador
+// (el formato "en-CA" da justo AAAA-MM-DD). El back calcula igual (common/edad-minima.validator.ts).
+export function hoyEnArgentina(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: ZONA_ARGENTINA }).format(new Date());
 }
 
-export function aTextoFecha(fecha: Date): string {
-  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-  const dia = String(fecha.getDate()).padStart(2, '0');
-  return `${fecha.getFullYear()}-${mes}-${dia}`;
+// Hoy en Argentina menos `anios` años, como AAAA-MM-DD (un 29/02 pasa al 01/03 si el año no es bisiesto)
+export function fechaHaceAnios(anios: number): string {
+  const [anio, mes, dia] = hoyEnArgentina().split('-').map(Number);
+  return new Date(Date.UTC(anio - anios, mes - 1, dia)).toISOString().slice(0, 10);
 }
