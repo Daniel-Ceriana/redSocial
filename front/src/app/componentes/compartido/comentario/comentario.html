@@ -14,8 +14,36 @@
         @if (c.modificado) {
           <span class="editado">editado</span>
         }
+        @if (editable() && esMio() && !editando()) {
+          <button type="button" class="editar" (click)="empezarEdicion()">Editar</button>
+        }
       </p>
-      <p class="mensaje">{{ c.mensaje }}</p>
+
+      @if (editando()) {
+        <form class="edicion" novalidate (submit)="guardar($event)">
+          <label class="oculto" [for]="'editar-' + c.id">Editar comentario</label>
+          <textarea
+            [id]="'editar-' + c.id"
+            rows="2"
+            [formField]="edicionForm.mensaje"
+            [attr.aria-invalid]="edicionForm.mensaje().touched() && edicionForm.mensaje().invalid()"
+          ></textarea>
+          <div class="pie-edicion">
+            <small class="ayuda">{{ model().mensaje.trim().length }}/{{ LARGO_MAXIMO }}</small>
+            @if (edicionForm.mensaje().touched() && edicionForm.mensaje().invalid()) {
+              <small class="error" role="alert">{{ edicionForm.mensaje().errors()[0].message }}</small>
+            }
+          </div>
+          <div class="botones">
+            <button type="button" class="btn btn-secundario" (click)="cancelar()">Cancelar</button>
+            <button type="submit" class="btn" [disabled]="edicionForm().submitting()">
+              {{ edicionForm().submitting() ? 'Guardando...' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      } @else {
+        <p class="mensaje">{{ c.mensaje }}</p>
+      }
     </div>
   </div>
 </div>

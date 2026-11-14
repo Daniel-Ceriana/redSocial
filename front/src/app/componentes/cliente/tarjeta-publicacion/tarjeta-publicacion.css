@@ -101,6 +101,25 @@ h2 {
   text-wrap: balance;
 }
 
+.enlace-titulo,
+.enlace-comentarios {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+.enlace-titulo:hover,
+.enlace-comentarios:hover {
+  text-decoration: underline;
+}
+
+.enlace-titulo:focus-visible,
+.enlace-comentarios:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 2px;
+}
+
 .descripcion {
   margin: 0;
   opacity: 0.92;

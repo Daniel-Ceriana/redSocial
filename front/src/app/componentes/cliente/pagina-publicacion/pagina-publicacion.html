@@ -1,0 +1,93 @@
+<a class="volver" routerLink="/publicaciones">‹ Volver a publicaciones</a>
+
+@switch (estado()) {
+  @case ('cargando') {
+    <app-cargando texto="Cargando publicación..." />
+  }
+  @case ('noExiste') {
+    <section class="mensaje-pagina">
+      <p class="codigo">ERROR 404</p>
+      <h1>Esta publicación no existe</h1>
+      <p>Puede que la hayan dado de baja o que el enlace esté mal.</p>
+      <a class="btn" routerLink="/publicaciones">Volver a publicaciones</a>
+    </section>
+  }
+  @case ('error') {
+    <div class="estado">
+      <p class="error">No se pudo cargar la publicación.</p>
+      <button type="button" class="btn" (click)="cargar(id())">Reintentar</button>
+    </div>
+  }
+  @case ('listo') {
+    @if (publicacion(); as p) {
+      <app-tarjeta-publicacion
+        [publicacion]="p"
+        [enlazar]="false"
+        (cambio)="publicacion.set($event)"
+        (eliminada)="alEliminar()"
+        (desactualizada)="cargar(id())"
+      />
+
+      <hr class="riel" />
+
+      <section class="comentarios" aria-labelledby="titulo-comentarios">
+        <h2 id="titulo-comentarios">Comentarios</h2>
+
+        @if (aviso()) {
+          <p class="aviso-ok" role="status">{{ aviso() }}</p>
+        }
+
+        <!-- Escribir un comentario (3.F2), arriba de la lista (D8.2) -->
+        <form class="tarjeta tarjeta-ancha nuevo" novalidate (submit)="comentar($event)">
+          <div class="campo">
+            <label for="mensaje-comentario">Tu comentario</label>
+            <textarea
+              id="mensaje-comentario"
+              rows="3"
+              [formField]="comentarioForm.mensaje"
+              [attr.aria-invalid]="comentarioForm.mensaje().touched() && comentarioForm.mensaje().invalid()"
+            ></textarea>
+            <small class="ayuda">{{ largoMensaje() }}/{{ LARGO_MAXIMO }}</small>
+            @if (comentarioForm.mensaje().touched() && comentarioForm.mensaje().invalid()) {
+              <small class="error" role="alert">{{ comentarioForm.mensaje().errors()[0].message }}</small>
+            }
+          </div>
+          <button type="submit" class="btn" [disabled]="comentarioForm().submitting()">
+            {{ comentarioForm().submitting() ? 'Publicando...' : 'Comentar' }}
+          </button>
+        </form>
+
+        <!-- Uno debajo del otro, el más nuevo primero (3.F3) -->
+        @if (comentarios().length === 0) {
+          <p class="vacio">Todavía no hay comentarios. ¡Escribí el primero!</p>
+        } @else {
+          <div class="lista">
+            @for (comentario of comentarios(); track comentario.id) {
+              <app-comentario
+                [comentario]="comentario"
+                [editable]="true"
+                (editado)="reemplazarComentario($event)"
+              />
+            }
+          </div>
+
+          <p class="cuenta">
+            Mostrando {{ comentarios().length }} de {{ totalComentarios() }}
+            {{ totalComentarios() === 1 ? 'comentario' : 'comentarios' }}
+          </p>
+        }
+
+        @if (hayMas()) {
+          <button
+            type="button"
+            class="btn btn-secundario mas"
+            [disabled]="cargandoMas()"
+            (click)="cargarMas()"
+          >
+            {{ cargandoMas() ? 'Cargando...' : 'Cargar más comentarios' }}
+          </button>
+        }
+      </section>
+    }
+  }
+}

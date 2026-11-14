@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.volver {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.comentarios {
+  display: grid;
+  gap: 1rem;
+}
+
+.comentarios h2 {
+  margin: 0;
+}
+
+.nuevo {
+  max-width: none;
+}
+
+.nuevo .campo textarea {
+  resize: vertical;
+}
+
+.lista {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.vacio,
+.cuenta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--gris);
+  text-align: center;
+}
+
+.mas {
+  justify-self: center;
+}

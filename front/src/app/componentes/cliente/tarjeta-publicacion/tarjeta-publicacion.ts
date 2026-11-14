@@ -21,6 +21,8 @@ export class TarjetaPublicacion {
   protected acciones = inject(AccionesPublicacion);
 
   publicacion = input.required<Publicacion>();
+  // El título y "N comentarios" llevan a la página de la publicación (D8.4); en esa misma página, no
+  enlazar = input(true);
 
   // Cambió el me gusta: trae la publicación con los números nuevos
   cambio = output<Publicacion>();

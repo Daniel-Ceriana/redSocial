@@ -20,6 +20,14 @@ export const routes: Routes = [
       import('./componentes/cliente/publicaciones/publicaciones').then((m) => m.Publicaciones),
   },
   {
+    path: 'publicaciones/:id',
+    canMatch: [sesionMatch],
+    loadComponent: () =>
+      import('./componentes/cliente/pagina-publicacion/pagina-publicacion').then(
+        (m) => m.PaginaPublicacion,
+      ),
+  },
+  {
     path: 'perfil',
     canMatch: [sesionMatch],
     loadComponent: () => import('./componentes/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil),

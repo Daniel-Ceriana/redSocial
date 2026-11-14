@@ -34,11 +34,30 @@ export class PublicacionesApi {
     return firstValueFrom(this.http.get<Pagina<Publicacion>>(this.url, { params }));
   }
 
-  // Los comentarios más recientes de una publicación
-  comentarios(id: string, limite: number) {
-    const params = { offset: 0, limit: limite };
+  // Una publicación (para su página)
+  obtener(id: string) {
+    return firstValueFrom(this.http.get<Publicacion>(`${this.url}/${id}`));
+  }
+
+  // Comentarios de una publicación, los más recientes primero. Para "cargar más", `offset` = cuántos ya se tienen.
+  comentarios(id: string, limite: number, offset = 0) {
+    const params = { offset, limit: limite };
     return firstValueFrom(
       this.http.get<Pagina<ComentarioPublicacion>>(`${this.url}/${id}/comentarios`, { params }),
+    );
+  }
+
+  comentar(id: string, mensaje: string) {
+    return firstValueFrom(
+      this.http.post<ComentarioPublicacion>(`${this.url}/${id}/comentarios`, { mensaje }),
+    );
+  }
+
+  editarComentario(id: string, comentarioId: string, mensaje: string) {
+    return firstValueFrom(
+      this.http.put<ComentarioPublicacion>(`${this.url}/${id}/comentarios/${comentarioId}`, {
+        mensaje,
+      }),
     );
   }
 

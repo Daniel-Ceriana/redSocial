@@ -77,3 +77,74 @@ time {
   overflow-wrap: anywhere;
   white-space: pre-line;
 }
+
+/* ---------- Edición en el mismo cartel (D8.3) ---------- */
+.editar {
+  margin-left: auto;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--verde);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.editar:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 2px;
+}
+
+.edicion {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.edicion textarea {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+  color: var(--carbon);
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.edicion textarea:focus {
+  outline: 3px solid var(--ocre);
+  outline-offset: 1px;
+}
+
+.edicion textarea[aria-invalid='true'] {
+  border-color: var(--error);
+}
+
+.pie-edicion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+}
+
+.botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.botones .btn {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.88rem;
+}
+
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

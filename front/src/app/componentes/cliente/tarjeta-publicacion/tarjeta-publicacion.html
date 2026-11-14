@@ -19,7 +19,13 @@
         </div>
       </header>
 
-      <h2>{{ p.titulo }}</h2>
+      <h2>
+        @if (enlazar()) {
+          <a class="enlace-titulo" [routerLink]="['/publicaciones', p.id]">{{ p.titulo }}</a>
+        } @else {
+          {{ p.titulo }}
+        }
+      </h2>
       @if (p.descripcion) {
         <p class="descripcion">{{ p.descripcion }}</p>
       }
@@ -40,9 +46,15 @@
           <span class="semaforo" aria-hidden="true"><i class="luz-roja"></i><i class="luz-verde"></i></span>
           {{ p.cantidadMeGusta }} me gusta
         </button>
-        <span class="contador">
-          {{ p.cantidadComentarios }} {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
-        </span>
+        @if (enlazar()) {
+          <a class="contador enlace-comentarios" [routerLink]="['/publicaciones', p.id]">
+            {{ p.cantidadComentarios }} {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
+          </a>
+        } @else {
+          <span class="contador">
+            {{ p.cantidadComentarios }} {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
+          </span>
+        }
         @if (esPropia()) {
           <button
             type="button"

@@ -7,6 +7,9 @@ import { fechaHaceAnios, hoyEnArgentina } from './fechas';
 
 export const EDAD_MINIMA = 13;
 
+// Como ComentarioDto del back (1 a 300 caracteres, recortado)
+export const LARGO_MAXIMO_COMENTARIO = 300;
+
 // Lo que acepta @IsEmail() del back: usuario@dominio con un dominio de al menos dos letras al final (.com, .ar).
 // El email() de Angular acepta "pepe@trochita", que el back rechaza.
 const CORREO = /^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@([A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
@@ -29,6 +32,15 @@ export function patron(campo: SchemaPath<string>, regex: RegExp, message: string
     const texto = value().trim();
     return texto && !regex.test(texto) ? { kind: 'patron', message } : null;
   });
+}
+
+export function mensajeComentario(campo: SchemaPath<string>) {
+  obligatorio(campo, 'El mensaje es obligatorio');
+  largoMaximo(
+    campo,
+    LARGO_MAXIMO_COMENTARIO,
+    `El mensaje puede tener hasta ${LARGO_MAXIMO_COMENTARIO} caracteres`,
+  );
 }
 
 export function correo(campo: SchemaPath<string>) {

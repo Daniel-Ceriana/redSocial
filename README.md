@@ -95,6 +95,7 @@ La URL de la API está en `front/src/environments/environment.ts`.
 |------|-------|----------|
 | `/login`, `/registro` | solo sin sesión | Login (con acceso rápido) y registro |
 | `/publicaciones`, `/perfil` | con sesión | Publicaciones (listado, orden, paginación, crear, me gusta y eliminar) y Mi perfil (ver, editar y mis últimas publicaciones con comentarios) |
+| `/publicaciones/:id` | con sesión | Una publicación en grande (diorama), comentar, comentarios de a 3 con «cargar más» (descarta repetidos por id) y editar los propios en el mismo cartel. Se llega desde el título o «N comentarios» de cualquier placa |
 | `/usuarios/:id` | con sesión | Perfil público de otro usuario y sus publicaciones |
 | `/sin-permiso` | — | Falta de permiso |
 | `**` | — | 404 |

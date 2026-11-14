@@ -47,13 +47,17 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 |----|---------------|--------|
 | 3.F8 | Cualquier respuesta 401 lleva al login | 🟨 adelantado (también al vencer el token, sin esperar una acción); falta probarlo en el navegador |
 | X13 | Aviso y cierre de sesión cuando vence el token | 🟨 adelantado; falta probarlo en el navegador |
-| 3.B1 | GET comentarios paginado, más recientes primero | ✔ offset y limit (revisado en la S7); falta probarlo |
-| 3.B2 | POST comentario con autor y fecha | ✔ S7; falta probarlo |
-| 3.B3 | PUT comentario (solo el autor, marca `modificado`) | ✔ S7; falta probarlo |
+| 3.B1 | GET comentarios paginado, más recientes primero | ✔ offset y limit (revisado en la S7) |
+| 3.B2 | POST comentario con autor y fecha | ✔ S7 |
+| 3.B3 | PUT comentario (solo el autor, marca `modificado`) | ✔ S7 |
 | 3.B4 | El JWT lleva identidad y perfil | ✔ `{ sub, correo, perfil }` |
-| 3.B6 | POST autorizar | ✔ S7; falta probarlo |
-| 3.B7 | Refrescar el token (`POST /api/autenticacion/refrescar`) | ✔ con token de 30 s; falta probarlo |
-| X17 | GET una publicación por id | ✔ S7; falta probarlo |
+| 3.B6 | POST autorizar | ✔ S7 |
+| 3.B7 | Refrescar el token (`POST /api/autenticacion/refrescar`) | ✔ con token de 30 s |
+| X17 | GET una publicación por id | ✔ S7 |
+| 3.F1 | Página de la publicación en grande con sus comentarios | ✔ S8 (`/publicaciones/:id`); falta probarlo en el navegador |
+| 3.F2 | Escribir comentarios | ✔ S8; falta probarlo |
+| 3.F3 | Comentarios uno debajo del otro, de a 3 con «cargar más» | ✔ S8; falta probarlo |
+| 3.F4 | El autor edita su comentario; se marca «editado» | ✔ S8; falta probarlo |
 | 3.F7 | Ofrecer extender la sesión antes de que venza | 🟨 adelantado: a la mitad de los 30 s; falta probarlo en el navegador |
 | 3.B5 | El token vence a los 15 minutos | 🟨 decisión: 30 s fijos para la presentación |
 | 3.F5, 3.F6 | Guardar el token y pantalla de cargando que usa autorizar | ⬜ (S9) |
