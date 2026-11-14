@@ -84,7 +84,7 @@ La URL de la API está en `front/src/environments/environment.ts`.
 - Además, en cada acción del usuario (petición a la API o cambio de pantalla) se revisa si el token ya venció según `venceEn`: si venció, no se hace la petición y pasa lo mismo. Un 401 de la API también. Sin sesión, tampoco se envían peticiones.
 - El token y su vencimiento se guardan en `localStorage`; un interceptor lo manda en `Authorization: Bearer`. Al abrir la app se valida con `GET /api/usuarios/yo`.
 - Sin `alert()`: los avisos y confirmaciones usan el modal propio (`services/modal.ts`).
-- Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo`, `fechaArgentina` y `fechaChapa` («14 NOV 2026»).
+- Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo`, `fechaArgentina` y `fechaChapa` («14 NOV 2026»). El pipe propio `resumen` acorta las descripciones de más de 200 caracteres en las listas (sin cortar palabras) y deja un «Ver más» que abre la publicación.
 - Validaciones compartidas en `utilidades/validaciones.ts`: recortan los espacios igual que el back y usan las mismas reglas y mensajes (correo con la misma exigencia de dominio que `@IsEmail()`, edad mínima con la fecha argentina).
 - Paginación con «Anterior» / «Siguiente»; después de crear o eliminar se vuelve a pedir la página a la API para que el total siempre coincida.
 - Las validaciones del front son las mismas que las del back (el back es la que manda).

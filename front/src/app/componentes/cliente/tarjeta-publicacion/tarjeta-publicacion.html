@@ -27,7 +27,15 @@
         }
       </h2>
       @if (p.descripcion) {
-        <p class="descripcion">{{ p.descripcion }}</p>
+        <!-- En las listas, una descripción larga se resume y "Ver más" abre la publicación; en su página va completa -->
+        @if (enlazar() && p.descripcion.length > LARGO_RESUMEN) {
+          <p class="descripcion">
+            {{ p.descripcion | resumen }}
+            <a class="ver-mas" [routerLink]="['/publicaciones', p.id]">Ver más</a>
+          </p>
+        } @else {
+          <p class="descripcion">{{ p.descripcion }}</p>
+        }
       }
       @if (p.imagen) {
         <img class="imagen" [src]="p.imagen" [alt]="'Imagen de la publicación: ' + p.titulo" loading="lazy" />

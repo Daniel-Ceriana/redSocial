@@ -193,10 +193,14 @@ export class Auth {
 
   private async ofrecerExtender() {
     const segundos = Math.max(1, Math.round((new Date(this._venceEn()!).getTime() - Date.now()) / 1000));
-    const extender = await this.modal.confirmar('¿Extender la sesión?', [
-      `Tu sesión vence en ${segundos} segundos.`,
-      'Si la extendés, vas a tener 30 segundos más desde ahora.',
-    ]);
+    const extender = await this.modal.confirmar(
+      '¿Extender la sesión?',
+      [
+        `Tu sesión vence en ${segundos} segundos.`,
+        'Si la extendés, vas a tener 30 segundos más desde ahora.',
+      ],
+      'Extender',
+    );
     // Si eligió "Cancelar", no hay otro aviso: al vencer se cierra la sesión.
     // Si mientras tanto venció (el modal de vencimiento reemplaza a este), tampoco se hace nada.
     if (extender && this.haySesion() && !this.tokenVencido()) await this.extenderSesion();

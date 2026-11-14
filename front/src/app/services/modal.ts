@@ -4,6 +4,8 @@ export interface EstadoModal {
   titulo: string;
   mensajes: string[];
   conCancelar: boolean;
+  // Texto del botón principal ("Entendido" en los avisos, "Aceptar" o el que se pida en las preguntas)
+  textoAceptar: string;
   // Mientras está abierto, ningún otro modal lo reemplaza (por ejemplo, "Tu sesión venció")
   prioritario: boolean;
 }
@@ -16,14 +18,24 @@ export class Modal {
 
   // Aviso con un solo botón "Entendido"
   avisar(titulo: string, mensajes: string | string[], prioritario = false): Promise<void> {
-    return this.abrir({ titulo, mensajes: [mensajes].flat(), conCancelar: false, prioritario }).then(
-      () => undefined,
-    );
+    return this.abrir({
+      titulo,
+      mensajes: [mensajes].flat(),
+      conCancelar: false,
+      textoAceptar: 'Entendido',
+      prioritario,
+    }).then(() => undefined);
   }
 
-  // Pregunta con "Aceptar" y "Cancelar"; devuelve lo que eligió la persona
-  confirmar(titulo: string, mensajes: string | string[]): Promise<boolean> {
-    return this.abrir({ titulo, mensajes: [mensajes].flat(), conCancelar: true, prioritario: false });
+  // Pregunta con "Aceptar" (o el texto que se pase) y "Cancelar"; devuelve lo que eligió la persona
+  confirmar(titulo: string, mensajes: string | string[], textoAceptar = 'Aceptar'): Promise<boolean> {
+    return this.abrir({
+      titulo,
+      mensajes: [mensajes].flat(),
+      conCancelar: true,
+      textoAceptar,
+      prioritario: false,
+    });
   }
 
   cerrar(aceptado: boolean) {

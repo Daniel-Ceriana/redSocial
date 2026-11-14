@@ -120,6 +120,23 @@ h2 {
   outline-offset: 2px;
 }
 
+.ver-mas {
+  margin-left: 0.25rem;
+  font-weight: 600;
+  color: var(--ocre-claro);
+  white-space: nowrap;
+  text-underline-offset: 3px;
+}
+
+.ver-mas:hover {
+  color: var(--crema);
+}
+
+.ver-mas:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 2px;
+}
+
 .descripcion {
   margin: 0;
   opacity: 0.92;
