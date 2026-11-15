@@ -45,7 +45,7 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 
 | ID | Requerimiento | Estado |
 |----|---------------|--------|
-| 3.F8 | Cualquier respuesta 401 lleva al login | 🟨 adelantado (también al vencer el token, sin esperar una acción); falta probarlo en el navegador |
+| 3.F8 | Cualquier respuesta 401 lleva al login | ✔ también al vencer el token, sin esperar una acción |
 | X13 | Aviso y cierre de sesión cuando vence el token | 🟨 adelantado; falta probarlo en el navegador |
 | 3.B1 | GET comentarios paginado, más recientes primero | ✔ offset y limit (revisado en la S7) |
 | 3.B2 | POST comentario con autor y fecha | ✔ S7 |
@@ -58,10 +58,23 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | 3.F2 | Escribir comentarios | ✔ S8 |
 | 3.F3 | Comentarios uno debajo del otro, de a 3 con «cargar más» | ✔ S8 |
 | 3.F4 | El autor edita su comentario; se marca «editado» | ✔ S8 |
-| 3.F7 | Ofrecer extender la sesión antes de que venza | 🟨 a la mitad de los 30 s, con cuenta regresiva; falta probarlo en el navegador |
+| 3.F7 | Ofrecer extender la sesión antes de que venza | ✔ a la mitad de los 30 s, con cuenta regresiva |
 | 3.B5 | El token vence a los 15 minutos | 🟨 decisión: 30 s fijos para la presentación |
 | 3.F5 | Login y registro guardan el token | ✔ `localStorage` (T9) |
-| 3.F6 | Pantalla de cargando al iniciar que valida con autorizar | ✔ S9 (mínimo 5 s); falta probarlo en el navegador |
+| 3.F6 | Pantalla de cargando al iniciar que valida con autorizar | ✔ S9 (mínimo 5 s) |
+
+## Sprint 4
+
+| ID | Requerimiento | Estado |
+|----|---------------|--------|
+| 4.B1 | Rutas de usuarios solo para administradores (perfil del token) | ✔ S10 (`SoloAdministradorGuard`) |
+| 4.B2 | `GET /api/usuarios` (paginado) | ✔ S10 |
+| 4.B3 | `POST /api/usuarios` con perfil usuario o administrador | ✔ S10 |
+| 4.B4 | `DELETE /api/usuarios/:id` (baja lógica); al ingresar se avisa que está deshabilitado (403) | ✔ S10 (el administrador elige si se ocultan sus publicaciones) |
+| 4.B5 | `POST /api/usuarios/:id/rehabilitar` | ✔ S10 (vuelven las publicaciones que se habían ocultado) |
+| X14 | Un deshabilitado con la sesión abierta no puede autorizar ni refrescar (403) | ✔ S10 |
+| X15 | Un administrador no puede deshabilitarse a sí mismo (400) | ✔ S10 |
+| X16 | Publicaciones de un deshabilitado: las oculta o no el administrador al deshabilitarlo | ✔ S10 |
 
 ## Agregados aprobados
 

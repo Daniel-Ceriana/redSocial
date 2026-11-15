@@ -37,12 +37,16 @@ npm run start:dev         # http://localhost:3000/api
 | Método y ruta | Quién | Respuestas |
 |---------------|-------|------------|
 | `POST /api/autenticacion/registro` (multipart) | público | 201 · 400 · 409 |
-| `POST /api/autenticacion/login` (JSON) | público | 200 · 400 · 401 |
+| `POST /api/autenticacion/login` (JSON; cuenta deshabilitada: 403) | público | 200 · 400 · 401 · 403 |
 | `POST /api/autenticacion/autorizar` (devuelve usuario, `emitidoEn` y `venceEn` del mismo token) | con token | 200 · 401 |
 | `POST /api/autenticacion/refrescar` (token nuevo de 30 s) | con token | 200 · 401 |
 | `GET /api/usuarios/yo` | con token | 200 · 401 |
 | `PATCH /api/usuarios/yo` (multipart; no admite correo, perfil ni activo) | el propio usuario | 200 · 400 · 401 · 409 |
 | `GET /api/usuarios/:id` (perfil público) | con token | 200 · 400 · 404 |
+| `GET /api/usuarios?offset=&limit=` (con `perfil` y `activo`) | administrador | 200 · 400 · 401 · 403 |
+| `POST /api/usuarios` (multipart: campos del registro + `perfil`) | administrador | 201 · 400 · 401 · 403 · 409 |
+| `DELETE /api/usuarios/:id?ocultarPublicaciones=true\|false` (baja lógica) | administrador, no a sí mismo | 200 · 400 · 401 · 403 · 404 · 409 |
+| `POST /api/usuarios/:id/rehabilitar` (vuelven las publicaciones ocultadas) | administrador | 200 · 400 · 401 · 403 · 404 · 409 |
 | `POST /api/publicaciones` (multipart) | con token | 201 · 400 · 401 |
 | `GET /api/publicaciones?orden=&usuario=&offset=&limit=` | con token | 200 · 400 · 401 |
 | `GET /api/publicaciones/:id` | con token | 200 · 400 · 401 · 404 |

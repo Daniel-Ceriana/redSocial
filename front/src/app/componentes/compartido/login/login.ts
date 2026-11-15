@@ -20,6 +20,7 @@ import { EscenaTren } from '../escena-tren/escena-tren';
 const CUENTAS_RAPIDAS = {
   usuario: { correo: 'usuario@trochita.com', contrasena: 'Trochita123' },
   administrador: { correo: 'admin@trochita.com', contrasena: 'Trochita123' },
+  deshabilitado: { correo: 'deshabilitado@trochita.com', contrasena: 'Trochita123' },
 };
 
 @Component({
@@ -67,6 +68,9 @@ export class Login {
       } catch (error) {
         if (error instanceof HttpErrorResponse && error.status === 401) {
           this.errorMsg.set('Correo o contraseña incorrectos');
+        } else if (error instanceof HttpErrorResponse && error.status === 403) {
+          // Cuenta deshabilitada (D10.1): el mensaje lo manda el back
+          this.errorMsg.set(mensajesDeError(error)[0]);
         } else {
           await this.modal.avisar('No se pudo iniciar sesión', mensajesDeError(error));
         }

@@ -84,6 +84,7 @@ export class Auth {
       const sinConexion = error instanceof HttpErrorResponse && error.status === 0;
       if (!sinConexion) localStorage.removeItem(CLAVE_SESION);
       if (error instanceof HttpErrorResponse && error.status === 401) this.avisarVencimiento();
+      if (error instanceof HttpErrorResponse && error.status === 403) this.avisarDeshabilitada();
     }
   }
 
@@ -128,6 +129,11 @@ export class Auth {
     } catch (error) {
       if (error instanceof HttpErrorResponse && error.status === 401) {
         this.alVencer();
+      } else if (error instanceof HttpErrorResponse && error.status === 403) {
+        // Lo deshabilitaron con la sesión abierta (X14): se cierra la sesión con su propio aviso
+        this.cerrarSesion();
+        void this.router.navigate(['/login']);
+        this.avisarDeshabilitada();
       } else {
         await this.modal.avisar(
           'No se pudo extender la sesión',
@@ -162,6 +168,14 @@ export class Auth {
     void this.modal.avisar(
       'Tu sesión venció',
       'Por seguridad, la sesión dura un tiempo limitado. Iniciá sesión de nuevo para seguir.',
+      true,
+    );
+  }
+
+  private avisarDeshabilitada() {
+    void this.modal.avisar(
+      'Tu cuenta fue deshabilitada',
+      'Un administrador deshabilitó tu cuenta. Contactá a un administrador para volver a entrar.',
       true,
     );
   }
