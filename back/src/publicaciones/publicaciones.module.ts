@@ -17,5 +17,7 @@ import { PublicacionesService } from './publicaciones.service.js';
   ],
   controllers: [PublicacionesController, ComentariosController],
   providers: [PublicacionesService, ComentariosService, ArchivosService],
+  // Usuarios lo usa para ocultar y restaurar las publicaciones de un usuario deshabilitado
+  exports: [PublicacionesService],
 })
 export class PublicacionesModule {}

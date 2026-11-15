@@ -164,6 +164,24 @@ export class PublicacionesService {
     return { cantidadMeGusta: actualizada.cantidadMeGusta, yoMeGusta: false };
   }
 
+  // Al deshabilitar a un usuario, si el administrador lo eligió: oculta sus publicaciones activas (D10.6)
+  async ocultarDeAutor(autorId: string): Promise<number> {
+    const { modifiedCount } = await this.modelo.updateMany(
+      { autor: autorId, activa: true },
+      { $set: { activa: false, ocultaPorDeshabilitacion: true } },
+    );
+    return modifiedCount;
+  }
+
+  // Al rehabilitarlo: vuelven solo las que se ocultaron por la deshabilitación (D10.7)
+  async restaurarDeAutor(autorId: string): Promise<number> {
+    const { modifiedCount } = await this.modelo.updateMany(
+      { autor: autorId, ocultaPorDeshabilitacion: true },
+      { $set: { activa: true, ocultaPorDeshabilitacion: false } },
+    );
+    return modifiedCount;
+  }
+
   async buscarActiva(id: string) {
     const publicacion = await this.modelo.findOne({ _id: id, activa: true }).exec();
     if (!publicacion) {

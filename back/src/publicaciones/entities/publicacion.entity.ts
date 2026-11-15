@@ -26,6 +26,11 @@ export class Publicacion {
   // Baja lógica
   @Prop({ default: true })
   activa: boolean;
+
+  // true si se ocultó porque deshabilitaron al autor (D10.6): al rehabilitarlo, solo estas vuelven (D10.7).
+  // Así no se reactivan las que el autor o un administrador eliminaron a propósito.
+  @Prop({ default: false })
+  ocultaPorDeshabilitacion: boolean;
 }
 
 export type PublicacionDocument = HydratedDocument<Publicacion>;

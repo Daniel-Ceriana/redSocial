@@ -9,7 +9,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PasswordHasher } from '@nestjs/authentication';
 import { ArchivosService } from '../common/archivos.service.js';
+import { Pagina, PaginacionDto } from '../common/paginacion.dto.js';
+import { PublicacionesService } from '../publicaciones/publicaciones.service.js';
 import { ActualizarUsuarioDto } from './dto/actualizar-usuario.dto.js';
+import { AltaUsuarioDto } from './dto/alta-usuario.dto.js';
 import { Perfil, Usuario, UsuarioDocument } from './entities/usuario.entity.js';
 
 export interface DatosNuevoUsuario {
@@ -38,6 +41,15 @@ export function aRespuesta(usuario: UsuarioDocument) {
   };
 }
 
+// Lo que ve un administrador en el listado: lo mismo que aRespuesta, más el estado y la fecha de alta
+export function aRespuestaAdmin(usuario: UsuarioDocument) {
+  return {
+    ...aRespuesta(usuario),
+    activo: usuario.activo,
+    creadoEn: (usuario as UsuarioDocument & { createdAt: Date }).createdAt,
+  };
+}
+
 // Lo que puede ver cualquier usuario logueado de otro: sin correo ni fecha de nacimiento
 export function aPerfilPublico(usuario: UsuarioDocument) {
   return {
@@ -57,7 +69,61 @@ export class UsuariosService {
     private readonly hasher: PasswordHasher,
     private readonly archivosService: ArchivosService,
     private readonly config: ConfigService,
+    private readonly publicacionesService: PublicacionesService,
   ) {}
+
+  // ---------- Administración (solo administradores; el guard lo controla en el controller) ----------
+
+  // Todos los usuarios, habilitados y deshabilitados, del más nuevo al más viejo (4.B2, D10.3)
+  async listar({ offset, limit }: PaginacionDto): Promise<Pagina<unknown>> {
+    const [usuarios, total] = await Promise.all([
+      this.modelo.find().sort({ createdAt: -1, _id: -1 }).skip(offset).limit(limit).exec(),
+      this.modelo.countDocuments(),
+    ]);
+    return { datos: (usuarios as UsuarioDocument[]).map(aRespuestaAdmin), total, offset, limit };
+  }
+
+  // Alta con perfil elegido (4.B3): mismas validaciones y pasos que el registro, pero no inicia sesión
+  async alta(dto: AltaUsuarioDto, imagen?: Express.Multer.File) {
+    const { perfil, ...datos } = dto;
+    await this.verificarDisponibles(datos.correo, datos.nombreUsuario);
+    const imagenPerfil = imagen
+      ? await this.archivosService.subirImagen(imagen, 'perfiles')
+      : this.config.get<string>('IMAGEN_PERFIL_DEFECTO', '');
+    return this.crear({ ...datos, imagenPerfil }, perfil);
+  }
+
+  // Baja lógica (4.B4). Un administrador no puede deshabilitarse a sí mismo (X15).
+  // Si se pide, también se ocultan sus publicaciones (X16, D10.6).
+  async deshabilitar(id: string, administradorId: string, ocultarPublicaciones: boolean) {
+    if (id === administradorId) {
+      throw new BadRequestException('No podés deshabilitar tu propia cuenta');
+    }
+    const usuario = await this.buscarPorId(id);
+    if (!usuario.activo) {
+      throw new ConflictException('El usuario ya está deshabilitado');
+    }
+    usuario.activo = false;
+    await usuario.save();
+    const publicacionesOcultadas = ocultarPublicaciones
+      ? await this.publicacionesService.ocultarDeAutor(id)
+      : 0;
+    return { usuario: aRespuestaAdmin(usuario), publicacionesOcultadas };
+  }
+
+  // Alta lógica (4.B5): vuelven las publicaciones que se ocultaron al deshabilitarlo (D10.7)
+  async rehabilitar(id: string) {
+    const usuario = await this.buscarPorId(id);
+    if (usuario.activo) {
+      throw new ConflictException('El usuario ya está habilitado');
+    }
+    usuario.activo = true;
+    await usuario.save();
+    const publicacionesRestauradas = await this.publicacionesService.restaurarDeAutor(id);
+    return { usuario: aRespuestaAdmin(usuario), publicacionesRestauradas };
+  }
+
+  // ---------- Resto ----------
 
   // Verifica correo y nombre de usuario repetidos (409). Se llama antes de subir la imagen.
   async verificarDisponibles(correo: string, nombreUsuario: string) {

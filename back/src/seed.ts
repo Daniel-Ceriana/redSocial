@@ -17,9 +17,12 @@ const CUENTAS: {
   correo: string;
   nombreUsuario: string;
   nombre: string;
+  deshabilitada?: boolean;
 }[] = [
   { perfil: 'usuario', clave: 'USUARIO', correo: 'usuario@trochita.com', nombreUsuario: 'maquinista', nombre: 'Usuario' },
   { perfil: 'administrador', clave: 'ADMIN', correo: 'admin@trochita.com', nombreUsuario: 'jefe_de_estacion', nombre: 'Administrador' },
+  // Para mostrar el aviso de cuenta deshabilitada con el tercer botón de acceso rápido (D10.9)
+  { perfil: 'usuario', clave: 'DESHABILITADO', correo: 'deshabilitado@trochita.com', nombreUsuario: 'sin_boleto', nombre: 'Deshabilitado', deshabilitada: true },
 ];
 
 // Publicaciones de ejemplo: autor (0 = usuario, 1 = administrador), quiénes dieron me gusta y comentarios
@@ -64,6 +67,11 @@ async function seed() {
         cuenta.perfil,
       );
       console.log(`Creado: ${correo} (${cuenta.perfil})`);
+    }
+    if (cuenta.deshabilitada && usuario.activo) {
+      usuario.activo = false;
+      await usuario.save();
+      console.log(`Deshabilitado: ${correo}`);
     }
     ids.push(usuario._id);
   }

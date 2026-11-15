@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ArchivosService } from '../common/archivos.service.js';
@@ -7,6 +12,8 @@ import { UsuariosService, aRespuesta } from '../usuarios/usuarios.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { PayloadToken } from './guards/auth.guard.js';
 import { RegistroDto } from './dto/registro.dto.js';
+
+const CUENTA_DESHABILITADA = 'Tu cuenta está deshabilitada. Contactá a un administrador.';
 
 @Injectable()
 export class AutenticacionService {
@@ -36,6 +43,10 @@ export class AutenticacionService {
     if (!usuario || !valida) {
       throw new UnauthorizedException('Correo o contraseña incorrectos');
     }
+    // Recién con la contraseña correcta se dice que está deshabilitada (4.B4, D10.1)
+    if (!usuario.activo) {
+      throw new ForbiddenException(CUENTA_DESHABILITADA);
+    }
     return this.emitirSesion(usuario);
   }
 
@@ -56,16 +67,22 @@ export class AutenticacionService {
     return this.emitirSesion(await this.usuarioDelToken(usuarioId));
   }
 
-  // Si el usuario del token ya no existe, el token no sirve: 401 (no 404)
+  // Si el usuario del token ya no existe, el token no sirve: 401 (no 404).
+  // Si lo deshabilitaron con la sesión abierta, 403 (X14): no puede recargar la app ni extender la sesión.
   private async usuarioDelToken(usuarioId: string) {
+    let usuario: UsuarioDocument;
     try {
-      return await this.usuariosService.buscarPorId(usuarioId);
+      usuario = await this.usuariosService.buscarPorId(usuarioId);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('El usuario del token ya no existe');
       }
       throw error;
     }
+    if (!usuario.activo) {
+      throw new ForbiddenException(CUENTA_DESHABILITADA);
+    }
+    return usuario;
   }
 
   // emitidoEn y venceEn salen del propio token (iat y exp): con eso el front calcula la mitad de su vida
