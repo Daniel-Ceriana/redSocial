@@ -38,10 +38,23 @@ export class AccionesPublicacion {
     }
   }
 
-  async eliminar(publicacion: Publicacion): Promise<'eliminada' | 'cancelada' | 'error'> {
-    const confirmado = await this.modal.confirmar('Eliminar publicación', [
-      `¿Querés eliminar "${publicacion.titulo}"? Esta acción no se puede deshacer.`,
-    ]);
+  // `comoAdministrador`: un administrador da de baja la publicación de otro usuario (4.F1)
+  async eliminar(
+    publicacion: Publicacion,
+    comoAdministrador = false,
+  ): Promise<'eliminada' | 'cancelada' | 'error'> {
+    const confirmado = comoAdministrador
+      ? await this.modal.confirmar(
+          'Dar de baja publicación',
+          [
+            `Vas a dar de baja "${publicacion.titulo}", de @${publicacion.autor.nombreUsuario}.`,
+            'La publicación y sus comentarios dejan de estar disponibles para todos.',
+          ],
+          'Dar de baja',
+        )
+      : await this.modal.confirmar('Eliminar publicación', [
+          `¿Querés eliminar "${publicacion.titulo}"? Esta acción no se puede deshacer.`,
+        ]);
     if (!confirmado) return 'cancelada';
 
     this.marcar(publicacion.id, true);
@@ -51,6 +64,31 @@ export class AccionesPublicacion {
     } catch (error) {
       await this.modal.avisar('No se pudo eliminar la publicación', mensajesDeError(error));
       return 'error';
+    } finally {
+      this.marcar(publicacion.id, false);
+    }
+  }
+
+  // Solo administradores (S11). Devuelve la publicación ya activa, o null si se canceló o falló.
+  async restaurar(publicacion: Publicacion): Promise<Publicacion | null> {
+    const confirmado = await this.modal.confirmar(
+      'Dar de alta publicación',
+      [
+        `"${publicacion.titulo}", de @${publicacion.autor.nombreUsuario}, vuelve a estar disponible para todos.`,
+        publicacion.estado === 'eliminadaPorAutor'
+          ? 'Ojo: la había eliminado su propio autor.'
+          : 'Sus comentarios también vuelven a verse.',
+      ],
+      'Dar de alta',
+    );
+    if (!confirmado) return null;
+
+    this.marcar(publicacion.id, true);
+    try {
+      return await this.api.restaurar(publicacion.id);
+    } catch (error) {
+      await this.modal.avisar('No se pudo dar de alta la publicación', mensajesDeError(error));
+      return null;
     } finally {
       this.marcar(publicacion.id, false);
     }

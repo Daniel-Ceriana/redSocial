@@ -14,6 +14,7 @@ import {
 interface OpcionesListado {
   usuarioId?: string; // solo las publicaciones de ese usuario
   limite?: number; // cuántas por página (por defecto, PUBLICACIONES_POR_PAGINA)
+  incluirBajas?: boolean; // solo administradores, junto con usuarioId: también las dadas de baja
 }
 
 // Llamadas a la API de publicaciones (el token lo agrega el interceptor)
@@ -31,6 +32,7 @@ export class PublicacionesApi {
       limit: limite,
     };
     if (opciones.usuarioId) params['usuario'] = opciones.usuarioId;
+    if (opciones.incluirBajas) params['incluirBajas'] = 'true';
     return firstValueFrom(this.http.get<Pagina<Publicacion>>(this.url, { params }));
   }
 
@@ -63,6 +65,11 @@ export class PublicacionesApi {
 
   crear(cuerpo: FormData) {
     return firstValueFrom(this.http.post<Publicacion>(this.url, cuerpo));
+  }
+
+  // Solo administradores: vuelve a dar de alta una publicación dada de baja
+  restaurar(id: string) {
+    return firstValueFrom(this.http.post<Publicacion>(`${this.url}/${id}/restaurar`, {}));
   }
 
   eliminar(id: string) {

@@ -292,3 +292,31 @@ h2 {
     font-size: 1.15rem;
   }
 }
+
+/* ---------- Publicación dada de baja (solo la ve un administrador, S11) ---------- */
+.dada-de-baja .placa,
+.dada-de-baja .postes,
+.dada-de-baja .base {
+  filter: grayscale(0.85);
+  opacity: 0.75;
+}
+
+.cartel-estado {
+  justify-self: start;
+  margin: 0 0 -4px 1rem;
+  position: relative;
+  z-index: 2;
+  padding: 0.2rem 0.8rem;
+  font-family: var(--fuente-maquina);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--error);
+  border-radius: 6px 6px 0 0;
+}
+
+.dar-de-alta {
+  margin-left: auto;
+  padding: 0.3rem 0.9rem;
+}

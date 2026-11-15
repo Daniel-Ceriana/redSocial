@@ -40,8 +40,10 @@
       @for (publicacion of publicaciones(); track publicacion.id) {
         <app-tarjeta-publicacion
           [publicacion]="publicacion"
+          [permitirAlta]="permitirAlta()"
           (cambio)="reemplazar($event)"
           (eliminada)="alEliminar()"
+          (restaurada)="alRestaurar($event)"
           (desactualizada)="cargar()"
         />
       }

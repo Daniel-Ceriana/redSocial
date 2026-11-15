@@ -1,0 +1,163 @@
+<form (submit)="onSubmit($event)" novalidate>
+  <div class="fila-campos">
+    <div class="campo">
+      <label for="nombre">Nombre</label>
+      <input
+        id="nombre"
+        type="text"
+        autocomplete="given-name"
+        [formField]="usuarioForm.nombre"
+        [attr.aria-invalid]="usuarioForm.nombre().touched() && usuarioForm.nombre().invalid()"
+      />
+      @if (usuarioForm.nombre().touched() && usuarioForm.nombre().invalid()) {
+        <small class="error" role="alert">{{ usuarioForm.nombre().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="apellido">Apellido</label>
+      <input
+        id="apellido"
+        type="text"
+        autocomplete="family-name"
+        [formField]="usuarioForm.apellido"
+        [attr.aria-invalid]="usuarioForm.apellido().touched() && usuarioForm.apellido().invalid()"
+      />
+      @if (usuarioForm.apellido().touched() && usuarioForm.apellido().invalid()) {
+        <small class="error" role="alert">{{ usuarioForm.apellido().errors()[0].message }}</small>
+      }
+    </div>
+  </div>
+
+  <div class="fila-campos">
+    <div class="campo">
+      <label for="correo">Correo</label>
+      <input
+        id="correo"
+        type="email"
+        autocomplete="email"
+        [formField]="usuarioForm.correo"
+        [attr.aria-invalid]="usuarioForm.correo().touched() && usuarioForm.correo().invalid()"
+      />
+      @if (usuarioForm.correo().touched() && usuarioForm.correo().invalid()) {
+        <small class="error" role="alert">{{ usuarioForm.correo().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="nombreUsuario">Nombre de usuario</label>
+      <input
+        id="nombreUsuario"
+        type="text"
+        autocomplete="username"
+        [formField]="usuarioForm.nombreUsuario"
+        [attr.aria-invalid]="usuarioForm.nombreUsuario().touched() && usuarioForm.nombreUsuario().invalid()"
+      />
+      @if (usuarioForm.nombreUsuario().touched() && usuarioForm.nombreUsuario().invalid()) {
+        <small class="error" role="alert">{{ usuarioForm.nombreUsuario().errors()[0].message }}</small>
+      }
+    </div>
+  </div>
+
+  <div class="fila-campos">
+    <div class="campo">
+      <label for="contrasena">Contraseña</label>
+      <input
+        id="contrasena"
+        type="password"
+        autocomplete="new-password"
+        [formField]="usuarioForm.contrasena"
+        [attr.aria-invalid]="usuarioForm.contrasena().touched() && usuarioForm.contrasena().invalid()"
+      />
+      @if (usuarioForm.contrasena().touched() && usuarioForm.contrasena().invalid()) {
+        <small class="error" role="alert">{{ usuarioForm.contrasena().errors()[0].message }}</small>
+      } @else {
+        <small class="ayuda">Mínimo 8 caracteres, una mayúscula y un número.</small>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="repetirContrasena">Repetir contraseña</label>
+      <input
+        id="repetirContrasena"
+        type="password"
+        autocomplete="new-password"
+        [formField]="usuarioForm.repetirContrasena"
+        [attr.aria-invalid]="usuarioForm.repetirContrasena().touched() && usuarioForm.repetirContrasena().invalid()"
+      />
+      @if (usuarioForm.repetirContrasena().touched() && usuarioForm.repetirContrasena().invalid()) {
+        <small class="error" role="alert">{{ usuarioForm.repetirContrasena().errors()[0].message }}</small>
+      }
+    </div>
+  </div>
+
+  <div class="campo">
+    <label for="fechaNacimiento">Fecha de nacimiento</label>
+    <input
+      id="fechaNacimiento"
+      type="date"
+      autocomplete="bday"
+      [max]="fechaMaxima"
+      [formField]="usuarioForm.fechaNacimiento"
+      [attr.aria-invalid]="usuarioForm.fechaNacimiento().touched() && usuarioForm.fechaNacimiento().invalid()"
+    />
+    @if (usuarioForm.fechaNacimiento().touched() && usuarioForm.fechaNacimiento().invalid()) {
+      <small class="error" role="alert">{{ usuarioForm.fechaNacimiento().errors()[0].message }}</small>
+    }
+  </div>
+
+  <div class="campo">
+    <label for="descripcion">Descripción breve (opcional)</label>
+    <textarea
+      id="descripcion"
+      rows="3"
+      [formField]="usuarioForm.descripcion"
+      [attr.aria-invalid]="usuarioForm.descripcion().touched() && usuarioForm.descripcion().invalid()"
+    ></textarea>
+    @if (usuarioForm.descripcion().touched() && usuarioForm.descripcion().invalid()) {
+      <small class="error" role="alert">{{ usuarioForm.descripcion().errors()[0].message }}</small>
+    }
+  </div>
+
+  <div class="campo">
+    <label for="imagen">Imagen de perfil (opcional)</label>
+    <input
+      #inputImagen
+      id="imagen"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      (change)="onImagen($event)"
+    />
+    <small class="ayuda">JPG, PNG o WEBP, hasta 2 MB.</small>
+    @if (errorImagen()) {
+      <small class="error" role="alert">{{ errorImagen() }}</small>
+    }
+    @if (vistaPrevia()) {
+      <div class="vista-previa">
+        <img [src]="vistaPrevia()" alt="Vista previa de la imagen de perfil" />
+        <button type="button" class="btn btn-secundario" (click)="quitarImagen(inputImagen)">
+          Quitar imagen
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (conPerfil()) {
+    <!-- Solo en el alta del dashboard: perfil del usuario nuevo -->
+    <fieldset class="campo perfil">
+      <legend>Perfil</legend>
+      <label>
+        <input type="radio" name="perfil" value="usuario" [checked]="perfil() === 'usuario'" (change)="perfil.set('usuario')" />
+        Usuario
+      </label>
+      <label>
+        <input type="radio" name="perfil" value="administrador" [checked]="perfil() === 'administrador'" (change)="perfil.set('administrador')" />
+        Administrador
+      </label>
+    </fieldset>
+  }
+
+  <button type="submit" class="btn btn-bloque" [disabled]="usuarioForm().submitting()">
+    {{ usuarioForm().submitting() ? textoEnviando() : textoBoton() }}
+  </button>
+</form>

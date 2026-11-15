@@ -1,0 +1,105 @@
+<div class="cabecera">
+  <h2>Usuarios</h2>
+  <a class="btn btn-ocre" routerLink="nuevo">Nuevo usuario</a>
+</div>
+
+@if (aviso()) {
+  <p class="aviso-ok" role="status">{{ aviso() }}</p>
+}
+
+@switch (estado()) {
+  @case ('cargando') {
+    <app-cargando texto="Cargando usuarios..." />
+  }
+  @case ('error') {
+    <div class="estado">
+      <p class="error">No se pudieron cargar los usuarios.</p>
+      <button type="button" class="btn" (click)="cargar()">Reintentar</button>
+    </div>
+  }
+  @default {
+    <!-- Planilla de usuarios (D11.2); en el celular cada fila se apila como una tarjeta -->
+    <div class="planilla-contenedor">
+      <table class="planilla">
+        <caption class="oculto">Usuarios de La Trochita</caption>
+        <thead>
+          <tr>
+            <th scope="col">Usuario</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Perfil</th>
+            <th scope="col">Estado</th>
+            <th scope="col"><span class="oculto">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of usuarios(); track u.id) {
+            <tr [class.inactivo]="!u.activo">
+              <td data-etiqueta="Usuario">
+                <div class="usuario">
+                  <app-avatar [usuario]="u" [tamano]="34" />
+                  <div>
+                    <!-- Su perfil: el administrador ve todas sus publicaciones, con su estado (S11) -->
+                    <a class="nombre" [routerLink]="u.id === auth.usuario()?.id ? '/perfil' : ['/usuarios', u.id]">
+                      {{ u.nombre }} {{ u.apellido }}
+                    </a>
+                    <small>&#64;{{ u.nombreUsuario }}</small>
+                  </div>
+                </div>
+              </td>
+              <td data-etiqueta="Correo" class="correo">{{ u.correo }}</td>
+              <td data-etiqueta="Perfil">
+                @if (u.perfil === 'administrador') {
+                  <span class="insignia admin">
+                    <svg viewBox="0 0 22 18" aria-hidden="true">
+                      <path d="M2 11 Q11 1 20 11 Z" />
+                      <rect class="visera" x="1" y="11" width="20" height="3" rx="1.5" />
+                      <rect x="5" y="14" width="15" height="2" rx="1" />
+                    </svg>
+                    Administrador
+                  </span>
+                } @else {
+                  <span class="insignia">Usuario</span>
+                }
+              </td>
+              <td data-etiqueta="Estado">
+                <span class="estado-usuario" [class.deshabilitado]="!u.activo">
+                  <i aria-hidden="true"></i>{{ u.activo ? 'Habilitado' : 'Deshabilitado' }}
+                </span>
+              </td>
+              <td class="acciones">
+                @if (u.id === auth.usuario()?.id) {
+                  <small class="vos">Tu cuenta</small>
+                } @else if (u.activo) {
+                  <button type="button" class="btn btn-secundario" [disabled]="ocupado() === u.id" (click)="deshabilitar(u)">
+                    Deshabilitar
+                  </button>
+                } @else {
+                  <button type="button" class="btn" [disabled]="ocupado() === u.id" (click)="rehabilitar(u)">
+                    Rehabilitar
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <nav class="paginacion" aria-label="Páginas de usuarios">
+        <button type="button" class="btn btn-secundario" [disabled]="pagina() <= 1" (click)="irAPagina(pagina() - 1)">
+          ‹ Anterior
+        </button>
+        <span>Página {{ pagina() }} de {{ totalPaginas() }}</span>
+        <button
+          type="button"
+          class="btn btn-secundario"
+          [disabled]="pagina() >= totalPaginas()"
+          (click)="irAPagina(pagina() + 1)"
+        >
+          Siguiente ›
+        </button>
+      </nav>
+    }
+  }
+}

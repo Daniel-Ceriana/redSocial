@@ -12,6 +12,23 @@ export interface Usuario {
   perfil: Perfil;
 }
 
+// Lo que ve un administrador en el dashboard: además, el estado y la fecha de alta
+export interface UsuarioAdmin extends Usuario {
+  activo: boolean;
+  creadoEn: string; // fecha ISO
+}
+
+// Respuestas de deshabilitar y rehabilitar (D10.6, D10.7)
+export interface RespuestaDeshabilitar {
+  usuario: UsuarioAdmin;
+  publicacionesOcultadas: number;
+}
+
+export interface RespuestaRehabilitar {
+  usuario: UsuarioAdmin;
+  publicacionesRestauradas: number;
+}
+
 // Lo que se ve del perfil de otro usuario (sin correo ni fecha de nacimiento)
 export interface PerfilPublico {
   id: string;
@@ -20,6 +37,7 @@ export interface PerfilPublico {
   nombreUsuario: string;
   descripcion: string;
   imagenPerfil: string;
+  activo: boolean; // false solo lo ve un administrador
 }
 
 // Lo que devuelve autorizar: los datos del usuario y las fechas del mismo token (no emite uno nuevo)

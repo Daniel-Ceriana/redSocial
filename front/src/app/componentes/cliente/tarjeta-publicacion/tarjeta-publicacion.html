@@ -1,6 +1,10 @@
 @let p = publicacion();
 <!-- Diorama: placa de estación (la publicación) sobre dos postes, con pasto, vía y zócalo con la fecha -->
-<article class="diorama">
+<article class="diorama" [class.dada-de-baja]="!activa()">
+  @if (!activa()) {
+    <!-- Solo lo ve un administrador (S11): por qué no está disponible -->
+    <p class="cartel-estado" role="note">{{ textoEstado() }}</p>
+  }
   <div class="placa">
     <span class="remache r1"></span><span class="remache r2"></span>
     <span class="remache r3"></span><span class="remache r4"></span>
@@ -20,7 +24,7 @@
       </header>
 
       <h2>
-        @if (enlazar()) {
+        @if (enlazar() && activa()) {
           <a class="enlace-titulo" [routerLink]="['/publicaciones', p.id]">{{ p.titulo }}</a>
         } @else {
           {{ p.titulo }}
@@ -28,7 +32,7 @@
       </h2>
       @if (p.descripcion) {
         <!-- En las listas, una descripción larga se resume y "Ver más" abre la publicación; en su página va completa -->
-        @if (enlazar() && p.descripcion.length > LARGO_RESUMEN) {
+        @if (enlazar() && activa() && p.descripcion.length > LARGO_RESUMEN) {
           <p class="descripcion">
             {{ p.descripcion | resumen }}
             <a class="ver-mas" [routerLink]="['/publicaciones', p.id]">Ver más</a>
@@ -42,6 +46,23 @@
       }
 
       <footer class="acciones">
+        @if (!activa()) {
+          <!-- Dada de baja: sin me gusta ni enlaces (su página da 404); el administrador la puede dar de alta -->
+          <span class="contador">
+            {{ p.cantidadMeGusta }} me gusta · {{ p.cantidadComentarios }}
+            {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
+          </span>
+          @if (auth.esAdministrador() && permitirAlta()) {
+            <button
+              type="button"
+              class="btn btn-ocre dar-de-alta"
+              [disabled]="acciones.estaOcupada(p.id)"
+              (click)="restaurar()"
+            >
+              Dar de alta
+            </button>
+          }
+        } @else {
         <!-- Me gusta como señal (E7): roja si todavía no di me gusta, verde si ya lo di -->
         <button
           type="button"
@@ -63,15 +84,17 @@
             {{ p.cantidadComentarios }} {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
           </span>
         }
-        @if (esPropia()) {
+        @if (puedeEliminar()) {
           <button
             type="button"
             class="btn btn-peligro"
             [disabled]="acciones.estaOcupada(p.id)"
+            [title]="esPropia() ? 'Eliminar mi publicación' : 'Dar de baja como administrador'"
             (click)="eliminar()"
           >
-            Eliminar
+            {{ esPropia() ? 'Eliminar' : 'Dar de baja' }}
           </button>
+        }
         }
       </footer>
     </div>

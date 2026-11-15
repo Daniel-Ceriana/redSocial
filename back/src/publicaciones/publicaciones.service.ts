@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -36,6 +37,23 @@ export function aAutor(autor: unknown): AutorResumen {
   };
 }
 
+// Estado de una publicación (S11): activa, o por qué se dio de baja. Las eliminadas antes de guardar
+// "bajaPor" no se sabe quién las eliminó: quedan como "eliminada".
+export type EstadoPublicacion =
+  | 'activa'
+  | 'eliminadaPorAutor'
+  | 'bajaPorAdministrador'
+  | 'ocultaPorDeshabilitacion'
+  | 'eliminada';
+
+function estadoDe(p: PublicacionDocument): EstadoPublicacion {
+  if (p.activa) return 'activa';
+  if (p.ocultaPorDeshabilitacion) return 'ocultaPorDeshabilitacion';
+  if (p.bajaPor === 'autor') return 'eliminadaPorAutor';
+  if (p.bajaPor === 'administrador') return 'bajaPorAdministrador';
+  return 'eliminada';
+}
+
 function aRespuesta(
   publicacion: PublicacionDocument,
   usuarioId: string,
@@ -51,6 +69,7 @@ function aRespuesta(
     cantidadMeGusta: publicacion.cantidadMeGusta,
     yoMeGusta: publicacion.meGusta.some((id) => id.toString() === usuarioId),
     cantidadComentarios,
+    estado: estadoDe(publicacion),
   };
 }
 
@@ -74,9 +93,20 @@ export class PublicacionesService {
     return aRespuesta(publicacion, usuarioId, 0);
   }
 
-  async listar(consulta: ConsultaPublicacionesDto, usuarioId: string): Promise<Pagina<unknown>> {
-    const { orden, usuario, offset, limit } = consulta;
-    const filtro: Record<string, unknown> = { activa: true };
+  // Con incluirBajas (solo administradores, y solo junto con "usuario") trae también las dadas de baja,
+  // cada una con su estado, para poder darlas de alta de nuevo (S11)
+  async listar(consulta: ConsultaPublicacionesDto, solicitante: PayloadToken): Promise<Pagina<unknown>> {
+    const { orden, usuario, offset, limit, incluirBajas } = consulta;
+    const usuarioId = solicitante.sub;
+    if (incluirBajas) {
+      if (solicitante.perfil !== 'administrador') {
+        throw new ForbiddenException('Solo un administrador puede ver las publicaciones dadas de baja');
+      }
+      if (!usuario) {
+        throw new BadRequestException('incluirBajas se usa junto con usuario');
+      }
+    }
+    const filtro: Record<string, unknown> = incluirBajas ? {} : { activa: true };
     if (usuario) filtro['autor'] = usuario;
 
     // Desempata por _id para que la paginación sea estable
@@ -131,6 +161,7 @@ export class PublicacionesService {
       throw new ForbiddenException('Solo el autor o un administrador puede eliminar la publicación');
     }
     publicacion.activa = false;
+    publicacion.bajaPor = esAutor ? 'autor' : 'administrador';
     await publicacion.save();
   }
 
@@ -164,6 +195,34 @@ export class PublicacionesService {
     return { cantidadMeGusta: actualizada.cantidadMeGusta, yoMeGusta: false };
   }
 
+  // Da de alta otra vez una publicación dada de baja (solo administradores; el guard lo controla).
+  // Regla única (D11.10): mientras el autor esté deshabilitado no se da de alta ninguna publicación suya,
+  // esté en el estado que esté; primero se lo rehabilita (las ocultas por la deshabilitación vuelven solas).
+  async restaurar(id: string, usuarioId: string) {
+    const publicacion = await this.modelo.findById(id).populate('autor', `${CAMPOS_AUTOR} activo`).exec();
+    if (!publicacion) {
+      throw new NotFoundException('La publicación no existe');
+    }
+    if (publicacion.activa) {
+      throw new ConflictException('La publicación ya está activa');
+    }
+    const autor = publicacion.autor as unknown as { activo: boolean; nombreUsuario: string };
+    if (!autor.activo) {
+      throw new ConflictException(
+        `Rehabilitá primero a @${autor.nombreUsuario} para dar de alta sus publicaciones`,
+      );
+    }
+    publicacion.activa = true;
+    publicacion.bajaPor = null;
+    publicacion.ocultaPorDeshabilitacion = false;
+    await publicacion.save();
+    const cantidadComentarios = await this.modeloComentarios.countDocuments({
+      publicacion: publicacion._id,
+      activo: true,
+    });
+    return aRespuesta(publicacion as PublicacionDocument, usuarioId, cantidadComentarios);
+  }
+
   // Al deshabilitar a un usuario, si el administrador lo eligió: oculta sus publicaciones activas (D10.6)
   async ocultarDeAutor(autorId: string): Promise<number> {
     const { modifiedCount } = await this.modelo.updateMany(
@@ -177,7 +236,7 @@ export class PublicacionesService {
   async restaurarDeAutor(autorId: string): Promise<number> {
     const { modifiedCount } = await this.modelo.updateMany(
       { autor: autorId, ocultaPorDeshabilitacion: true },
-      { $set: { activa: true, ocultaPorDeshabilitacion: false } },
+      { $set: { activa: true, ocultaPorDeshabilitacion: false, bajaPor: null } },
     );
     return modifiedCount;
   }

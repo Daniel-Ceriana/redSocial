@@ -1,5 +1,5 @@
 @if (modal.estado(); as m) {
-  <div class="fondo" (click)="modal.cerrar(false)">
+  <div class="fondo" (click)="modal.cancelar()">
     <div
       class="ventana"
       role="dialog"
@@ -19,14 +19,18 @@
         </ul>
       }
       <div class="acciones">
-        @if (m.conCancelar) {
-          <button type="button" class="btn btn-secundario" (click)="modal.cerrar(false)">
-            Cancelar
+        @for (opcion of m.opciones; track $index) {
+          <button
+            type="button"
+            class="btn"
+            [class.btn-secundario]="opcion.estilo === 'secundario'"
+            [class.btn-peligro]="opcion.estilo === 'peligro'"
+            [attr.autofocus]="$last ? '' : null"
+            (click)="modal.cerrar(opcion.valor)"
+          >
+            {{ opcion.texto }}
           </button>
         }
-        <button type="button" class="btn" autofocus (click)="modal.cerrar(true)">
-          {{ m.textoAceptar }}
-        </button>
       </div>
     </div>
   </div>

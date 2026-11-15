@@ -1,0 +1,216 @@
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.cabecera h2 {
+  margin: 0;
+}
+
+/* ---------- Planilla tipo horario de estación (D11.2) ---------- */
+.planilla-contenedor {
+  overflow-x: auto;
+  border: 2px solid var(--verde);
+  border-radius: 10px;
+  background: var(--papel);
+}
+
+.planilla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.planilla thead th {
+  padding: 0.55rem 0.75rem;
+  font-family: var(--fuente-cartel);
+  font-weight: 400;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  color: var(--crema);
+  background: var(--verde);
+}
+
+.planilla td {
+  padding: 0.6rem 0.75rem;
+  vertical-align: middle;
+  border-top: 1px dashed var(--borde);
+}
+
+/* Renglones alternados, como una planilla de papel */
+.planilla tbody tr:nth-child(even) {
+  background: #f8f1e1;
+}
+
+.planilla tr.inactivo .usuario,
+.planilla tr.inactivo .correo {
+  opacity: 0.6;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.usuario .nombre {
+  display: block;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--carbon);
+}
+
+.usuario .nombre:hover {
+  color: var(--verde);
+}
+
+.usuario .nombre:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 2px;
+}
+
+.usuario small {
+  color: var(--gris);
+}
+
+.correo {
+  font-family: var(--fuente-maquina);
+  overflow-wrap: anywhere;
+}
+
+.insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--gris);
+  background: var(--ocre-claro);
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.insignia.admin {
+  padding-left: 0.35rem;
+  color: var(--crema);
+  background: var(--verde);
+}
+
+.insignia svg {
+  width: 18px;
+  height: 14px;
+  fill: var(--ocre-claro);
+}
+
+.insignia .visera {
+  fill: var(--ocre);
+}
+
+/* Estado con una lucecita de señal: verde habilitado, roja deshabilitado */
+.estado-usuario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estado-usuario i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #36c26a;
+  box-shadow: 0 0 5px #36c26a;
+}
+
+.estado-usuario.deshabilitado {
+  color: var(--error);
+}
+
+.estado-usuario.deshabilitado i {
+  background: #e0473a;
+  box-shadow: 0 0 5px #e0473a;
+}
+
+.acciones {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.acciones .btn {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.vos {
+  color: var(--gris);
+  font-style: italic;
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* En el celular cada fila se apila como una tarjeta, con el nombre de la columna al lado del dato */
+@media (max-width: 640px) {
+  .planilla thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .planilla,
+  .planilla tbody,
+  .planilla tr,
+  .planilla td {
+    display: block;
+  }
+
+  .planilla tr {
+    padding: 0.5rem 0.25rem;
+    border-top: 2px solid var(--borde);
+  }
+
+  .planilla td {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border: 0;
+  }
+
+  .planilla td[data-etiqueta]::before {
+    content: attr(data-etiqueta);
+    font-weight: 600;
+    color: var(--gris);
+  }
+
+  .planilla td:first-child::before {
+    content: none;
+  }
+
+  .acciones {
+    justify-content: flex-end;
+  }
+}

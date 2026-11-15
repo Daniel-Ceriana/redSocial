@@ -19,6 +19,10 @@ export class ListadoPublicaciones {
   private api = inject(PublicacionesApi);
 
   usuarioId = input<string>();
+  // Solo administradores, en el perfil de un usuario: también las dadas de baja, con su estado (S11)
+  incluirBajas = input(false);
+  // false si el autor está deshabilitado (D11.10): las placas no ofrecen "Dar de alta"
+  permitirAlta = input(true);
 
   protected orden = signal<OrdenPublicaciones>('fecha');
   protected pagina = signal(1);
@@ -52,6 +56,7 @@ export class ListadoPublicaciones {
     try {
       const respuesta = await this.api.listar(this.orden(), this.pagina(), {
         usuarioId: this.usuarioId(),
+        incluirBajas: this.incluirBajas(),
       });
       if (numero !== this.numeroPedido) return;
 
@@ -93,6 +98,12 @@ export class ListadoPublicaciones {
   // Solo se reemplaza esa tarjeta, con los números reales que devolvió la API
   protected reemplazar(actualizada: Publicacion) {
     this.publicaciones.update((lista) => lista.map((p) => (p.id === actualizada.id ? actualizada : p)));
+  }
+
+  // Un administrador la dio de alta otra vez: se reemplaza en el lugar
+  protected alRestaurar(restaurada: Publicacion) {
+    this.reemplazar(restaurada);
+    this.mostrarAviso('Publicación dada de alta');
   }
 
   // Se vuelve a pedir la página actual para que el total y las páginas coincidan

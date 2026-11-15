@@ -31,6 +31,10 @@ export class Publicacion {
   // Así no se reactivan las que el autor o un administrador eliminaron a propósito.
   @Prop({ default: false })
   ocultaPorDeshabilitacion: boolean;
+
+  // Quién la dio de baja (se guarda desde la S11). Las eliminadas antes no lo tienen: se muestran como "eliminada".
+  @Prop({ type: String, enum: ['autor', 'administrador'], default: null })
+  bajaPor: 'autor' | 'administrador' | null;
 }
 
 export type PublicacionDocument = HydratedDocument<Publicacion>;

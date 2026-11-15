@@ -72,6 +72,8 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | 4.B3 | `POST /api/usuarios` con perfil usuario o administrador | ✔ S10 |
 | 4.B4 | `DELETE /api/usuarios/:id` (baja lógica); al ingresar se avisa que está deshabilitado (403) | ✔ S10 (el administrador elige si se ocultan sus publicaciones) |
 | 4.B5 | `POST /api/usuarios/:id/rehabilitar` | ✔ S10 (vuelven las publicaciones que se habían ocultado) |
+| 4.F1 | Un administrador da de baja cualquier publicación (listado y página) | ✔ S11; falta probarlo en el navegador |
+| 4.F2 | `dashboard/usuarios`: listado, alta con perfil, deshabilitar y rehabilitar | ✔ S11; falta probarlo en el navegador |
 | X14 | Un deshabilitado con la sesión abierta no puede autorizar ni refrescar (403) | ✔ S10 |
 | X15 | Un administrador no puede deshabilitarse a sí mismo (400) | ✔ S10 |
 | X16 | Publicaciones de un deshabilitado: las oculta o no el administrador al deshabilitarlo | ✔ S10 |

@@ -18,7 +18,7 @@ import { ListadoPublicaciones } from '../listado-publicaciones/listado-publicaci
 })
 export class PerfilPublico {
   private api = inject(UsuariosApi);
-  private auth = inject(Auth);
+  protected auth = inject(Auth);
   private router = inject(Router);
 
   protected id = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id') ?? '')), {

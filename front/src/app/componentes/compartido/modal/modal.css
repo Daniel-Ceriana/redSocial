@@ -30,6 +30,17 @@
 
 .acciones {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.6rem;
+}
+
+.btn-peligro {
+  color: #fff;
+  background: var(--error);
+  border-color: var(--error);
+}
+
+.btn-peligro:hover:not(:disabled) {
+  background: #8a3226;
 }

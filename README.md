@@ -50,6 +50,8 @@ npm run start:dev         # http://localhost:3000/api
 | `POST /api/publicaciones` (multipart) | con token | 201 · 400 · 401 |
 | `GET /api/publicaciones?orden=&usuario=&offset=&limit=` | con token | 200 · 400 · 401 |
 | `GET /api/publicaciones/:id` | con token | 200 · 400 · 401 · 404 |
+| `GET /api/publicaciones?usuario=&incluirBajas=true` (también las dadas de baja, con `estado`) | administrador | 200 · 400 · 401 · 403 |
+| `POST /api/publicaciones/:id/restaurar` (dar de alta otra vez) | administrador | 200 · 400 · 401 · 403 · 404 · 409 |
 | `DELETE /api/publicaciones/:id` (baja lógica) | autor o administrador | 204 · 400 · 403 · 404 |
 | `POST` y `DELETE /api/publicaciones/:id/me-gusta` | con token | 201 / 200 · 400 · 404 · 409 |
 | `GET /api/publicaciones/:id/comentarios?offset=&limit=` (más recientes primero) | con token | 200 · 400 · 401 · 404 |
@@ -100,6 +102,7 @@ La URL de la API está en `front/src/environments/environment.ts`.
 |------|-------|----------|
 | `/login`, `/registro` | solo sin sesión | Login (con acceso rápido) y registro |
 | `/publicaciones`, `/perfil` | con sesión | Publicaciones (listado, orden, paginación, crear, me gusta y eliminar) y Mi perfil (ver, editar y mis últimas publicaciones con comentarios) |
+| `/dashboard/usuarios`, `/dashboard/usuarios/nuevo` | administrador | Planilla de usuarios paginada (perfil y estado), alta con el mismo formulario del registro más el perfil, deshabilitar (eligiendo si se ocultan sus publicaciones) y rehabilitar |
 | `/publicaciones/:id` | con sesión | Una publicación en grande (diorama), comentar, comentarios de a 3 con «cargar más» (descarta repetidos por id) y editar los propios en el mismo cartel. Se llega desde el título o «N comentarios» de cualquier placa |
 | `/usuarios/:id` | con sesión | Perfil público de otro usuario y sus publicaciones |
 | `/sin-permiso` | — | Falta de permiso |

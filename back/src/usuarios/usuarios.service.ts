@@ -59,6 +59,8 @@ export function aPerfilPublico(usuario: UsuarioDocument) {
     nombreUsuario: usuario.nombreUsuario,
     descripcion: usuario.descripcion,
     imagenPerfil: usuario.imagenPerfil,
+    // Solo un administrador puede llegar a ver uno deshabilitado (S11)
+    activo: usuario.activo,
   };
 }
 
@@ -205,10 +207,11 @@ export class UsuariosService {
     }
   }
 
-  // Para el perfil público: un usuario deshabilitado se trata como inexistente
-  async buscarPublico(id: string) {
+  // Para el perfil público: un usuario deshabilitado se trata como inexistente, salvo para un
+  // administrador, que tiene que poder entrar desde el dashboard y dar de alta sus publicaciones (S11)
+  async buscarPublico(id: string, esAdministrador = false) {
     const usuario = await this.buscarPorId(id);
-    if (!usuario.activo) {
+    if (!usuario.activo && !esAdministrador) {
       throw new NotFoundException('El usuario no existe');
     }
     return usuario;

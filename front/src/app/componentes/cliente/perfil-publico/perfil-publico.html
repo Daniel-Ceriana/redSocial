@@ -22,6 +22,10 @@
         <div>
           <h1>{{ p.nombre }} {{ p.apellido }}</h1>
           <p class="usuario">&#64;{{ p.nombreUsuario }}</p>
+          @if (!p.activo) {
+            <!-- Solo un administrador llega a ver a un usuario deshabilitado (S11) -->
+            <p class="deshabilitado">Cuenta deshabilitada</p>
+          }
           @if (p.descripcion) {
             <p class="descripcion">{{ p.descripcion }}</p>
           }
@@ -30,7 +34,21 @@
 
       <hr class="riel" />
       <h2>Publicaciones de {{ p.nombre }}</h2>
-      <app-listado-publicaciones [usuarioId]="p.id" />
+      @if (auth.esAdministrador()) {
+        <p class="nota-admin">
+          @if (p.activo) {
+            Como administrador ves también sus publicaciones dadas de baja, y podés darlas de alta.
+          } @else {
+            Como administrador ves también sus publicaciones dadas de baja. Rehabilitá a &#64;{{ p.nombreUsuario }}
+            para poder darlas de alta: las que se ocultaron al deshabilitarlo vuelven solas.
+          }
+        </p>
+      }
+      <app-listado-publicaciones
+        [usuarioId]="p.id"
+        [incluirBajas]="auth.esAdministrador()"
+        [permitirAlta]="p.activo"
+      />
     }
   }
 }

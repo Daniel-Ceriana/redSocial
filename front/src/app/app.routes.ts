@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { invitadoMatch, sesionMatch } from './guards/auth-guard';
+import { adminMatch, invitadoMatch, sesionMatch } from './guards/auth-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/publicaciones', pathMatch: 'full' },
@@ -37,6 +37,27 @@ export const routes: Routes = [
     canMatch: [sesionMatch],
     loadComponent: () =>
       import('./componentes/cliente/perfil-publico/perfil-publico').then((m) => m.PerfilPublico),
+  },
+  // Solo administradores (4.F2): un usuario común va a "sin permiso" y sin sesión, al login
+  {
+    path: 'dashboard',
+    canMatch: [adminMatch],
+    loadComponent: () => import('./componentes/admin/dashboard/dashboard').then((m) => m.Dashboard),
+    children: [
+      { path: '', redirectTo: 'usuarios', pathMatch: 'full' },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./componentes/admin/dashboard-usuarios/dashboard-usuarios').then(
+            (m) => m.DashboardUsuarios,
+          ),
+      },
+      {
+        path: 'usuarios/nuevo',
+        loadComponent: () =>
+          import('./componentes/admin/alta-usuario/alta-usuario').then((m) => m.AltaUsuario),
+      },
+    ],
   },
   {
     path: 'sin-permiso',

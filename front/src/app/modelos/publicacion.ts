@@ -6,6 +6,14 @@ export interface AutorPublicacion {
   imagenPerfil: string;
 }
 
+// Activa, o por qué se dio de baja (las que no son "activa" solo las ve un administrador)
+export type EstadoPublicacion =
+  | 'activa'
+  | 'eliminadaPorAutor'
+  | 'bajaPorAdministrador'
+  | 'ocultaPorDeshabilitacion'
+  | 'eliminada';
+
 export interface Publicacion {
   id: string;
   titulo: string;
@@ -16,6 +24,7 @@ export interface Publicacion {
   cantidadMeGusta: number;
   yoMeGusta: boolean;
   cantidadComentarios: number;
+  estado: EstadoPublicacion;
 }
 
 // Forma de los listados de la API

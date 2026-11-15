@@ -50,8 +50,12 @@ export class UsuariosController {
   // Perfil público de otro usuario (sin correo ni fecha de nacimiento).
   // Va después de "yo" para que "yo" no se tome como un id.
   @Get(':id')
-  async perfilPublico(@Param('id', ParseObjectIdPipe) id: string) {
-    return aPerfilPublico(await this.usuariosService.buscarPublico(id));
+  async perfilPublico(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Req() req: { usuario: PayloadToken },
+  ) {
+    const esAdministrador = req.usuario.perfil === 'administrador';
+    return aPerfilPublico(await this.usuariosService.buscarPublico(id, esAdministrador));
   }
 
   // ---------- Solo administradores (4.B1): el AuthGuard de la clase corre primero, después este ----------

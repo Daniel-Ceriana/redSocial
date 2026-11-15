@@ -15,6 +15,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { AuthGuard, PayloadToken } from '../autenticacion/guards/auth.guard.js';
+import { SoloAdministradorGuard } from '../autenticacion/guards/solo-administrador.guard.js';
 import { crearPipeImagen } from '../common/imagen.pipe.js';
 import { ParseObjectIdPipe } from '../common/parse-object-id.pipe.js';
 import { ConsultaPublicacionesDto } from './dto/consulta-publicaciones.dto.js';
@@ -41,7 +42,7 @@ export class PublicacionesController {
 
   @Get()
   listar(@Query() consulta: ConsultaPublicacionesDto, @Req() req: Solicitud) {
-    return this.publicacionesService.listar(consulta, req.usuario.sub);
+    return this.publicacionesService.listar(consulta, req.usuario);
   }
 
   // Una publicación (X17)
@@ -54,6 +55,14 @@ export class PublicacionesController {
   @HttpCode(204)
   eliminar(@Param('id', ParseObjectIdPipe) id: string, @Req() req: Solicitud) {
     return this.publicacionesService.eliminar(id, req.usuario);
+  }
+
+  // Vuelve a dar de alta una publicación dada de baja (solo administradores, S11)
+  @Post(':id/restaurar')
+  @HttpCode(200)
+  @UseGuards(SoloAdministradorGuard)
+  restaurar(@Param('id', ParseObjectIdPipe) id: string, @Req() req: Solicitud) {
+    return this.publicacionesService.restaurar(id, req.usuario.sub);
   }
 
   @Post(':id/me-gusta')
