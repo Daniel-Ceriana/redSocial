@@ -9,6 +9,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
     <h1 class="cartel-titulo">Dashboard</h1>
     <nav class="subnav" aria-label="Dashboard">
       <a routerLink="usuarios" routerLinkActive="activo">Usuarios</a>
+      <a routerLink="estadisticas" routerLinkActive="activo">Estadísticas</a>
     </nav>
     <router-outlet />
   `,

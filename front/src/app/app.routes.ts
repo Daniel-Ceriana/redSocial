@@ -57,6 +57,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./componentes/admin/alta-usuario/alta-usuario').then((m) => m.AltaUsuario),
       },
+      {
+        path: 'estadisticas',
+        loadComponent: () =>
+          import('./componentes/admin/dashboard-estadisticas/dashboard-estadisticas').then(
+            (m) => m.DashboardEstadisticas,
+          ),
+      },
     ],
   },
   {

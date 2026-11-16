@@ -17,3 +17,14 @@ export function fechaHaceAnios(anios: number): string {
   const [anio, mes, dia] = hoyEnArgentina().split('-').map(Number);
   return new Date(Date.UTC(anio - anios, mes - 1, dia)).toISOString().slice(0, 10);
 }
+
+// Hoy en Argentina menos `dias` días, como AAAA-MM-DD
+export function fechaHaceDias(dias: number): string {
+  const [anio, mes, dia] = hoyEnArgentina().split('-').map(Number);
+  return new Date(Date.UTC(anio, mes - 1, dia - dias)).toISOString().slice(0, 10);
+}
+
+// Cuántos días hay entre dos fechas AAAA-MM-DD (de "desde" a "hasta", los dos incluidos)
+export function diasEntre(desde: string, hasta: string): number {
+  return Math.round((Date.parse(hasta) - Date.parse(desde)) / 86_400_000) + 1;
+}

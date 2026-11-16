@@ -1,0 +1,31 @@
+.cabecera {
+  margin-bottom: 1rem;
+}
+
+.cabecera h2 {
+  margin: 0;
+}
+
+.filtros {
+  margin-bottom: 1.25rem;
+}
+
+.grafica {
+  margin-bottom: 1.25rem;
+}
+
+.grafica h3 {
+  margin: 0 0 0.75rem;
+}
+
+.resumen {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--gris);
+}
+
+.vacio,
+.estado {
+  text-align: center;
+  color: var(--gris);
+}

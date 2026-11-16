@@ -1,0 +1,126 @@
+<div class="cabecera">
+  <h2>Estadísticas</h2>
+</div>
+
+<!-- Un solo lapso para los tres gráficos (D12.3) y el estado de las publicaciones (D12.4) -->
+<form class="tarjeta tarjeta-ancha filtros" novalidate (submit)="ver($event)">
+  <div class="fila-campos">
+    <div class="campo">
+      <label for="desde">Desde</label>
+      <input
+        id="desde"
+        type="date"
+        [max]="hoy"
+        [formField]="filtroForm.desde"
+        [attr.aria-invalid]="filtroForm.desde().touched() && filtroForm.desde().invalid()"
+      />
+      @if (filtroForm.desde().touched() && filtroForm.desde().invalid()) {
+        <small class="error" role="alert">{{ filtroForm.desde().errors()[0].message }}</small>
+      }
+    </div>
+    <div class="campo">
+      <label for="hasta">Hasta</label>
+      <input
+        id="hasta"
+        type="date"
+        [max]="hoy"
+        [formField]="filtroForm.hasta"
+        [attr.aria-invalid]="filtroForm.hasta().touched() && filtroForm.hasta().invalid()"
+      />
+      @if (filtroForm.hasta().touched() && filtroForm.hasta().invalid()) {
+        <small class="error" role="alert">{{ filtroForm.hasta().errors()[0].message }}</small>
+      }
+    </div>
+  </div>
+
+  <fieldset class="campo perfil">
+    <legend>Publicaciones</legend>
+    <label>
+      <input type="radio" name="estado" value="activas" [checked]="estado() === 'activas'" (change)="elegirEstado('activas')" />
+      Activas
+    </label>
+    <label>
+      <input type="radio" name="estado" value="inactivas" [checked]="estado() === 'inactivas'" (change)="elegirEstado('inactivas')" />
+      Inactivas
+    </label>
+    <label>
+      <input type="radio" name="estado" value="todas" [checked]="estado() === 'todas'" (change)="elegirEstado('todas')" />
+      Todas
+    </label>
+  </fieldset>
+
+  <button type="submit" class="btn">Ver estadísticas</button>
+</form>
+
+<!-- 1. Torta: publicaciones por usuario -->
+<section class="tarjeta tarjeta-ancha grafica">
+  <h3>Publicaciones por usuario</h3>
+  @switch (porUsuario().estado) {
+    @case ('cargando') {
+      <app-cargando texto="Cargando gráfico..." />
+    }
+    @case ('error') {
+      <div class="estado">
+        <p class="error">No se pudo cargar este gráfico.</p>
+        <button type="button" class="btn" (click)="reintentar()">Reintentar</button>
+      </div>
+    }
+    @default {
+      @if (graficoTorta(); as config) {
+        <app-grafico [config]="config" descripcion="Gráfico de torta: publicaciones por usuario" />
+      } @else {
+        <p class="vacio">No hay publicaciones en este lapso.</p>
+      }
+    }
+  }
+</section>
+
+<!-- 2. Líneas: comentarios por día en el lapso -->
+<section class="tarjeta tarjeta-ancha grafica">
+  <h3>Comentarios por día</h3>
+  @switch (porDia().estado) {
+    @case ('cargando') {
+      <app-cargando texto="Cargando gráfico..." />
+    }
+    @case ('error') {
+      <div class="estado">
+        <p class="error">No se pudo cargar este gráfico.</p>
+        <button type="button" class="btn" (click)="reintentar()">Reintentar</button>
+      </div>
+    }
+    @default {
+      @if (totalComentarios() === 0) {
+        <p class="vacio">No hay comentarios en este lapso.</p>
+      } @else if (graficoLineas(); as config) {
+        <p class="resumen">
+          {{ totalComentarios() }} {{ totalComentarios() === 1 ? 'comentario' : 'comentarios' }} en el lapso.
+        </p>
+        <app-grafico [config]="config" descripcion="Gráfico de líneas: comentarios por día" />
+      }
+    }
+  }
+</section>
+
+<!-- 3. Barras: comentarios por publicación (las 10 con más comentarios) -->
+<section class="tarjeta tarjeta-ancha grafica">
+  <h3>Comentarios por publicación</h3>
+  @switch (porPublicacion().estado) {
+    @case ('cargando') {
+      <app-cargando texto="Cargando gráfico..." />
+    }
+    @case ('error') {
+      <div class="estado">
+        <p class="error">No se pudo cargar este gráfico.</p>
+        <button type="button" class="btn" (click)="reintentar()">Reintentar</button>
+      </div>
+    }
+    @default {
+      @if (graficoBarras(); as config) {
+        <p class="resumen">Las 10 publicaciones con más comentarios.</p>
+        <app-grafico [config]="config" descripcion="Gráfico de barras: comentarios por publicación" />
+      } @else {
+        <p class="vacio">No hay comentarios en este lapso.</p>
+      }
+    }
+  }
+</section>
