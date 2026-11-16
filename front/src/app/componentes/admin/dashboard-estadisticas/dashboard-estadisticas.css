@@ -58,3 +58,10 @@
   text-align: center;
   color: var(--gris);
 }
+
+/* Mientras se vuelve a pedir, el gráfico anterior sigue a la vista (mismo alto) y atenuado */
+.grafica.recargando app-grafico,
+.grafica.recargando .resumen {
+  opacity: 0.45;
+  transition: opacity 0.15s;
+}

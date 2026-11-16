@@ -43,7 +43,7 @@ npm run start:dev         # http://localhost:3000/api
 | `GET /api/usuarios/yo` | con token | 200 · 401 |
 | `PATCH /api/usuarios/yo` (multipart; no admite correo, perfil ni activo) | el propio usuario | 200 · 400 · 401 · 409 |
 | `GET /api/usuarios/:id` (perfil público) | con token | 200 · 400 · 404 |
-| `GET /api/usuarios?offset=&limit=` (con `perfil` y `activo`) | administrador | 200 · 400 · 401 · 403 |
+| `GET /api/usuarios?offset=&limit=&buscar=` (`buscar`: texto en el correo o el nombre de usuario; con `perfil` y `activo`) | administrador | 200 · 400 · 401 · 403 |
 | `POST /api/usuarios` (multipart: campos del registro + `perfil`) | administrador | 201 · 400 · 401 · 403 · 409 |
 | `DELETE /api/usuarios/:id?ocultarPublicaciones=true\|false` (baja lógica) | administrador, no a sí mismo | 200 · 400 · 401 · 403 · 404 · 409 |
 | `POST /api/usuarios/:id/rehabilitar` (vuelven las publicaciones ocultadas) | administrador | 200 · 400 · 401 · 403 · 404 · 409 |

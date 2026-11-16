@@ -3,6 +3,23 @@
   <a class="btn btn-ocre" routerLink="nuevo">Nuevo usuario</a>
 </div>
 
+<!-- Búsqueda por correo o nombre de usuario (D13.1) -->
+<form class="busqueda" role="search" (submit)="$event.preventDefault(); buscarAhora(texto.value)">
+  <label class="oculto" for="buscar-usuario">Buscar por correo o nombre de usuario</label>
+  <input
+    #texto
+    id="buscar-usuario"
+    type="search"
+    placeholder="Buscar por correo o nombre de usuario"
+    autocomplete="off"
+    [attr.maxlength]="LARGO_MAXIMO_BUSQUEDA"
+    (input)="escribirBusqueda(texto.value)"
+  />
+  @if (buscar()) {
+    <button type="button" class="btn btn-secundario" (click)="limpiarBusqueda(texto)">Limpiar</button>
+  }
+</form>
+
 @if (aviso()) {
   <p class="aviso-ok" role="status">{{ aviso() }}</p>
 }
@@ -19,7 +36,16 @@
   }
   @default {
     <!-- Planilla de usuarios (D11.2); en el celular cada fila se apila como una tarjeta -->
-    <div class="planilla-contenedor">
+    @if (usuarios().length === 0) {
+      <p class="sin-resultados">
+        @if (buscar()) {
+          No hay usuarios cuyo correo o nombre de usuario contenga «{{ buscar() }}».
+        } @else {
+          Todavía no hay usuarios.
+        }
+      </p>
+    }
+    <div class="planilla-contenedor" [hidden]="usuarios().length === 0">
       <table class="planilla">
         <caption class="oculto">Usuarios de La Trochita</caption>
         <thead>

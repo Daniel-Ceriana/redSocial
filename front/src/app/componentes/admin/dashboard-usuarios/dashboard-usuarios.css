@@ -214,3 +214,31 @@
     justify-content: flex-end;
   }
 }
+
+/* ---------- Búsqueda ---------- */
+.busqueda {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.busqueda input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--carbon);
+  background: var(--papel);
+  border: 2px solid var(--borde);
+  border-radius: 8px;
+}
+
+.busqueda input:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 2px;
+}
+
+.sin-resultados {
+  text-align: center;
+  color: var(--gris);
+}

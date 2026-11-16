@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { UsuarioAdmin } from '../../../modelos/usuario';
 import { Auth } from '../../../services/auth';
 import { Modal } from '../../../services/modal';
-import { USUARIOS_POR_PAGINA, UsuariosApi } from '../../../services/usuarios-api';
+import { LARGO_MAXIMO_BUSQUEDA, USUARIOS_POR_PAGINA, UsuariosApi } from '../../../services/usuarios-api';
 import { mensajesDeError } from '../../../utilidades/errores';
 import { Avatar } from '../../compartido/avatar/avatar';
 import { Cargando } from '../../compartido/cargando/cargando';
@@ -24,6 +24,8 @@ export class DashboardUsuarios implements OnInit {
   protected usuarios = signal<UsuarioAdmin[]>([]);
   protected total = signal(0);
   protected pagina = signal(1);
+  protected readonly LARGO_MAXIMO_BUSQUEDA = LARGO_MAXIMO_BUSQUEDA;
+  protected buscar = signal(''); // lo que se está buscando (correo o nombre de usuario)
   protected estado = signal<'cargando' | 'listo' | 'error'>('cargando');
   protected ocupado = signal<string | null>(null); // id del usuario con una acción en curso
   protected aviso = signal('');
@@ -31,6 +33,8 @@ export class DashboardUsuarios implements OnInit {
   protected totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / USUARIOS_POR_PAGINA)));
 
   private temporizadorAviso?: ReturnType<typeof setTimeout>;
+  private temporizadorBusqueda?: ReturnType<typeof setTimeout>;
+  private consulta = 0; // para descartar la respuesta de una búsqueda vieja
 
   ngOnInit() {
     // Si se viene del alta, se muestra su aviso (llega en el estado de la navegación)
@@ -40,15 +44,39 @@ export class DashboardUsuarios implements OnInit {
   }
 
   protected async cargar() {
-    this.estado.set('cargando');
+    // Si ya hay una lista se deja a la vista mientras llega la nueva: así la pantalla no salta ni pierde el foco
+    if (this.estado() !== 'listo') this.estado.set('cargando');
+    const numero = ++this.consulta;
     try {
-      const respuesta = await this.api.listar(this.pagina());
+      const respuesta = await this.api.listar(this.pagina(), this.buscar());
+      if (numero !== this.consulta) return;
       this.usuarios.set(respuesta.datos);
       this.total.set(respuesta.total);
       this.estado.set('listo');
     } catch {
-      this.estado.set('error');
+      if (numero === this.consulta) this.estado.set('error');
     }
+  }
+
+  // Busca mientras se escribe, esperando un momento a que termine de tipear
+  protected escribirBusqueda(texto: string) {
+    clearTimeout(this.temporizadorBusqueda);
+    this.temporizadorBusqueda = setTimeout(() => this.buscarAhora(texto), 300);
+  }
+
+  protected buscarAhora(texto: string) {
+    clearTimeout(this.temporizadorBusqueda);
+    const recortado = texto.trim();
+    if (recortado === this.buscar()) return;
+    this.buscar.set(recortado);
+    this.pagina.set(1);
+    void this.cargar();
+  }
+
+  protected limpiarBusqueda(campo: HTMLInputElement) {
+    campo.value = '';
+    this.buscarAhora('');
+    campo.focus();
   }
 
   protected irAPagina(pagina: number) {

@@ -20,8 +20,8 @@ import { crearPipeImagen } from '../common/imagen.pipe.js';
 import { ParseObjectIdPipe } from '../common/parse-object-id.pipe.js';
 import { ActualizarUsuarioDto } from './dto/actualizar-usuario.dto.js';
 import { SoloAdministradorGuard } from '../autenticacion/guards/solo-administrador.guard.js';
-import { PaginacionDto } from '../common/paginacion.dto.js';
 import { AltaUsuarioDto } from './dto/alta-usuario.dto.js';
+import { ConsultaUsuariosDto } from './dto/consulta-usuarios.dto.js';
 import { DeshabilitarUsuarioDto } from './dto/deshabilitar-usuario.dto.js';
 import { UsuariosService, aPerfilPublico, aRespuesta, aRespuestaAdmin } from './usuarios.service.js';
 
@@ -60,11 +60,11 @@ export class UsuariosController {
 
   // ---------- Solo administradores (4.B1): el AuthGuard de la clase corre primero, después este ----------
 
-  // ?offset=&limit= (4.B2)
+  // ?offset=&limit=&buscar= (4.B2, D13.1)
   @Get()
   @UseGuards(SoloAdministradorGuard)
-  listar(@Query() paginacion: PaginacionDto) {
-    return this.usuariosService.listar(paginacion);
+  listar(@Query() consulta: ConsultaUsuariosDto) {
+    return this.usuariosService.listar(consulta);
   }
 
   // multipart/form-data: los campos del registro + "perfil" (usuario | administrador) + "imagen" opcional (4.B3)

@@ -9,10 +9,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PasswordHasher } from '@nestjs/authentication';
 import { ArchivosService } from '../common/archivos.service.js';
-import { Pagina, PaginacionDto } from '../common/paginacion.dto.js';
+import { Pagina } from '../common/paginacion.dto.js';
 import { PublicacionesService } from '../publicaciones/publicaciones.service.js';
 import { ActualizarUsuarioDto } from './dto/actualizar-usuario.dto.js';
 import { AltaUsuarioDto } from './dto/alta-usuario.dto.js';
+import { ConsultaUsuariosDto } from './dto/consulta-usuarios.dto.js';
 import { Perfil, Usuario, UsuarioDocument } from './entities/usuario.entity.js';
 
 export interface DatosNuevoUsuario {
@@ -77,10 +78,17 @@ export class UsuariosService {
   // ---------- Administración (solo administradores; el guard lo controla en el controller) ----------
 
   // Todos los usuarios, habilitados y deshabilitados, del más nuevo al más viejo (4.B2, D10.3)
-  async listar({ offset, limit }: PaginacionDto): Promise<Pagina<unknown>> {
+  // Con "buscar": solo los que tienen ese texto en el correo o en el nombre de usuario (sin distinguir mayúsculas)
+  async listar({ offset, limit, buscar }: ConsultaUsuariosDto): Promise<Pagina<unknown>> {
+    let filtro = {};
+    if (buscar) {
+      // El texto se escapa: se busca tal cual, no como expresión regular
+      const texto = new RegExp(buscar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      filtro = { $or: [{ correo: texto }, { nombreUsuario: texto }] };
+    }
     const [usuarios, total] = await Promise.all([
-      this.modelo.find().sort({ createdAt: -1, _id: -1 }).skip(offset).limit(limit).exec(),
-      this.modelo.countDocuments(),
+      this.modelo.find(filtro).sort({ createdAt: -1, _id: -1 }).skip(offset).limit(limit).exec(),
+      this.modelo.countDocuments(filtro),
     ]);
     return { datos: (usuarios as UsuarioDocument[]).map(aRespuestaAdmin), total, offset, limit };
   }

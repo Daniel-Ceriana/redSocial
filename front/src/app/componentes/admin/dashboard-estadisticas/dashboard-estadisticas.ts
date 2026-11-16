@@ -70,6 +70,9 @@ export class DashboardEstadisticas implements OnInit {
   // Para descartar la respuesta de una consulta vieja si se vuelve a pedir (una cuenta por gráfico)
   private consultas = { usuario: 0, dia: 0, publicacion: 0 };
 
+  // Gráficos que se están volviendo a pedir: se dejan a la vista, atenuados, para que la página no salte
+  protected recargando = signal({ usuario: false, dia: false, publicacion: false });
+
   protected graficoTorta = computed(() => {
     const c = this.porUsuario();
     if (c.estado !== 'listo' || c.datos.length === 0) return null;
@@ -206,14 +209,21 @@ export class DashboardEstadisticas implements OnInit {
   // Muestra "cargando", espera la respuesta y la guarda; descarta la que llega después de una consulta más nueva
   private async pedir<T>(grafico: 'usuario' | 'dia' | 'publicacion', llamada: Promise<T>, destino: WritableSignal<Carga<T>>) {
     const numero = ++this.consultas[grafico];
-    destino.set({ estado: 'cargando' });
+    if (destino().estado === 'listo') {
+      // Ya hay un gráfico: se queda donde está (con su alto) hasta que llegue el nuevo
+      this.recargando.update((r) => ({ ...r, [grafico]: true }));
+    } else {
+      destino.set({ estado: 'cargando' });
+    }
     let resultado: Carga<T>;
     try {
       resultado = { estado: 'listo', datos: await llamada };
     } catch {
       resultado = { estado: 'error' };
     }
-    if (numero === this.consultas[grafico]) destino.set(resultado);
+    if (numero !== this.consultas[grafico]) return;
+    destino.set(resultado);
+    this.recargando.update((r) => ({ ...r, [grafico]: false }));
   }
 
   // "2026-11-14" -> "14/11"

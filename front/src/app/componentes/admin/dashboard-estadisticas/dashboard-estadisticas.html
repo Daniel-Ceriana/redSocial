@@ -53,7 +53,7 @@
 </form>
 
 <!-- 1. Torta: publicaciones por usuario -->
-<section class="tarjeta tarjeta-ancha grafica">
+<section class="tarjeta tarjeta-ancha grafica" [class.recargando]="recargando().usuario">
   <h3>Publicaciones por usuario</h3>
   <div class="controles">
     <label>
@@ -94,7 +94,7 @@
 </section>
 
 <!-- 2. Líneas: comentarios por día en el lapso -->
-<section class="tarjeta tarjeta-ancha grafica">
+<section class="tarjeta tarjeta-ancha grafica" [class.recargando]="recargando().dia">
   <h3>Comentarios por día</h3>
   @switch (porDia().estado) {
     @case ('cargando') {
@@ -120,7 +120,7 @@
 </section>
 
 <!-- 3. Barras: comentarios por publicación (las 10 con más comentarios) -->
-<section class="tarjeta tarjeta-ancha grafica">
+<section class="tarjeta tarjeta-ancha grafica" [class.recargando]="recargando().publicacion">
   <h3>Comentarios por publicación</h3>
   <div class="controles">
     <label>
