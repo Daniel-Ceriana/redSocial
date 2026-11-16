@@ -81,8 +81,8 @@ export class DashboardUsuarios implements OnInit {
   // D11.3: tres botones; el administrador elige si se ocultan las publicaciones (D10.6)
   protected async deshabilitar(u: UsuarioAdmin) {
     const ocultar = await this.modal.elegir(`¿Deshabilitar a @${u.nombreUsuario}?`, [
-      'No va a poder iniciar sesión hasta que lo rehabilites.',
-      'Elegí qué pasa con sus publicaciones: si las ocultás, vuelven a verse cuando lo rehabilites.',
+      'No va a poder iniciar sesión hasta que lo habilites.',
+      'Elegí qué pasa con sus publicaciones: si las ocultás, vuelven a verse cuando lo habilites.',
     ], [
       { texto: 'Cancelar', valor: null, estilo: 'secundario' },
       { texto: 'Deshabilitar y dejarlas visibles', valor: false, estilo: 'principal' },
@@ -108,9 +108,9 @@ export class DashboardUsuarios implements OnInit {
 
   protected async rehabilitar(u: UsuarioAdmin) {
     const confirmado = await this.modal.confirmar(
-      `¿Rehabilitar a @${u.nombreUsuario}?`,
+      `¿Habilitar a @${u.nombreUsuario}?`,
       'Va a poder volver a iniciar sesión, y vuelven a verse las publicaciones que se ocultaron al deshabilitarlo.',
-      'Rehabilitar',
+      'Habilitar',
     );
     if (!confirmado) return;
 
@@ -122,7 +122,7 @@ export class DashboardUsuarios implements OnInit {
         `@${u.nombreUsuario} quedó habilitado. Se restauraron ${r.publicacionesRestauradas} ${plural(r.publicacionesRestauradas, 'publicación', 'publicaciones')}.`,
       );
     } catch (error) {
-      await this.modal.avisar('No se pudo rehabilitar', mensajesDeError(error));
+      await this.modal.avisar('No se pudo habilitar', mensajesDeError(error));
       void this.cargar();
     } finally {
       this.ocupado.set(null);
