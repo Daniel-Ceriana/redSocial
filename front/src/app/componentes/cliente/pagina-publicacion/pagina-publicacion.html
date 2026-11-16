@@ -34,7 +34,7 @@
         <h2 id="titulo-comentarios">Comentarios</h2>
 
         @if (aviso()) {
-          <p class="aviso-ok" role="status">{{ aviso() }}</p>
+          <p class="aviso-ok" role="status" [appAutoOcultar]="4" [reiniciarCon]="aviso()" (ocultar)="aviso.set('')">{{ aviso() }}</p>
         }
 
         <!-- Escribir un comentario (3.F2), arriba de la lista (D8.2) -->

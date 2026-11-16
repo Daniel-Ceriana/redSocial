@@ -52,8 +52,9 @@
             {{ p.cantidadMeGusta }} me gusta · {{ p.cantidadComentarios }}
             {{ p.cantidadComentarios === 1 ? 'comentario' : 'comentarios' }}
           </span>
-          @if (auth.esAdministrador() && permitirAlta()) {
+          @if (permitirAlta()) {
             <button
+              *appSoloAdministrador
               type="button"
               class="btn btn-ocre dar-de-alta"
               [disabled]="acciones.estaOcupada(p.id)"

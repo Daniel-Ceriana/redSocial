@@ -13,7 +13,9 @@
     placeholder="Buscar por correo o nombre de usuario"
     autocomplete="off"
     [attr.maxlength]="LARGO_MAXIMO_BUSQUEDA"
-    (input)="escribirBusqueda(texto.value)"
+    appBusquedaDiferida
+    [espera]="300"
+    (busqueda)="buscarAhora($event)"
   />
   @if (buscar()) {
     <button type="button" class="btn btn-secundario" (click)="limpiarBusqueda(texto)">Limpiar</button>
@@ -21,7 +23,7 @@
 </form>
 
 @if (aviso()) {
-  <p class="aviso-ok" role="status">{{ aviso() }}</p>
+  <p class="aviso-ok" role="status" [appAutoOcultar]="5" [reiniciarCon]="aviso()" (ocultar)="aviso.set('')">{{ aviso() }}</p>
 }
 
 @switch (estado()) {

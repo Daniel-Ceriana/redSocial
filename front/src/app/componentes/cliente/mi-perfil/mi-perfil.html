@@ -1,7 +1,7 @@
 <h1 class="cartel-titulo">Mi perfil</h1>
 
 @if (aviso()) {
-  <p class="aviso-ok" role="status">{{ aviso() }}</p>
+  <p class="aviso-ok" role="status" [appAutoOcultar]="4" [reiniciarCon]="aviso()" (ocultar)="aviso.set('')">{{ aviso() }}</p>
 }
 
 @if (usuario(); as u) {

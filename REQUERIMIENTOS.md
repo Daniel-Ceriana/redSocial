@@ -76,6 +76,9 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | 4.F2 | `dashboard/usuarios`: listado, alta con perfil, deshabilitar y rehabilitar | ✔ S11; falta probarlo en el navegador |
 | 4.B6 | `GET /api/estadisticas/publicaciones-por-usuario`, `/comentarios-por-dia` y `/comentarios-por-publicacion` (lapso `desde`/`hasta` y `estado`), solo administradores | ✔ S12 (hecho y compilado; falta probar con Postman) |
 | 4.F3 | `dashboard/estadisticas`: torta, líneas y barras con un lapso elegible y selector de estado de las publicaciones | ✔ S12 (hecho y compilado; falta probarlo en el navegador) |
+| 4.F4 | PWA: manifiesto, íconos propios y service worker (sin caché de la API) | ✔ S13 (falta verificarla con Lighthouse en la URL pública) |
+| 4.F5 | 3 pipes propios | ✔ hay 4: `tiempoRelativo`, `fechaArgentina`, `fechaChapa` y `resumen` |
+| 4.F6 | 3 directivas propias | ✔ S13: `*appSoloAdministrador`, `appBusquedaDiferida` y `appAutoOcultar` |
 | X14 | Un deshabilitado con la sesión abierta no puede autorizar ni refrescar (403) | ✔ S10 |
 | X15 | Un administrador no puede deshabilitarse a sí mismo (400) | ✔ S10 |
 | X16 | Publicaciones de un deshabilitado: las oculta o no el administrador al deshabilitarlo | ✔ S10 |

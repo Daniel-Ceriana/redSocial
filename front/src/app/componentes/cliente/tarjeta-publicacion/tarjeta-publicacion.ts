@@ -1,3 +1,4 @@
+import { SoloAdministrador } from '../../../directivas/solo-administrador';
 import { Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { EstadoPublicacion, Publicacion } from '../../../modelos/publicacion';
@@ -20,7 +21,7 @@ const TEXTO_ESTADO: Record<EstadoPublicacion, string> = {
 // Una publicación, dibujada como una placa de estación montada en un diorama (T26 de la hoja de ruta).
 // Dar me gusta y eliminar los hace el servicio compartido; la tarjeta avisa el resultado.
 @Component({
-  imports: [Avatar, RouterLink, TiempoRelativoPipe, FechaArgentinaPipe, FechaChapaPipe, ResumenPipe],
+  imports: [Avatar, RouterLink, SoloAdministrador, TiempoRelativoPipe, FechaArgentinaPipe, FechaChapaPipe, ResumenPipe],
   selector: 'app-tarjeta-publicacion',
   templateUrl: './tarjeta-publicacion.html',
   styleUrl: './tarjeta-publicacion.css',

@@ -34,16 +34,14 @@
 
       <hr class="riel" />
       <h2>Publicaciones de {{ p.nombre }}</h2>
-      @if (auth.esAdministrador()) {
-        <p class="nota-admin">
-          @if (p.activo) {
-            Como administrador ves también sus publicaciones dadas de baja, y podés darlas de alta.
-          } @else {
-            Como administrador ves también sus publicaciones dadas de baja. Rehabilitá a &#64;{{ p.nombreUsuario }}
-            para poder darlas de alta: las que se ocultaron al deshabilitarlo vuelven solas.
-          }
-        </p>
-      }
+      <p *appSoloAdministrador class="nota-admin">
+        @if (p.activo) {
+          Como administrador ves también sus publicaciones dadas de baja, y podés darlas de alta.
+        } @else {
+          Como administrador ves también sus publicaciones dadas de baja. Rehabilitá a &#64;{{ p.nombreUsuario }}
+          para poder darlas de alta: las que se ocultaron al deshabilitarlo vuelven solas.
+        }
+      </p>
       <app-listado-publicaciones
         [usuarioId]="p.id"
         [incluirBajas]="auth.esAdministrador()"

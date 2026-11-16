@@ -1,3 +1,4 @@
+import { SoloAdministrador } from '../../../directivas/solo-administrador';
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '../../../services/auth';
@@ -5,7 +6,7 @@ import { Avatar } from '../avatar/avatar';
 import { Locomotora } from '../locomotora/locomotora';
 
 @Component({
-  imports: [RouterLink, RouterLinkActive, Avatar, Locomotora],
+  imports: [RouterLink, RouterLinkActive, Avatar, Locomotora, SoloAdministrador],
   selector: 'app-nav',
   templateUrl: './nav.html',
   styleUrl: './nav.css',

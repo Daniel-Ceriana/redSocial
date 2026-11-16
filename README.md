@@ -25,7 +25,7 @@ npm run start:dev         # http://localhost:3000/api
 ### Decisiones técnicas
 
 - Rutas en español bajo `/api`. Errores con el formato de Nest: `{ statusCode, message, error }`.
-- Token JWT (15 minutos) en el cuerpo de la respuesta; el front lo manda en el header `Authorization: Bearer <token>`.
+- Token JWT (30 s fijos para la presentación; el enunciado pide 15 minutos) en el cuerpo de la respuesta; el front lo manda en el header `Authorization: Bearer <token>`.
   `venceEn` (fecha ISO) permite armar el contador del front.
 - Contraseñas con `PasswordHasher` de `@nestjs/authentication`; el hash nunca sale en una respuesta.
 - Validación con DTOs (`class-validator`) y `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform`.
@@ -68,6 +68,7 @@ Los listados devuelven `{ datos, total, offset, limit }` (`limit` 5 por defecto,
 | NestJS, Mongoose, `class-validator`, `@nestjs/config`, `@nestjs/jwt`, `PasswordHasher`, `@nestjs/mapped-types`, Cloudinary + Multer | clase |
 | Guard que lee el header `Authorization` (en clase leía la cookie) | clase, con cambios |
 | Excepciones HTTP de Nest en lugar de `throw new Error` | clase, con cambios |
+| `aggregate()` de Mongoose (`$group`, `$lookup`, `$dateToString`) para las estadísticas | clase, con cambios (en clase se usó `find`; acá hay que agrupar y contar) |
 | Script de seed | nuevo |
 
 ## Front
@@ -91,11 +92,26 @@ La URL de la API está en `front/src/environments/environment.ts`.
 - El token dura **30 segundos** (fijo, para poder mostrarlo en la presentación; el enunciado pide 15 minutos). Login, registro y `POST /api/autenticacion/refrescar` devuelven `emitidoEn` y `venceEn`. Con eso, `services/auth.ts` programa dos temporizadores: a la mitad de la vida del token, un modal ofrece extender la sesión (si acepta, se llama a refrescar y se vuelve a programar todo); al vencer, se cierra la sesión sola, se lleva al login y se avisa con el modal «Tu sesión venció».
 - Además, en cada acción del usuario (petición a la API o cambio de pantalla) se revisa si el token ya venció según `venceEn`: si venció, no se hace la petición y pasa lo mismo. Un 401 de la API también. Sin sesión, tampoco se envían peticiones.
 - El token y su vencimiento se guardan en `localStorage`; un interceptor lo manda en `Authorization: Bearer`. Al abrir la app se muestra una pantalla de cargando (5 segundos como mínimo) mientras se valida el token con `POST /api/autenticacion/autorizar`; después los guards llevan a publicaciones o al login. El modal para extender la sesión tiene cuenta regresiva.
+- **Directivas propias** (`src/app/directivas/`, standalone y con la API de signals): `*appSoloAdministrador` (estructural: muestra el elemento solo si la sesión es de un administrador; se usa en el nav, la tarjeta de publicación y el perfil público), `appBusquedaDiferida` (en un `<input>`: avisa con el texto cuando se deja de escribir; búsqueda de usuarios) y `appAutoOcultar` (borra un aviso a los N segundos; avisos de listado, mi perfil, página de publicación y usuarios).
+- **Pipes propios** (`src/app/pipes/`): `tiempoRelativo`, `fechaArgentina`, `fechaChapa` y `resumen`.
+- **PWA**: `manifest.webmanifest` con íconos propios (la locomotora; uno «maskable») y service worker de `@angular/service-worker` registrado solo en el build de producción. `ngsw-config.json` cachea solo los archivos de la app (JS, CSS, íconos), **nunca** las respuestas de la API (no tiene `dataGroups`). El service worker no corre en `ng serve`: para probarlo, `npm run build` y servir `dist/front/browser` (o usar la URL pública) y abrir Lighthouse.
+- **Estadísticas**: gráficos con Chart.js directa (un `<canvas>` por gráfico, componente `app-grafico`), registrando solo torta, barras y líneas.
 - Sin `alert()`: los avisos y confirmaciones usan el modal propio (`services/modal.ts`).
 - Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo`, `fechaArgentina` y `fechaChapa` («14 NOV 2026»). El pipe propio `resumen` acorta las descripciones de más de 200 caracteres en las listas (sin cortar palabras) y deja un «Ver más» que abre la publicación.
 - Validaciones compartidas en `utilidades/validaciones.ts`: recortan los espacios igual que el back y usan las mismas reglas y mensajes (correo con la misma exigencia de dominio que `@IsEmail()`, edad mínima con la fecha argentina).
 - Paginación con «Anterior» / «Siguiente»; después de crear o eliminar se vuelve a pedir la página a la API para que el total siempre coincida.
 - Las validaciones del front son las mismas que las del back (el back es la que manda).
+
+### Origen de las tecnologías
+
+| Pieza | Origen |
+|-------|--------|
+| Angular standalone, signals, Signal Forms, `@if/@for`, guards `canMatch`, carga diferida, `HttpClient` con interceptor | clase / TP 1 |
+| Directivas propias con `inject`, `input`, `output` y `effect` | clase, con cambios (API de signals) |
+| Directiva estructural con `TemplateRef` y `ViewContainerRef` (`*appSoloAdministrador`) | nuevo |
+| Pipes propios | clase |
+| `chart.js` | nuevo (librería aprobada en la S12) |
+| `@angular/service-worker` y manifiesto web (PWA) | nuevo (librería aprobada en la S13) |
 
 ### Rutas del front
 

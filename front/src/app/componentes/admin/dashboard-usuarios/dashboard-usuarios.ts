@@ -1,3 +1,5 @@
+import { AutoOcultar } from '../../../directivas/auto-ocultar';
+import { BusquedaDiferida } from '../../../directivas/busqueda-diferida';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { UsuarioAdmin } from '../../../modelos/usuario';
@@ -11,7 +13,7 @@ import { Cargando } from '../../compartido/cargando/cargando';
 // dashboard/usuarios (4.F2): tabla tipo planilla (D11.2), paginada de a 10, con deshabilitar y rehabilitar.
 // Las acciones actualizan la fila sin volver a pedir la lista.
 @Component({
-  imports: [Avatar, Cargando, RouterLink],
+  imports: [Avatar, AutoOcultar, BusquedaDiferida, Cargando, RouterLink],
   selector: 'app-dashboard-usuarios',
   templateUrl: './dashboard-usuarios.html',
   styleUrl: './dashboard-usuarios.css',
@@ -32,8 +34,6 @@ export class DashboardUsuarios implements OnInit {
 
   protected totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / USUARIOS_POR_PAGINA)));
 
-  private temporizadorAviso?: ReturnType<typeof setTimeout>;
-  private temporizadorBusqueda?: ReturnType<typeof setTimeout>;
   private consulta = 0; // para descartar la respuesta de una búsqueda vieja
 
   ngOnInit() {
@@ -58,14 +58,8 @@ export class DashboardUsuarios implements OnInit {
     }
   }
 
-  // Busca mientras se escribe, esperando un momento a que termine de tipear
-  protected escribirBusqueda(texto: string) {
-    clearTimeout(this.temporizadorBusqueda);
-    this.temporizadorBusqueda = setTimeout(() => this.buscarAhora(texto), 300);
-  }
-
+  // Busca mientras se escribe (la directiva appBusquedaDiferida espera a que se deje de tipear) o al apretar Enter
   protected buscarAhora(texto: string) {
-    clearTimeout(this.temporizadorBusqueda);
     const recortado = texto.trim();
     if (recortado === this.buscar()) return;
     this.buscar.set(recortado);
@@ -140,9 +134,7 @@ export class DashboardUsuarios implements OnInit {
   }
 
   private mostrarAviso(mensaje: string) {
-    clearTimeout(this.temporizadorAviso);
-    this.aviso.set(mensaje);
-    this.temporizadorAviso = setTimeout(() => this.aviso.set(''), 5000);
+    this.aviso.set(mensaje); // se borra solo a los 5 segundos (appAutoOcultar en la plantilla)
   }
 }
 

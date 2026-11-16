@@ -1,3 +1,4 @@
+import { AutoOcultar } from '../../../directivas/auto-ocultar';
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import {
   OrdenPublicaciones,
@@ -10,7 +11,7 @@ import { TarjetaPublicacion } from '../tarjeta-publicacion/tarjeta-publicacion';
 
 // Listado de tarjetas con orden y paginación. Con `usuarioId` muestra solo las de ese usuario.
 @Component({
-  imports: [TarjetaPublicacion, Cargando],
+  imports: [AutoOcultar, TarjetaPublicacion, Cargando],
   selector: 'app-listado-publicaciones',
   templateUrl: './listado-publicaciones.html',
   styleUrl: './listado-publicaciones.css',
@@ -37,7 +38,6 @@ export class ListadoPublicaciones {
 
   // Cada pedido tiene un número; si llega una respuesta de uno viejo, se ignora
   private numeroPedido = 0;
-  private temporizadorAviso?: ReturnType<typeof setTimeout>;
 
   constructor() {
     // Carga al abrir y cada vez que cambia el usuario filtrado (por ejemplo, de un perfil a otro)
@@ -112,9 +112,8 @@ export class ListadoPublicaciones {
     void this.cargar();
   }
 
+  // El aviso se borra solo a los 4 segundos (directiva appAutoOcultar en la plantilla)
   private mostrarAviso(mensaje: string) {
-    clearTimeout(this.temporizadorAviso);
     this.aviso.set(mensaje);
-    this.temporizadorAviso = setTimeout(() => this.aviso.set(''), 4000);
   }
 }

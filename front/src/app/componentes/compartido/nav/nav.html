@@ -41,21 +41,20 @@
           <app-locomotora class="tren" />
         }
       </a>
-      @if (usuario()?.perfil === 'administrador') {
-        <!-- Solo administradores (D11.5) -->
-        <a
-          class="estacion"
-          routerLink="/dashboard"
-          routerLinkActive="activo"
-          #rlaDashboard="routerLinkActive"
-          (click)="menuAbierto.set(false)"
-        >
-          Dashboard
-          @if (rlaDashboard.isActive) {
-            <app-locomotora class="tren" />
-          }
-        </a>
-      }
+      <!-- Solo administradores (D11.5) -->
+      <a
+        *appSoloAdministrador
+        class="estacion"
+        routerLink="/dashboard"
+        routerLinkActive="activo"
+        #rlaDashboard="routerLinkActive"
+        (click)="menuAbierto.set(false)"
+      >
+        Dashboard
+        @if (rlaDashboard.isActive) {
+          <app-locomotora class="tren" />
+        }
+      </a>
     </nav>
 
     @if (usuario(); as u) {

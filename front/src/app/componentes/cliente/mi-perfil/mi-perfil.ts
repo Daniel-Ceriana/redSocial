@@ -1,3 +1,4 @@
+import { AutoOcultar } from '../../../directivas/auto-ocultar';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ComentarioPublicacion } from '../../../modelos/comentario';
 import { Publicacion } from '../../../modelos/publicacion';
@@ -20,7 +21,7 @@ interface PublicacionConComentarios {
 }
 
 @Component({
-  imports: [Avatar, Cargando, Comentario, EditarPerfil, TarjetaPublicacion],
+  imports: [Avatar, AutoOcultar, Cargando, Comentario, EditarPerfil, TarjetaPublicacion],
   selector: 'app-mi-perfil',
   templateUrl: './mi-perfil.html',
   styleUrl: './mi-perfil.css',
@@ -39,7 +40,6 @@ export class MiPerfil implements OnInit {
   protected estado = signal<'cargando' | 'listo' | 'error'>('cargando');
   protected cantidadComentarios = CANTIDAD_COMENTARIOS;
 
-  private temporizadorAviso?: ReturnType<typeof setTimeout>;
 
   ngOnInit() {
     // Muestra lo que ya hay y lo actualiza con los datos del back
@@ -86,8 +86,6 @@ export class MiPerfil implements OnInit {
   protected alGuardar() {
     this.editando.set(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    clearTimeout(this.temporizadorAviso);
-    this.aviso.set('Perfil actualizado');
-    this.temporizadorAviso = setTimeout(() => this.aviso.set(''), 4000);
+    this.aviso.set('Perfil actualizado'); // se borra solo (appAutoOcultar)
   }
 }

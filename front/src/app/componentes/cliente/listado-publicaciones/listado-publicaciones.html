@@ -1,5 +1,5 @@
 @if (aviso()) {
-  <p class="aviso-ok" role="status">{{ aviso() }}</p>
+  <p class="aviso-ok" role="status" [appAutoOcultar]="4" [reiniciarCon]="aviso()" (ocultar)="aviso.set('')">{{ aviso() }}</p>
 }
 
 <div class="orden" role="group" aria-label="Ordenar publicaciones">

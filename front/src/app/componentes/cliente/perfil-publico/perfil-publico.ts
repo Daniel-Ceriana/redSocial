@@ -1,3 +1,4 @@
+import { SoloAdministrador } from '../../../directivas/solo-administrador';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -11,7 +12,7 @@ import { ListadoPublicaciones } from '../listado-publicaciones/listado-publicaci
 
 // Perfil de otro usuario: lo que él mismo muestra (sin correo ni fecha de nacimiento) y sus publicaciones
 @Component({
-  imports: [Avatar, Cargando, ListadoPublicaciones, RouterLink],
+  imports: [Avatar, Cargando, ListadoPublicaciones, RouterLink, SoloAdministrador],
   selector: 'app-perfil-publico',
   templateUrl: './perfil-publico.html',
   styleUrl: './perfil-publico.css',

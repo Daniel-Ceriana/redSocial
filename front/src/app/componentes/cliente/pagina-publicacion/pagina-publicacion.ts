@@ -1,3 +1,4 @@
+import { AutoOcultar } from '../../../directivas/auto-ocultar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -20,7 +21,7 @@ const COMENTARIOS_POR_CARGA = 3;
 // Página de una publicación (3.F1): la publicación en grande, el formulario para comentar (3.F2) y los
 // comentarios, de a 3 con "cargar más" (3.F3); el autor edita los suyos en el mismo cartel (3.F4).
 @Component({
-  imports: [TarjetaPublicacion, Comentario, Cargando, FormField, RouterLink],
+  imports: [AutoOcultar, TarjetaPublicacion, Comentario, Cargando, FormField, RouterLink],
   selector: 'app-pagina-publicacion',
   templateUrl: './pagina-publicacion.html',
   styleUrl: './pagina-publicacion.css',
@@ -49,7 +50,6 @@ export class PaginaPublicacion {
   private posicion = 0;
   protected hayMas = signal(false);
 
-  private temporizadorAviso?: ReturnType<typeof setTimeout>;
 
   protected model = signal({ mensaje: '' });
   protected comentarioForm = form(this.model, (p) => {
@@ -138,9 +138,8 @@ export class PaginaPublicacion {
     void this.modal.avisar('Publicación eliminada', 'La publicación y sus comentarios ya no están disponibles.');
   }
 
+  // El aviso se borra solo a los 4 segundos (directiva appAutoOcultar en la plantilla)
   private mostrarAviso(mensaje: string) {
-    clearTimeout(this.temporizadorAviso);
     this.aviso.set(mensaje);
-    this.temporizadorAviso = setTimeout(() => this.aviso.set(''), 4000);
   }
 }
