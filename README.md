@@ -51,7 +51,7 @@ npm run start:dev         # http://localhost:3000/api
 | `GET /api/publicaciones?orden=&usuario=&offset=&limit=` | con token | 200 · 400 · 401 |
 | `GET /api/publicaciones/:id` | con token | 200 · 400 · 401 · 404 |
 | `GET /api/publicaciones?usuario=&incluirBajas=true` (también las dadas de baja, con `estado`) | administrador | 200 · 400 · 401 · 403 |
-| `GET /api/estadisticas/publicaciones-por-usuario`, `/comentarios-por-dia`, `/comentarios-por-publicacion` (query `desde`, `hasta` en `AAAA-MM-DD`, `estado` = `activas`\|`inactivas`\|`todas`) | administrador | 200 · 400 · 401 · 403 |
+| `GET /api/estadisticas/publicaciones-por-usuario`, `/comentarios-por-dia`, `/comentarios-por-publicacion` (query `desde`, `hasta` en `AAAA-MM-DD`, `estado` = `activas`\|`inactivas`\|`todas`; los rankings suman `cantidad` = `5`\|`10`\|`15`\|`todos` y `orden` = `mayor`\|`menor`, y comentarios por publicación `incluirSinComentarios`) | administrador | 200 · 400 · 401 · 403 |
 | `POST /api/publicaciones/:id/restaurar` (dar de alta otra vez) | administrador | 200 · 400 · 401 · 403 · 404 · 409 |
 | `DELETE /api/publicaciones/:id` (baja lógica) | autor o administrador | 204 · 400 · 403 · 404 |
 | `POST` y `DELETE /api/publicaciones/:id/me-gusta` | con token | 201 / 200 · 400 · 404 · 409 |

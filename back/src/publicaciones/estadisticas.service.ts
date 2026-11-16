@@ -3,7 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, PipelineStage } from 'mongoose';
 import { Usuario } from '../usuarios/entities/usuario.entity.js';
 import {
+  ConsultaComentariosPublicacionDto,
   ConsultaEstadisticasDto,
+  ConsultaRankingDto,
   DIAS_MAXIMOS_LAPSO,
   EstadoEstadisticas,
 } from './dto/consulta-estadisticas.dto.js';
@@ -12,8 +14,6 @@ import { Publicacion } from './entities/publicacion.entity.js';
 
 const ZONA_ARGENTINA = 'America/Argentina/Buenos_Aires';
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
-// Publicaciones que muestra el gráfico de barras (las que más comentarios tienen)
-const TOP_PUBLICACIONES = 10;
 
 interface Lapso {
   desde: Date; // 00:00 (hora argentina) del primer día, incluido
@@ -31,7 +31,7 @@ export class EstadisticasService {
   ) {}
 
   // Torta: cuántas publicaciones creó cada usuario en el lapso
-  async publicacionesPorUsuario(dto: ConsultaEstadisticasDto) {
+  async publicacionesPorUsuario(dto: ConsultaRankingDto) {
     const lapso = this.lapso(dto);
     const filas = await this.publicacionModel.aggregate<{
       _id: string;
@@ -59,7 +59,8 @@ export class EstadisticasService {
           usuario: { $arrayElemAt: ['$autor.nombreUsuario', 0] },
         },
       },
-      { $sort: { cantidad: -1, usuario: 1 } },
+      { $sort: { cantidad: dto.orden === 'mayor' ? -1 : 1, usuario: 1 } },
+      ...this.limite(dto),
     ]);
     return filas.map((f) => ({
       usuarioId: f._id.toString(),
@@ -84,30 +85,49 @@ export class EstadisticasService {
     return lapso.dias.map((fecha) => ({ fecha, cantidad: porDia.get(fecha) ?? 0 }));
   }
 
-  // Barras: las publicaciones con más comentarios en el lapso
-  async comentariosPorPublicacion(dto: ConsultaEstadisticasDto) {
+  // Barras: las publicaciones con más (o menos) comentarios en el lapso. Se parte de las publicaciones que cumplen
+  // el estado, así pueden aparecer también las que no tuvieron comentarios (D12.8).
+  async comentariosPorPublicacion(dto: ConsultaComentariosPublicacionDto) {
     const lapso = this.lapso(dto);
-    const filas = await this.comentarioModel.aggregate<{
+    const filas = await this.publicacionModel.aggregate<{
       _id: string;
       cantidad: number;
       titulo: string;
     }>([
-      ...this.comentariosDelLapso(lapso, dto.estado),
+      // Las publicadas hasta el final del lapso (una posterior no pudo tener comentarios en él)
+      { $match: { createdAt: { $lt: lapso.hasta }, ...this.filtroEstado(dto.estado) } },
       {
-        $group: {
-          _id: '$publicacion',
-          cantidad: { $sum: 1 },
-          titulo: { $first: { $arrayElemAt: ['$pub.titulo', 0] } },
+        $lookup: {
+          from: this.comentarioModel.collection.name,
+          let: { publicacionId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$publicacion', '$$publicacionId'] },
+                createdAt: { $gte: lapso.desde, $lt: lapso.hasta },
+                activo: true,
+              },
+            },
+            { $count: 'n' },
+          ],
+          as: 'comentarios',
         },
       },
-      { $sort: { cantidad: -1, titulo: 1 } },
-      { $limit: TOP_PUBLICACIONES },
+      { $project: { titulo: 1, cantidad: { $ifNull: [{ $arrayElemAt: ['$comentarios.n', 0] }, 0] } } },
+      ...(dto.incluirSinComentarios ? [] : [{ $match: { cantidad: { $gt: 0 } } } as PipelineStage]),
+      { $sort: { cantidad: dto.orden === 'mayor' ? -1 : 1, titulo: 1 } },
+      ...this.limite(dto),
     ]);
     return filas.map((f) => ({
       publicacionId: f._id.toString(),
       titulo: f.titulo,
       cantidad: f.cantidad,
     }));
+  }
+
+  // "5", "10", "15" o "todos" (sin límite)
+  private limite(dto: ConsultaRankingDto): PipelineStage[] {
+    return dto.cantidad === 'todos' ? [] : [{ $limit: Number(dto.cantidad) }];
   }
 
   // Comentarios hechos en el lapso, de publicaciones que cumplen el estado pedido (queda en "pub")

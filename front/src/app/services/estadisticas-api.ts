@@ -6,6 +6,7 @@ import {
   ComentariosDePublicacion,
   ComentariosDeUnDia,
   Lapso,
+  OpcionesRanking,
   PublicacionesDeUsuario,
 } from '../modelos/estadisticas';
 
@@ -15,9 +16,11 @@ export class EstadisticasApi {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/estadisticas`;
 
-  publicacionesPorUsuario(lapso: Lapso) {
+  publicacionesPorUsuario(lapso: Lapso, ranking: OpcionesRanking) {
     return firstValueFrom(
-      this.http.get<PublicacionesDeUsuario[]>(`${this.url}/publicaciones-por-usuario`, { params: { ...lapso } }),
+      this.http.get<PublicacionesDeUsuario[]>(`${this.url}/publicaciones-por-usuario`, {
+        params: { ...lapso, ...ranking },
+      }),
     );
   }
 
@@ -27,9 +30,11 @@ export class EstadisticasApi {
     );
   }
 
-  comentariosPorPublicacion(lapso: Lapso) {
+  comentariosPorPublicacion(lapso: Lapso, ranking: OpcionesRanking, incluirSinComentarios: boolean) {
     return firstValueFrom(
-      this.http.get<ComentariosDePublicacion[]>(`${this.url}/comentarios-por-publicacion`, { params: { ...lapso } }),
+      this.http.get<ComentariosDePublicacion[]>(`${this.url}/comentarios-por-publicacion`, {
+        params: { ...lapso, ...ranking, incluirSinComentarios },
+      }),
     );
   }
 }

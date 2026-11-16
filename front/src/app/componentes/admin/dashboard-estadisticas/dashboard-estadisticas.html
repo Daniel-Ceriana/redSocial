@@ -55,6 +55,24 @@
 <!-- 1. Torta: publicaciones por usuario -->
 <section class="tarjeta tarjeta-ancha grafica">
   <h3>Publicaciones por usuario</h3>
+  <div class="controles">
+    <label>
+      Mostrar
+      <select #cantU [value]="cantidadUsuarios()" (change)="cambiarUsuarios(cantU.value, ordU.value)">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="todos">Todos</option>
+      </select>
+    </label>
+    <label>
+      los usuarios con
+      <select #ordU [value]="ordenUsuarios()" (change)="cambiarUsuarios(cantU.value, ordU.value)">
+        <option value="mayor">más publicaciones</option>
+        <option value="menor">menos publicaciones</option>
+      </select>
+    </label>
+  </div>
   @switch (porUsuario().estado) {
     @case ('cargando') {
       <app-cargando texto="Cargando gráfico..." />
@@ -104,6 +122,33 @@
 <!-- 3. Barras: comentarios por publicación (las 10 con más comentarios) -->
 <section class="tarjeta tarjeta-ancha grafica">
   <h3>Comentarios por publicación</h3>
+  <div class="controles">
+    <label>
+      Mostrar
+      <select #cantP [value]="cantidadPublicaciones()" (change)="cambiarPublicaciones(cantP.value, ordP.value, sinP.checked)">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="todos">Todas</option>
+      </select>
+    </label>
+    <label>
+      las publicaciones con
+      <select #ordP [value]="ordenPublicaciones()" (change)="cambiarPublicaciones(cantP.value, ordP.value, sinP.checked)">
+        <option value="mayor">más comentarios</option>
+        <option value="menor">menos comentarios</option>
+      </select>
+    </label>
+    <label class="tilde">
+      <input
+        #sinP
+        type="checkbox"
+        [checked]="incluirSinComentarios()"
+        (change)="cambiarPublicaciones(cantP.value, ordP.value, sinP.checked)"
+      />
+      Incluir las que no tienen comentarios
+    </label>
+  </div>
   @switch (porPublicacion().estado) {
     @case ('cargando') {
       <app-cargando texto="Cargando gráfico..." />
@@ -116,7 +161,6 @@
     }
     @default {
       @if (graficoBarras(); as config) {
-        <p class="resumen">Las 10 publicaciones con más comentarios.</p>
         <app-grafico [config]="config" descripcion="Gráfico de barras: comentarios por publicación" />
       } @else {
         <p class="vacio">No hay comentarios en este lapso.</p>

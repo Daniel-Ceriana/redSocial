@@ -8,6 +8,15 @@ export interface Lapso {
   estado: EstadoEstadisticas;
 }
 
+// Los gráficos de ranking muestran los N usuarios o publicaciones con más o con menos (D12.7)
+export type CantidadRanking = '5' | '10' | '15' | 'todos';
+export type OrdenRanking = 'mayor' | 'menor';
+
+export interface OpcionesRanking {
+  cantidad: CantidadRanking;
+  orden: OrdenRanking;
+}
+
 export interface PublicacionesDeUsuario {
   usuarioId: string;
   usuario: string; // nombre de usuario

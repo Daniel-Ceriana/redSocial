@@ -1,11 +1,13 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { form, FormField, required, validate } from '@angular/forms/signals';
 import { ChartConfiguration } from 'chart.js';
 import {
   ComentariosDePublicacion,
   ComentariosDeUnDia,
+  CantidadRanking,
   EstadoEstadisticas,
   Lapso,
+  OrdenRanking,
   PublicacionesDeUsuario,
 } from '../../../modelos/estadisticas';
 import { EstadisticasApi } from '../../../services/estadisticas-api';
@@ -36,6 +38,13 @@ export class DashboardEstadisticas implements OnInit {
   protected hoy = hoyEnArgentina();
   protected estado = signal<EstadoEstadisticas>('activas');
 
+  // Controles propios de cada ranking (D12.7, D12.8): cuántos se muestran y si son los de más o los de menos
+  protected cantidadUsuarios = signal<CantidadRanking>('10');
+  protected ordenUsuarios = signal<OrdenRanking>('mayor');
+  protected cantidadPublicaciones = signal<CantidadRanking>('10');
+  protected ordenPublicaciones = signal<OrdenRanking>('mayor');
+  protected incluirSinComentarios = signal(false);
+
   protected model = signal({ desde: fechaHaceDias(DIAS_POR_DEFECTO - 1), hasta: hoyEnArgentina() });
   // Mismas reglas que ConsultaEstadisticasDto y EstadisticasService del back (G9)
   protected filtroForm = form(this.model, (p) => {
@@ -58,8 +67,8 @@ export class DashboardEstadisticas implements OnInit {
   protected porDia = signal<Carga<ComentariosDeUnDia[]>>({ estado: 'cargando' });
   protected porPublicacion = signal<Carga<ComentariosDePublicacion[]>>({ estado: 'cargando' });
 
-  // Para descartar la respuesta de una consulta vieja si se vuelve a pedir
-  private consulta = 0;
+  // Para descartar la respuesta de una consulta vieja si se vuelve a pedir (una cuenta por gráfico)
+  private consultas = { usuario: 0, dia: 0, publicacion: 0 };
 
   protected graficoTorta = computed(() => {
     const c = this.porUsuario();
@@ -139,6 +148,20 @@ export class DashboardEstadisticas implements OnInit {
     void this.cargar();
   }
 
+  // Cambiar un control de un ranking vuelve a pedir solo ese gráfico
+  protected cambiarUsuarios(cantidad: string, orden: string) {
+    this.cantidadUsuarios.set(cantidad as CantidadRanking);
+    this.ordenUsuarios.set(orden as OrdenRanking);
+    void this.cargarUsuarios();
+  }
+
+  protected cambiarPublicaciones(cantidad: string, orden: string, incluirSin: boolean) {
+    this.cantidadPublicaciones.set(cantidad as CantidadRanking);
+    this.ordenPublicaciones.set(orden as OrdenRanking);
+    this.incluirSinComentarios.set(incluirSin);
+    void this.cargarPublicaciones();
+  }
+
   protected ver(evento: Event) {
     evento.preventDefault();
     this.filtroForm.desde().markAsTouched();
@@ -153,26 +176,44 @@ export class DashboardEstadisticas implements OnInit {
   // Pide los tres gráficos juntos; cada uno muestra su propio error si falla
   private async cargar() {
     if (this.filtroForm().invalid()) return;
-    const numero = ++this.consulta;
-    const lapso: Lapso = { ...this.model(), estado: this.estado() };
-    this.porUsuario.set({ estado: 'cargando' });
-    this.porDia.set({ estado: 'cargando' });
-    this.porPublicacion.set({ estado: 'cargando' });
+    await Promise.all([this.cargarUsuarios(), this.cargarDia(), this.cargarPublicaciones()]);
+  }
 
-    const pedir = async <T>(llamada: Promise<T>, destino: (c: Carga<T>) => void) => {
-      let resultado: Carga<T>;
-      try {
-        resultado = { estado: 'listo', datos: await llamada };
-      } catch {
-        resultado = { estado: 'error' };
-      }
-      if (numero === this.consulta) destino(resultado);
-    };
-    await Promise.all([
-      pedir(this.api.publicacionesPorUsuario(lapso), (c) => this.porUsuario.set(c)),
-      pedir(this.api.comentariosPorDia(lapso), (c) => this.porDia.set(c)),
-      pedir(this.api.comentariosPorPublicacion(lapso), (c) => this.porPublicacion.set(c)),
-    ]);
+  private lapso(): Lapso {
+    return { ...this.model(), estado: this.estado() };
+  }
+
+  private cargarUsuarios() {
+    if (this.filtroForm().invalid()) return;
+    const ranking = { cantidad: this.cantidadUsuarios(), orden: this.ordenUsuarios() };
+    return this.pedir('usuario', this.api.publicacionesPorUsuario(this.lapso(), ranking), this.porUsuario);
+  }
+
+  private cargarDia() {
+    return this.pedir('dia', this.api.comentariosPorDia(this.lapso()), this.porDia);
+  }
+
+  private cargarPublicaciones() {
+    if (this.filtroForm().invalid()) return;
+    const ranking = { cantidad: this.cantidadPublicaciones(), orden: this.ordenPublicaciones() };
+    return this.pedir(
+      'publicacion',
+      this.api.comentariosPorPublicacion(this.lapso(), ranking, this.incluirSinComentarios()),
+      this.porPublicacion,
+    );
+  }
+
+  // Muestra "cargando", espera la respuesta y la guarda; descarta la que llega después de una consulta más nueva
+  private async pedir<T>(grafico: 'usuario' | 'dia' | 'publicacion', llamada: Promise<T>, destino: WritableSignal<Carga<T>>) {
+    const numero = ++this.consultas[grafico];
+    destino.set({ estado: 'cargando' });
+    let resultado: Carga<T>;
+    try {
+      resultado = { estado: 'listo', datos: await llamada };
+    } catch {
+      resultado = { estado: 'error' };
+    }
+    if (numero === this.consultas[grafico]) destino.set(resultado);
   }
 
   // "2026-11-14" -> "14/11"
