@@ -112,7 +112,7 @@ export class Auth {
     this._usuario.set(await this.pedirUsuario());
   }
 
-  // Pide un token nuevo con 30 segundos más de vida (3.B7). Si el back lo rechaza (401: ya venció),
+  // Pide un token nuevo con 60 segundos más de vida (3.B7). Si el back lo rechaza (401: ya venció),
   // se cierra la sesión como en cualquier otro vencimiento.
   async extenderSesion() {
     try {
@@ -213,7 +213,7 @@ export class Auth {
     this.temporizadorCuenta = setInterval(() => segundos.set(this.segundosRestantes()), 1000);
     const mensajes = computed(() => [
       `Tu sesión vence en ${segundos()} ${segundos() === 1 ? 'segundo' : 'segundos'}.`,
-      'Si la extendés, vas a tener 30 segundos más desde ahora.',
+      'Si la extendés, vas a tener 60 segundos más desde ahora.',
     ]);
 
     const extender = await this.modal.confirmar('¿Extender la sesión?', mensajes, 'Extender');

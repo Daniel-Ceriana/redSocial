@@ -52,14 +52,14 @@ Estado: ⬜ pendiente · 🟨 parcial · ✔ hecho. Detalle de cada uno en `docs
 | 3.B3 | PUT comentario (solo el autor, marca `modificado`) | ✔ S7 |
 | 3.B4 | El JWT lleva identidad y perfil | ✔ `{ sub, correo, perfil }` |
 | 3.B6 | POST autorizar | ✔ S7 |
-| 3.B7 | Refrescar el token (`POST /api/autenticacion/refrescar`) | ✔ con token de 30 s |
+| 3.B7 | Refrescar el token (`POST /api/autenticacion/refrescar`) | ✔ con token de 60 s |
 | X17 | GET una publicación por id | ✔ S7 |
 | 3.F1 | Página de la publicación en grande con sus comentarios | ✔ S8 (`/publicaciones/:id`) |
 | 3.F2 | Escribir comentarios | ✔ S8 |
 | 3.F3 | Comentarios uno debajo del otro, de a 3 con «cargar más» | ✔ S8 |
 | 3.F4 | El autor edita su comentario; se marca «editado» | ✔ S8 |
-| 3.F7 | Ofrecer extender la sesión antes de que venza | ✔ a la mitad de los 30 s, con cuenta regresiva |
-| 3.B5 | El token vence a los 15 minutos | 🟨 decisión: 30 s fijos para la presentación |
+| 3.F7 | Ofrecer extender la sesión antes de que venza | ✔ a la mitad de los 60 s (quedan 30), con cuenta regresiva |
+| 3.B5 | El token vence a los 15 minutos | 🟨 decisión: 60 s fijos para la presentación |
 | 3.F5 | Login y registro guardan el token | ✔ `localStorage` (T9) |
 | 3.F6 | Pantalla de cargando al iniciar que valida con autorizar | ✔ S9 (mínimo 5 s) |
 

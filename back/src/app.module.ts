@@ -21,7 +21,7 @@ import { PublicacionesModule } from './publicaciones/publicaciones.module.js';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '30s' },
+        signOptions: { expiresIn: '60s' },
       }),
     }),
     // Solo para usar PasswordHasher: el guard global queda apagado, usamos el nuestro

@@ -25,7 +25,7 @@ npm run start:dev         # http://localhost:3000/api
 ### Decisiones técnicas
 
 - Rutas en español bajo `/api`. Errores con el formato de Nest: `{ statusCode, message, error }`.
-- Token JWT (30 s fijos para la presentación; el enunciado pide 15 minutos) en el cuerpo de la respuesta; el front lo manda en el header `Authorization: Bearer <token>`.
+- Token JWT (60 s fijos para la presentación; el enunciado pide 15 minutos) en el cuerpo de la respuesta; el front lo manda en el header `Authorization: Bearer <token>`.
   `venceEn` (fecha ISO) permite armar el contador del front.
 - Contraseñas con `PasswordHasher` de `@nestjs/authentication`; el hash nunca sale en una respuesta.
 - Validación con DTOs (`class-validator`) y `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform`.
@@ -39,7 +39,7 @@ npm run start:dev         # http://localhost:3000/api
 | `POST /api/autenticacion/registro` (multipart) | público | 201 · 400 · 409 |
 | `POST /api/autenticacion/login` (JSON; cuenta deshabilitada: 403) | público | 200 · 400 · 401 · 403 |
 | `POST /api/autenticacion/autorizar` (devuelve usuario, `emitidoEn` y `venceEn` del mismo token) | con token | 200 · 401 |
-| `POST /api/autenticacion/refrescar` (token nuevo de 30 s) | con token | 200 · 401 |
+| `POST /api/autenticacion/refrescar` (token nuevo de 60 s) | con token | 200 · 401 |
 | `GET /api/usuarios/yo` | con token | 200 · 401 |
 | `PATCH /api/usuarios/yo` (multipart; no admite correo, perfil ni activo) | el propio usuario | 200 · 400 · 401 · 409 |
 | `GET /api/usuarios/:id` (perfil público) | con token | 200 · 400 · 404 |
@@ -89,7 +89,7 @@ La URL de la API está en `front/src/environments/environment.ts`.
 - Temática de ferromodelismo en el propio diseño, aunque una publicación no tenga foto: cada publicación es una placa de estación esmaltada montada en un diorama (postes, pasto, vía y zócalo con la fecha en una chapa de bronce), y cada comentario es un cartel chico con su poste. Todos los dibujos son SVG y CSS propios (`componentes/compartido/locomotora`, `cargando`, `escena-tren`); las animaciones se apagan con `prefers-reduced-motion`.
 - El fondo de toda la app es una maqueta vista desde arriba (`componentes/compartido/fondo-maqueta`): pasto, árboles, casas, un camino, un río y la estación, con dos vías a los costados del contenido por las que pasa un tren. Se calcula según el tamaño de la ventana y nada queda detrás del panel del contenido (800 px).
 - Navegación como una vía con estaciones (la locomotora se para en la pantalla actual), el me gusta como una señal ferroviaria (roja / verde), la insignia del administrador con una gorra de jefe de estación y el avatar de los perfiles dentro de un reloj de estación.
-- El token dura **30 segundos** (fijo, para poder mostrarlo en la presentación; el enunciado pide 15 minutos). Login, registro y `POST /api/autenticacion/refrescar` devuelven `emitidoEn` y `venceEn`. Con eso, `services/auth.ts` programa dos temporizadores: a la mitad de la vida del token, un modal ofrece extender la sesión (si acepta, se llama a refrescar y se vuelve a programar todo); al vencer, se cierra la sesión sola, se lleva al login y se avisa con el modal «Tu sesión venció».
+- El token dura **60 segundos** (fijo, para poder mostrarlo en la presentación; el enunciado pide 15 minutos). Login, registro y `POST /api/autenticacion/refrescar` devuelven `emitidoEn` y `venceEn`. Con eso, `services/auth.ts` programa un temporizador: a la mitad de la vida del token, un modal ofrece extender la sesión (si acepta, se llama a refrescar y se vuelve a programar todo); si no se extiende, se deja vencer: la sesión se cierra recién cuando el back responde 401 a la siguiente petición, y el interceptor lleva al login y avisa con el modal «Tu sesión venció».
 - Además, en cada acción del usuario (petición a la API o cambio de pantalla) se revisa si el token ya venció según `venceEn`: si venció, no se hace la petición y pasa lo mismo. Un 401 de la API también. Sin sesión, tampoco se envían peticiones.
 - El token y su vencimiento se guardan en `localStorage`; un interceptor lo manda en `Authorization: Bearer`. Al abrir la app se muestra una pantalla de cargando (5 segundos como mínimo) mientras se valida el token con `POST /api/autenticacion/autorizar`; después los guards llevan a publicaciones o al login. El modal para extender la sesión tiene cuenta regresiva.
 - **Directivas propias** (`src/app/directivas/`, standalone y con la API de signals): `*appSoloAdministrador` (estructural: muestra el elemento solo si la sesión es de un administrador; se usa en el nav, la tarjeta de publicación y el perfil público), `appBusquedaDiferida` (en un `<input>`: avisa con el texto cuando se deja de escribir; búsqueda de usuarios) y `appAutoOcultar` (borra un aviso a los N segundos; avisos de listado, mi perfil, página de publicación y usuarios).

@@ -61,7 +61,7 @@ export class AutenticacionService {
     };
   }
 
-  // Token nuevo con el mismo payload y la duración completa (30 s), contada desde ahora (3.B7).
+  // Token nuevo con el mismo payload y la duración completa (60 s), contada desde ahora (3.B7).
   // El AuthGuard ya rechazó con 401 un token vencido o inválido.
   async refrescar(usuarioId: string) {
     return this.emitirSesion(await this.usuarioDelToken(usuarioId));
