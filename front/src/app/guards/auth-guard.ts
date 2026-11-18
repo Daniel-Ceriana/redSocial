@@ -2,9 +2,8 @@ import { inject } from '@angular/core';
 import { CanMatchFn, Router } from '@angular/router';
 import { Auth } from '../services/auth';
 
-// Hay sesión y el token no venció. Si venció, se cierra la sesión y se avisa (sin redirigir: lo hace el guard).
+// Solo mira si hay sesión abierta. El vencimiento del token no se chequea acá: lo detecta el back con un 401.
 function haySesionVigente(auth: Auth): boolean {
-  if (auth.haySesion() && auth.tokenVencido()) auth.alVencer(false);
   return auth.haySesion();
 }
 

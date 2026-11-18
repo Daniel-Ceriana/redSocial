@@ -25,9 +25,8 @@ export class Auth {
   private _emitidoEn = signal<string | null>(null);
   private _venceEn = signal<string | null>(null);
 
-  // A la mitad de la vida del token se ofrece extenderla; al vencer se cierra la sesión
+  // A la mitad de la vida del token se ofrece extenderla; si no se extiende, se deja vencer
   private temporizadorAviso?: ReturnType<typeof setTimeout>;
-  private temporizadorVencimiento?: ReturnType<typeof setTimeout>;
   // Actualiza cada segundo la cuenta regresiva del modal de extender
   private temporizadorCuenta?: ReturnType<typeof setInterval>;
   private _usuario = signal<Usuario | null>(null);
@@ -63,13 +62,8 @@ export class Auth {
     const guardado = localStorage.getItem(CLAVE_SESION);
     if (!guardado) return;
     try {
-      const { token, venceEn } = JSON.parse(guardado) as SesionGuardada;
-      if (new Date(venceEn).getTime() <= Date.now()) {
-        // Ya venció mientras la app estaba cerrada: ni hace falta preguntarle al back
-        this.cerrarSesion();
-        this.avisarVencimiento();
-        return;
-      }
+      const { token } = JSON.parse(guardado) as SesionGuardada;
+      // Aunque ya haya vencido, se le pregunta al back: él es quien responde el 401
       this._token.set(token); // el interceptor lo manda en el header
       const res = await firstValueFrom(
         this.http.post<RespuestaAutorizar>(`${environment.apiUrl}/autenticacion/autorizar`, {}),
@@ -148,14 +142,7 @@ export class Auth {
     localStorage.removeItem(CLAVE_SESION);
   }
 
-  // ¿Ya pasó la hora de vencimiento del token? Se chequea en cada acción del usuario.
-  tokenVencido(): boolean {
-    const venceEn = this._venceEn();
-    return venceEn !== null && new Date(venceEn).getTime() <= Date.now();
-  }
-
-  // La sesión ya no sirve (venció el token o la API lo rechazó): se cierra, se lleva al login
-  // (salvo que quien llama ya lo esté redirigiendo) y se avisa
+  // La API rechazó el token con 401: se cierra la sesión, se lleva al login y se avisa
   alVencer(irAlLogin = true) {
     if (!this.haySesion()) return; // ya se cerró (por ejemplo, otra petición también dio 401)
     this.cerrarSesion();
@@ -200,7 +187,7 @@ export class Auth {
 
   // Programa los dos momentos de la sesión actual (y descarta los de un token anterior):
   //  - a la mitad de la vida del token, el modal que ofrece extenderla (3.F7);
-  //  - al vencer, cerrar la sesión, ir al login y avisar, aunque la persona no haga nada.
+  // Al vencer no se redirige: el token vencido se manda igual y la redirección ocurre con el 401 del back.
   private programarTemporizadores() {
     this.cancelarTemporizadores();
     const venceEn = this._venceEn();
@@ -210,7 +197,7 @@ export class Auth {
     const emitido = this._emitidoEn() ? new Date(this._emitidoEn()!).getTime() : null;
     const ahora = Date.now();
 
-    this.temporizadorVencimiento = setTimeout(() => this.alVencer(), Math.max(0, vence - ahora));
+    // Al vencer no se hace nada: la sesión se cierra recién cuando el back responde 401
 
     // Sin la fecha de emisión (sesión guardada antes de este cambio) no se sabe cuál es la mitad
     if (emitido === null) return;
@@ -232,9 +219,9 @@ export class Auth {
     const extender = await this.modal.confirmar('¿Extender la sesión?', mensajes, 'Extender');
     clearInterval(this.temporizadorCuenta);
 
-    // Si eligió "Cancelar", no hay otro aviso: al vencer se cierra la sesión.
-    // Si mientras tanto venció (el modal de vencimiento reemplaza a este), tampoco se hace nada.
-    if (extender && this.haySesion() && !this.tokenVencido()) await this.extenderSesion();
+    // Si eligió "Cancelar", se deja vencer: la próxima petición recibirá el 401 del back.
+    // Si ya venció, el back rechaza la extensión con 401 y se cierra la sesión.
+    if (extender && this.haySesion()) await this.extenderSesion();
   }
 
   private segundosRestantes(): number {
@@ -245,7 +232,6 @@ export class Auth {
 
   private cancelarTemporizadores() {
     clearTimeout(this.temporizadorAviso);
-    clearTimeout(this.temporizadorVencimiento);
     clearInterval(this.temporizadorCuenta);
   }
 

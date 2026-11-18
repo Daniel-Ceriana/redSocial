@@ -17,10 +17,9 @@ function sesionVencida(url: string) {
   );
 }
 
-// Antes de cada petición a nuestra API (salvo login y registro) revisa la sesión:
-//  - si el token ya venció, cierra la sesión, lleva al login y avisa; la petición no se envía;
-//  - si no hay sesión (por ejemplo, ya se cerró), tampoco se envía.
-// Si igual la API responde 401, hace lo mismo. El login y el registro quedan afuera: ahí un 401
+// Si no hay sesión (por ejemplo, ya se cerró), la petición a la API no se envía.
+// Un token vencido SÍ se envía: cuando la API responde 401, se cierra la sesión, se lleva al login
+// y se avisa (visible en la pestaña Network). El login y el registro quedan afuera: ahí un 401
 // significa "credenciales incorrectas", no "sesión vencida".
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(Auth);
@@ -29,10 +28,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = auth.token();
 
   if (esDeLaApi && !esDeAutenticacion) {
-    if (token && auth.tokenVencido()) {
-      auth.alVencer();
-      return sesionVencida(req.url);
-    }
     if (!token) return sesionVencida(req.url);
   }
 
