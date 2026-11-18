@@ -150,6 +150,14 @@ export class Auth {
     this.avisarVencimiento();
   }
 
+  // La API respondió 403 "cuenta deshabilitada": un administrador la dio de baja con la sesión abierta
+  alDeshabilitar() {
+    if (!this.haySesion()) return; // ya se cerró (por ejemplo, otra petición también dio 403)
+    this.cerrarSesion();
+    void this.router.navigate(['/login']);
+    this.avisarDeshabilitada();
+  }
+
   private avisarVencimiento() {
     // Sin await: el aviso no tiene que frenar la navegación
     void this.modal.avisar(

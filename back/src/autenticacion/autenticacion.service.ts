@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -10,10 +9,9 @@ import { ArchivosService } from '../common/archivos.service.js';
 import { UsuarioDocument } from '../usuarios/entities/usuario.entity.js';
 import { UsuariosService, aRespuesta } from '../usuarios/usuarios.service.js';
 import { LoginDto } from './dto/login.dto.js';
-import { PayloadToken } from './guards/auth.guard.js';
+import { cuentaDeshabilitada, PayloadToken } from './guards/auth.guard.js';
 import { RegistroDto } from './dto/registro.dto.js';
 
-const CUENTA_DESHABILITADA = 'Tu cuenta está deshabilitada. Contactá a un administrador.';
 
 @Injectable()
 export class AutenticacionService {
@@ -45,7 +43,7 @@ export class AutenticacionService {
     }
     // Recién con la contraseña correcta se dice que está deshabilitada (4.B4, D10.1)
     if (!usuario.activo) {
-      throw new ForbiddenException(CUENTA_DESHABILITADA);
+      throw cuentaDeshabilitada();
     }
     return this.emitirSesion(usuario);
   }
@@ -80,7 +78,7 @@ export class AutenticacionService {
       throw error;
     }
     if (!usuario.activo) {
-      throw new ForbiddenException(CUENTA_DESHABILITADA);
+      throw cuentaDeshabilitada();
     }
     return usuario;
   }
