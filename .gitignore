@@ -1,2 +1,7 @@
-docs/
 .env
+
+# Material de trabajo del TP que no se publica
+docs/HOJA_DE_RUTA.md
+docs/GUION_DEFENSA.md
+docs/postman/
+docs/diagramas.md

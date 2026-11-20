@@ -7,12 +7,22 @@ import { RespuestaAutorizar, RespuestaSesion, Usuario } from '../modelos/usuario
 import { Modal } from './modal';
 
 const CLAVE_SESION = 'trochita.sesion';
-const TIEMPO_MINIMO_CARGANDO = 5000; // ms (D9.2)
+const TIEMPO_MINIMO_CARGANDO = 1500; // ms (D9.2): lo justo para que se vea la animación
 
 interface SesionGuardada {
   token: string;
   emitidoEn?: string; // las sesiones guardadas antes de este cambio no lo tienen
   venceEn: string;
+}
+
+// 450 -> "7 minutos y 30 segundos"; 45 -> "45 segundos"
+function tiempoRestante(total: number): string {
+  const minutos = Math.floor(total / 60);
+  const segundos = total % 60;
+  const partes: string[] = [];
+  if (minutos > 0) partes.push(`${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`);
+  if (segundos > 0 || minutos === 0) partes.push(`${segundos} ${segundos === 1 ? 'segundo' : 'segundos'}`);
+  return partes.join(' y ');
 }
 
 @Service()
@@ -112,7 +122,7 @@ export class Auth {
     this._usuario.set(await this.pedirUsuario());
   }
 
-  // Pide un token nuevo con 60 segundos más de vida (3.B7). Si el back lo rechaza (401: ya venció),
+  // Pide un token nuevo con la duración completa otra vez (3.B7). Si el back lo rechaza (401: ya venció),
   // se cierra la sesión como en cualquier otro vencimiento.
   async extenderSesion() {
     try {
@@ -220,8 +230,8 @@ export class Auth {
     const segundos = signal(this.segundosRestantes());
     this.temporizadorCuenta = setInterval(() => segundos.set(this.segundosRestantes()), 1000);
     const mensajes = computed(() => [
-      `Tu sesión vence en ${segundos()} ${segundos() === 1 ? 'segundo' : 'segundos'}.`,
-      'Si la extendés, vas a tener 60 segundos más desde ahora.',
+      `Tu sesión vence en ${tiempoRestante(segundos())}.`,
+      `Si la extendés, vas a tener ${tiempoRestante(this.duracionToken())} más desde ahora.`,
     ]);
 
     const extender = await this.modal.confirmar('¿Extender la sesión?', mensajes, 'Extender');
@@ -230,6 +240,14 @@ export class Auth {
     // Si eligió "Cancelar", se deja vencer: la próxima petición recibirá el 401 del back.
     // Si ya venció, el back rechaza la extensión con 401 y se cierra la sesión.
     if (extender && this.haySesion()) await this.extenderSesion();
+  }
+
+  // Duración total del token, en segundos (viene de las fechas que manda el back)
+  private duracionToken(): number {
+    const emitido = this._emitidoEn();
+    const vence = this._venceEn();
+    if (!emitido || !vence) return 0;
+    return Math.round((new Date(vence).getTime() - new Date(emitido).getTime()) / 1000);
   }
 
   private segundosRestantes(): number {

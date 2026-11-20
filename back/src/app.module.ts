@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthenticationModule } from '@nestjs/authentication';
 import { AutenticacionModule } from './autenticacion/autenticacion.module.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
@@ -21,9 +22,11 @@ import { PublicacionesModule } from './publicaciones/publicaciones.module.js';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' },
+        signOptions: { expiresIn: '15m' },
       }),
     }),
+    // Límite de intentos: solo lo aplican las rutas que usan ThrottlerGuard (login y registro)
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 10 }]),
     // Solo para usar PasswordHasher: el guard global queda apagado, usamos el nuestro
     AuthenticationModule.forRoot({ globalGuard: false }),
     UsuariosModule,

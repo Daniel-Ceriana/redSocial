@@ -17,15 +17,16 @@ const CUENTAS: {
   correo: string;
   nombreUsuario: string;
   nombre: string;
+  descripcion: string;
   deshabilitada?: boolean;
 }[] = [
-  { perfil: 'usuario', clave: 'USUARIO', correo: 'usuario@trochita.com', nombreUsuario: 'maquinista', nombre: 'Usuario' },
-  { perfil: 'administrador', clave: 'ADMIN', correo: 'admin@trochita.com', nombreUsuario: 'jefe_de_estacion', nombre: 'Administrador' },
+  { perfil: 'usuario', clave: 'USUARIO', correo: 'usuario@trochita.com', nombreUsuario: 'maquinista', descripcion: 'Armo dioramas en escala N y colecciono locomotoras a vapor.', nombre: 'Usuario' },
+  { perfil: 'administrador', clave: 'ADMIN', correo: 'admin@trochita.com', nombreUsuario: 'jefe_de_estacion', descripcion: 'Administro la comunidad de La Trochita.', nombre: 'Administrador' },
   // Para mostrar el aviso de cuenta deshabilitada con el tercer botón de acceso rápido (D10.9)
-  { perfil: 'usuario', clave: 'DESHABILITADO', correo: 'deshabilitado@trochita.com', nombreUsuario: 'sin_boleto', nombre: 'Deshabilitado', deshabilitada: true },
-  { perfil: 'usuario', clave: 'LUCIA', correo: 'lucia@trochita.com', nombreUsuario: 'lucia_vapor', nombre: 'Lucía' },
-  { perfil: 'usuario', clave: 'MARTIN', correo: 'martin@trochita.com', nombreUsuario: 'martin_riel', nombre: 'Martín' },
-  { perfil: 'usuario', clave: 'SOFIA', correo: 'sofia@trochita.com', nombreUsuario: 'sofi_maquetas', nombre: 'Sofía' },
+  { perfil: 'usuario', clave: 'DESHABILITADO', correo: 'deshabilitado@trochita.com', nombreUsuario: 'sin_boleto', descripcion: 'Cuenta deshabilitada, para probar el aviso de baja.', nombre: 'Deshabilitado', deshabilitada: true },
+  { perfil: 'usuario', clave: 'LUCIA', correo: 'lucia@trochita.com', nombreUsuario: 'lucia_vapor', descripcion: 'Locomotoras a vapor, iluminación LED y electrónica.', nombre: 'Lucía' },
+  { perfil: 'usuario', clave: 'MARTIN', correo: 'martin@trochita.com', nombreUsuario: 'martin_riel', descripcion: 'Trenes de carga y locomotoras diésel en escala N.', nombre: 'Martín' },
+  { perfil: 'usuario', clave: 'SOFIA', correo: 'sofia@trochita.com', nombreUsuario: 'sofi_maquetas', descripcion: 'Paisajes, nieve y maquetas grandes de club.', nombre: 'Sofía' },
 ];
 
 // Publicaciones de ejemplo: autor (índice en CUENTAS: 0 usuario, 1 administrador, 3 Lucía, 4 Martín, 5 Sofía),
@@ -79,7 +80,7 @@ async function seed() {
           nombreUsuario: cuenta.nombreUsuario,
           contrasena,
           fechaNacimiento: '2000-01-01',
-          descripcion: `Cuenta de ${cuenta.perfil} para pruebas`,
+          descripcion: cuenta.descripcion,
           imagenPerfil,
         },
         cuenta.perfil,

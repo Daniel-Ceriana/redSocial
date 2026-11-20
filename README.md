@@ -1,45 +1,100 @@
-# La Trochita
+# 🚂 La Trochita
 
-Red social de ferromodelismo. TP 2 de Programación IV (UTN FRA, 2026 C2), individual.
+**Red social de ferromodelismo.** Los usuarios publican sus maquetas con foto, dan «me gusta» y comentan; los administradores gestionan usuarios y ven estadísticas. Hecha de punta a punta: API REST con NestJS y MongoDB, front en Angular, imágenes en Cloudinary y todo desplegado en la nube.
 
-- `front/` — Angular (S2 en adelante)
-- `back/` — NestJS + MongoDB (Mongoose) + JWT + Cloudinary
+> Nació como el TP 2 de Programación IV (UTN FRA, 2026) y quedó como proyecto de portfolio. Detalles en [Contexto académico](#contexto-académico).
 
-Estado de los requerimientos: ver `REQUERIMIENTOS.md`.
+## Demo
 
-## Back
+**▶ https://front-taupe-six.vercel.app** · API: https://red-social-nu-five.vercel.app/api
 
-### Cómo correrlo
+La primera petición puede tardar unos segundos (arranque en frío de Vercel y Atlas). Los botones de **acceso rápido** de la pantalla de login completan el formulario:
 
-```bash
-cd back
-npm install
-cp .env.example .env      # completar MONGO_URI, JWT_SECRET y las claves de Cloudinary
-npm run seed              # crea las cuentas de acceso rápido y publicaciones de ejemplo (se puede repetir sin problema)
-npm run start:dev         # http://localhost:3000/api
+| Cuenta | Correo | Contraseña | Para ver |
+|--------|--------|------------|----------|
+| Usuario | `usuario@trochita.com` | `Trochita123` | publicar, comentar, me gusta, editar el perfil |
+| Administrador | `admin@trochita.com` | `Trochita123` | gráficos de estadísticas, gestión de usuarios, bajas y altas |
+| Deshabilitado | `deshabilitado@trochita.com` | `Trochita123` | el aviso de cuenta dada de baja |
+
+<!-- CAPTURAS: guardarlas en docs/img/ con estos nombres -->
+<p align="center">
+  <img src="docs/img/login.png" width="45%" alt="Login con acceso rápido">
+  <img src="docs/img/publicaciones.png" width="45%" alt="Listado de publicaciones">
+</p>
+<p align="center">
+  <img src="docs/img/publicacion.png" width="45%" alt="Una publicación con comentarios">
+  <img src="docs/img/estadisticas.png" width="45%" alt="Dashboard de estadísticas del administrador">
+</p>
+
+## Stack y arquitectura
+
+| Capa | Tecnologías |
+|------|-------------|
+| Front | Angular 22 (standalone, signals, Signal Forms, carga diferida), Chart.js, PWA con service worker, CSS propio |
+| API | NestJS 12, Mongoose, `class-validator`, JWT, Multer, Helmet y límite de intentos (`@nestjs/throttler`) |
+| Datos | MongoDB Atlas (agregaciones para las estadísticas) |
+| Imágenes | Cloudinary |
+| Hosting | Vercel (front y API, dos proyectos) |
+
+```mermaid
+flowchart LR
+  U["Navegador<br/>Angular 22"] -- "HTTPS /api<br/>Authorization: Bearer JWT" --> A["API NestJS<br/>(Vercel)"]
+  A -- Mongoose --> M[("MongoDB Atlas")]
+  A -- "upload_stream" --> C["Cloudinary<br/>(imágenes)"]
+  U -. "carga las imágenes por URL" .-> C
 ```
 
-`npm run build` compila. No hay tests automatizados: se prueba con Postman
-(colección en `docs/postman/`, que no se sube al repositorio).
+```
+front/    Angular: componentes, servicios, guards, interceptor, directivas y pipes propios
+back/     NestJS: módulos autenticacion, usuarios y publicaciones; utilidades en src/common
+docs/     capturas del README
+docs-tp/  documentación del trabajo práctico
+```
 
-### Decisiones técnicas
+## Decisiones técnicas
 
-- Rutas en español bajo `/api`. Errores con el formato de Nest: `{ statusCode, message, error }`.
-- Token JWT (60 s fijos para la presentación; el enunciado pide 15 minutos) en el cuerpo de la respuesta; el front lo manda en el header `Authorization: Bearer <token>`.
-  `venceEn` (fecha ISO) permite armar el contador del front.
-- Contraseñas con `PasswordHasher` de `@nestjs/authentication`; el hash nunca sale en una respuesta.
-- Validación con DTOs (`class-validator`) y `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform`.
-- Imágenes de perfil en Cloudinary (JPG/PNG/WEBP, máx. 2 MB); solo se guarda la URL.
-- Solo hay tres módulos, los del TP: `autenticacion`, `usuarios` y `publicaciones`. Las utilidades compartidas (subida a Cloudinary, validador de edad) están en `src/common/`, sin módulo.
+**Autenticación con JWT y refresco**
+- Login y registro devuelven un token de **15 minutos** más `emitidoEn` y `venceEn`. El front lo guarda en `localStorage` y un interceptor lo manda en `Authorization: Bearer`. Va en el header y no en una cookie, así que front y API pueden vivir en dominios distintos.
+- `services/auth.ts` programa un temporizador: **a la mitad de la vida del token** (7 min 30 s) un modal con cuenta regresiva ofrece extender la sesión (`POST /autenticacion/refrescar`). Si no se extiende, se deja vencer.
+- La sesión se cierra cuando la API responde **401**: el interceptor limpia la sesión, lleva al login y avisa con «Tu sesión venció». Un 403 con código `CUENTA_DESHABILITADA` hace lo mismo con su propio aviso.
+- El `AuthGuard` no se queda con verificar la firma: consulta la base para comprobar que la cuenta siga existiendo y habilitada. Si un administrador da de baja a alguien, se nota en su **siguiente petición** y no cuando venza el token.
+- Contraseñas con hash (`PasswordHasher` de `@nestjs/authentication`); el hash nunca sale en una respuesta.
 
-### Rutas
+**Validación y errores**
+- DTOs con `class-validator` y un `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform`: lo que no está en el DTO se rechaza con 400, con mensajes en español.
+- El front valida lo mismo con Signal Forms, y la API siempre vuelve a validar.
+
+**Roles**
+- Dos perfiles, `usuario` y `administrador`. `AuthGuard` + `SoloAdministradorGuard` protegen en la API todas las rutas de administración; en el front, guards de ruta y la directiva estructural `*appSoloAdministrador` (solo de presentación: la protección real es la de la API).
+
+**Bajas lógicas**
+- Usuarios y publicaciones **no se borran**: se marcan como dados de baja y se pueden restaurar. Al deshabilitar un usuario, el administrador elige si se ocultan también sus publicaciones, y al rehabilitarlo vuelven.
+
+**Subida de imágenes**
+- Multer en memoria, validación con un pipe (JPG, PNG o WEBP, máx. 2 MB) y envío a Cloudinary; en la base solo se guarda la URL.
+
+**Seguridad**
+- **Helmet** agrega cabeceras HTTP de seguridad. **CORS** con lista blanca de orígenes (`FRONT_URL`), nunca `*`.
+- **Límite de intentos**: login y registro admiten 5 pedidos por minuto y por IP (después, 429). El contador vive en la memoria de cada instancia serverless, así que es una protección básica y no un límite global exacto; para eso haría falta un almacén compartido (Redis).
+- Secretos solo en variables de entorno; `back/.env.example` documenta cuáles.
+
+**Estadísticas**
+- Tres gráficos (torta, líneas, barras) con Chart.js, alimentados por pipelines de `aggregate()` de Mongoose (`$group`, `$lookup`, `$dateToString`) con filtros de fechas, estado y ranking.
+
+**Diseño**
+- CSS propio sin librerías de estilos, con temática ferroviaria: cada publicación es una placa de estación sobre un diorama, el fondo es una maqueta con un tren que pasa, el me gusta es una señal roja/verde. Todo en SVG y CSS propios; las animaciones se apagan con `prefers-reduced-motion`.
+- Directivas propias (`appBusquedaDiferida`, `appAutoOcultar`, `*appSoloAdministrador`) y pipes propios para fechas y textos.
+
+## API
+
+Prefijo `/api`, errores con el formato de Nest `{ statusCode, message, error }`. Los listados devuelven `{ datos, total, offset, limit }` (`limit` 5 por defecto, máximo 20).
 
 | Método y ruta | Quién | Respuestas |
 |---------------|-------|------------|
-| `POST /api/autenticacion/registro` (multipart) | público | 201 · 400 · 409 |
-| `POST /api/autenticacion/login` (JSON; cuenta deshabilitada: 403) | público | 200 · 400 · 401 · 403 |
+| `POST /api/autenticacion/registro` (multipart) | público | 201 · 400 · 409 · 429 |
+| `POST /api/autenticacion/login` (JSON; cuenta deshabilitada: 403) | público | 200 · 400 · 401 · 403 · 429 |
 | `POST /api/autenticacion/autorizar` (devuelve usuario, `emitidoEn` y `venceEn` del mismo token) | con token | 200 · 401 |
-| `POST /api/autenticacion/refrescar` (token nuevo de 60 s) | con token | 200 · 401 |
+| `POST /api/autenticacion/refrescar` (token nuevo de 15 min) | con token | 200 · 401 |
 | `GET /api/usuarios/yo` | con token | 200 · 401 |
 | `PATCH /api/usuarios/yo` (multipart; no admite correo, perfil ni activo) | el propio usuario | 200 · 400 · 401 · 409 |
 | `GET /api/usuarios/:id` (perfil público) | con token | 200 · 400 · 404 |
@@ -61,7 +116,55 @@ npm run start:dev         # http://localhost:3000/api
 
 Los listados devuelven `{ datos, total, offset, limit }` (`limit` 5 por defecto, máximo 20).
 
-### Origen de las tecnologías
+### Rutas del front
+
+| Ruta | Acceso | Pantalla |
+|------|--------|----------|
+| `/login`, `/registro` | sin sesión | Login (con acceso rápido) y registro |
+| `/publicaciones`, `/perfil` | con sesión | Listado (orden, paginación, crear, me gusta y eliminar) y mi perfil |
+| `/publicaciones/:id` | con sesión | Una publicación, comentarios paginados y edición de los propios |
+| `/usuarios/:id` | con sesión | Perfil público de otro usuario |
+| `/dashboard/estadisticas` | administrador | Tres gráficos con filtros |
+| `/dashboard/usuarios`, `/dashboard/usuarios/nuevo` | administrador | Planilla paginada, alta, deshabilitar y rehabilitar |
+
+## Cómo correrlo localmente
+
+Requisitos: Node 22 o superior, una base en MongoDB Atlas (o local) y una cuenta gratuita de Cloudinary.
+
+```bash
+# API
+cd back
+npm install
+cp .env.example .env      # completar MONGO_URI, JWT_SECRET y las claves de Cloudinary
+npm run seed              # cuentas de acceso rápido y publicaciones de ejemplo (se puede repetir sin duplicar)
+npm run start:dev         # http://localhost:3000/api
+
+# Front (en otra terminal)
+cd front
+npm install
+npm start                 # http://localhost:4200
+```
+
+`npm run build` compila cada parte. La URL de la API del front está en `front/src/environments/`.
+
+## Despliegue
+
+Dos proyectos de **Vercel** del mismo repositorio (*Root Directory* `back` y `front`), base en **MongoDB Atlas** e imágenes en **Cloudinary**. Se despliega solo con cada push.
+
+- **API:** variables `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `IMAGEN_PERFIL_DEFECTO` y `FRONT_URL` (admite varias URLs separadas por coma). Atlas permite `0.0.0.0/0` porque Vercel no tiene IP fija; es una limitación conocida de este tipo de despliegue.
+- **Front:** el build de producción reemplaza `environment.ts` por `environment.production.ts`; `front/vercel.json` manda todas las rutas a `index.html`. *Output Directory*: `dist/front/browser`.
+
+## Qué mejoraría
+
+- Tests automáticos: e2e de autenticación y publicaciones en la API.
+- Integración continua con GitHub Actions (build y tests en cada push).
+- Límite de intentos con almacén compartido (Redis) y *refresh token* en cookie `httpOnly`, en lugar del token en `localStorage`.
+
+## Contexto académico
+
+Proyecto individual del **TP 2 de Programación IV** (UTN FRA, 2026 C2), aprobado. Se desarrolló por sprints; el estado de cada requerimiento está en [docs-tp/REQUERIMIENTOS.md](docs-tp/REQUERIMIENTOS.md).
+
+#### Origen de las tecnologías
 
 | Pieza | Origen |
 |-------|--------|
@@ -70,72 +173,3 @@ Los listados devuelven `{ datos, total, offset, limit }` (`limit` 5 por defecto,
 | Excepciones HTTP de Nest en lugar de `throw new Error` | clase, con cambios |
 | `aggregate()` de Mongoose (`$group`, `$lookup`, `$dateToString`) para las estadísticas | clase, con cambios (en clase se usó `find`; acá hay que agrupar y contar) |
 | Script de seed | nuevo |
-
-## Front
-
-```bash
-cd front
-npm install
-npm start        # http://localhost:4200 (la API tiene que estar corriendo en http://localhost:3000)
-npm run build    # compila
-```
-
-La URL de la API está en `front/src/environments/environment.ts`.
-
-### Decisiones técnicas
-
-- Angular standalone con signals, Signal Forms, `@if/@for`, guards `canMatch` y carga diferida por ruta (igual que el TP 1).
-- CSS propio con variables (`src/styles.css`), sin librerías de estilos. Identidad "Boletería de época": crema, verde locomotora y ocre; Playfair Display e Inter, Rye para los carteles y Courier Prime para fechas y chapas.
-- Temática de ferromodelismo en el propio diseño, aunque una publicación no tenga foto: cada publicación es una placa de estación esmaltada montada en un diorama (postes, pasto, vía y zócalo con la fecha en una chapa de bronce), y cada comentario es un cartel chico con su poste. Todos los dibujos son SVG y CSS propios (`componentes/compartido/locomotora`, `cargando`, `escena-tren`); las animaciones se apagan con `prefers-reduced-motion`.
-- El fondo de toda la app es una maqueta vista desde arriba (`componentes/compartido/fondo-maqueta`): pasto, árboles, casas, un camino, un río y la estación, con dos vías a los costados del contenido por las que pasa un tren. Se calcula según el tamaño de la ventana y nada queda detrás del panel del contenido (800 px).
-- Navegación como una vía con estaciones (la locomotora se para en la pantalla actual), el me gusta como una señal ferroviaria (roja / verde), la insignia del administrador con una gorra de jefe de estación y el avatar de los perfiles dentro de un reloj de estación.
-- El token dura **60 segundos** (fijo, para poder mostrarlo en la presentación; el enunciado pide 15 minutos). Login, registro y `POST /api/autenticacion/refrescar` devuelven `emitidoEn` y `venceEn`. Con eso, `services/auth.ts` programa un temporizador: a la mitad de la vida del token, un modal ofrece extender la sesión (si acepta, se llama a refrescar y se vuelve a programar todo); si no se extiende, se deja vencer: la sesión se cierra recién cuando el back responde 401 a la siguiente petición, y el interceptor lleva al login y avisa con el modal «Tu sesión venció».
-- Además, en cada acción del usuario (petición a la API o cambio de pantalla) se revisa si el token ya venció según `venceEn`: si venció, no se hace la petición y pasa lo mismo. Un 401 de la API también. Sin sesión, tampoco se envían peticiones.
-- El token y su vencimiento se guardan en `localStorage`; un interceptor lo manda en `Authorization: Bearer`. Al abrir la app se muestra una pantalla de cargando (5 segundos como mínimo) mientras se valida el token con `POST /api/autenticacion/autorizar`; después los guards llevan a publicaciones o al login. El modal para extender la sesión tiene cuenta regresiva.
-- **Directivas propias** (`src/app/directivas/`, standalone y con la API de signals): `*appSoloAdministrador` (estructural: muestra el elemento solo si la sesión es de un administrador; se usa en el nav, la tarjeta de publicación y el perfil público), `appBusquedaDiferida` (en un `<input>`: avisa con el texto cuando se deja de escribir; búsqueda de usuarios) y `appAutoOcultar` (borra un aviso a los N segundos; avisos de listado, mi perfil, página de publicación y usuarios).
-- **Pipes propios** (`src/app/pipes/`): `tiempoRelativo`, `fechaArgentina`, `fechaChapa` y `resumen`.
-- **PWA**: `manifest.webmanifest` con íconos propios (la locomotora; uno «maskable») y service worker de `@angular/service-worker` registrado solo en el build de producción. `ngsw-config.json` cachea solo los archivos de la app (JS, CSS, íconos), **nunca** las respuestas de la API (no tiene `dataGroups`). El service worker no corre en `ng serve`: para probarlo, `npm run build` y servir `dist/front/browser` (o usar la URL pública) y abrir Lighthouse.
-- **Estadísticas**: gráficos con Chart.js directa (un `<canvas>` por gráfico, componente `app-grafico`), registrando solo torta, barras y líneas.
-- Sin `alert()`: los avisos y confirmaciones usan el modal propio (`services/modal.ts`).
-- Fechas en hora argentina con `Intl` nativo, mediante los pipes propios `tiempoRelativo`, `fechaArgentina` y `fechaChapa` («14 NOV 2026»). El pipe propio `resumen` acorta las descripciones de más de 200 caracteres en las listas (sin cortar palabras) y deja un «Ver más» que abre la publicación.
-- Validaciones compartidas en `utilidades/validaciones.ts`: recortan los espacios igual que el back y usan las mismas reglas y mensajes (correo con la misma exigencia de dominio que `@IsEmail()`, edad mínima con la fecha argentina).
-- Paginación con «Anterior» / «Siguiente»; después de crear o eliminar se vuelve a pedir la página a la API para que el total siempre coincida.
-- Las validaciones del front son las mismas que las del back (el back es la que manda).
-
-### Origen de las tecnologías
-
-| Pieza | Origen |
-|-------|--------|
-| Angular standalone, signals, Signal Forms, `@if/@for`, guards `canMatch`, carga diferida, `HttpClient` con interceptor | clase / TP 1 |
-| Directivas propias con `inject`, `input`, `output` y `effect` | clase, con cambios (API de signals) |
-| Directiva estructural con `TemplateRef` y `ViewContainerRef` (`*appSoloAdministrador`) | nuevo |
-| Pipes propios | clase |
-| `chart.js` | nuevo (librería aprobada en la S12) |
-| `@angular/service-worker` y manifiesto web (PWA) | nuevo (librería aprobada en la S13) |
-
-### Rutas del front
-
-| Ruta | Guard | Pantalla |
-|------|-------|----------|
-| `/login`, `/registro` | solo sin sesión | Login (con acceso rápido) y registro |
-| `/publicaciones`, `/perfil` | con sesión | Publicaciones (listado, orden, paginación, crear, me gusta y eliminar) y Mi perfil (ver, editar y mis últimas publicaciones con comentarios) |
-| `/dashboard/estadisticas` | administrador | Tres gráficos con Chart.js (torta: publicaciones por usuario; líneas: comentarios por día; barras: comentarios por publicación) con un lapso y el estado de las publicaciones elegibles |
-| `/dashboard/usuarios`, `/dashboard/usuarios/nuevo` | administrador | Planilla de usuarios paginada (perfil y estado), alta con el mismo formulario del registro más el perfil, deshabilitar (eligiendo si se ocultan sus publicaciones) y rehabilitar |
-| `/publicaciones/:id` | con sesión | Una publicación en grande (diorama), comentar, comentarios de a 3 con «cargar más» (descarta repetidos por id) y editar los propios en el mismo cartel. Se llega desde el título o «N comentarios» de cualquier placa |
-| `/usuarios/:id` | con sesión | Perfil público de otro usuario y sus publicaciones |
-| `/sin-permiso` | — | Falta de permiso |
-| `**` | — | 404 |
-
-## Despliegue
-
-Front y back están en **Vercel** (dos proyectos del mismo repositorio), la base en **MongoDB Atlas** y las imágenes en **Cloudinary**.
-
-| Parte | URL | Root Directory |
-|-------|-----|----------------|
-| Front | https://front-taupe-six.vercel.app | `front` |
-| Back (API) | https://red-social-nu-five.vercel.app/api | `back` |
-
-- **Back:** Vercel detecta NestJS por `src/main.ts`. Variables de entorno en el panel del proyecto: `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `IMAGEN_PERFIL_DEFECTO` y `FRONT_URL` (la URL del front; admite varias separadas por coma). Atlas tiene que permitir `0.0.0.0/0`, porque Vercel no tiene IP fija.
-- **Front:** el build de producción reemplaza `environment.ts` por `environment.production.ts` (URL del back). `front/vercel.json` manda todas las rutas a `index.html` para que recargar una ruta no dé 404. *Output Directory*: `dist/front/browser`.
-- Se despliega solo con cada `git push`. Como el token viaja en el header `Authorization`, front y back pueden estar en dominios distintos.
-- El seed (`npm run seed`) se corre una vez desde la computadora, con el `MONGO_URI` de la base de producción.

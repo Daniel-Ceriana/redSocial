@@ -8,6 +8,9 @@ export function mensajesDeError(error: unknown): string[] {
   if (error.status === 0) {
     return ['No se pudo conectar con el servidor. Revisá tu conexión y probá de nuevo.'];
   }
+  if (error.status === 429) {
+    return ['Demasiados intentos seguidos. Esperá un minuto y probá de nuevo.'];
+  }
   const mensaje = (error.error as { message?: string | string[] } | null)?.message;
   if (Array.isArray(mensaje) && mensaje.length) return mensaje;
   if (typeof mensaje === 'string' && mensaje) return [mensaje];
