@@ -8,8 +8,10 @@ import { configurarApp } from './configurar-app.js';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  configurarApp(app);
+  const app = await NestFactory.create(AppModule);
+  configurarApp(app as NestExpressApplication);
   await app.listen(process.env.PORT ?? 3000);
 }
-void bootstrap();
+// Vercel detecta la app por esta forma exacta (create + bootstrap()), por eso no se usa `void` ni un genérico
+// oxlint-disable-next-line typescript/no-floating-promises
+bootstrap();
