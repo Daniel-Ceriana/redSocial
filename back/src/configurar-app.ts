@@ -1,6 +1,8 @@
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import helmet from 'helmet';
+// Import del módulo completo y no `import helmet from 'helmet'`: los tipos de helmet son CommonJS (.d.cts) y, según
+// cómo compile cada herramienta (por ejemplo, el build de Vercel), el import por defecto no se tipa como función.
+import * as helmet from 'helmet';
 
 // Toda la configuración de la app que no es "levantar el servidor". La usan main.ts y los tests e2e,
 // así los tests prueban la misma app que corre en producción.
@@ -9,7 +11,7 @@ export function configurarApp(app: NestExpressApplication) {
   // Detrás del proxy de Vercel: sin esto todos los clientes parecen tener la misma IP y el límite de intentos sería global
   app.set('trust proxy', 1);
   // Cabeceras de seguridad HTTP (X-Content-Type-Options, HSTS, etc.)
-  app.use(helmet());
+  app.use(helmet.default());
   // FRONT_URL puede traer varias URLs separadas por coma; se les saca la barra final
   // porque el navegador manda el origen sin ella y tienen que coincidir exactas
   const origenes = (process.env.FRONT_URL ?? 'http://localhost:4200')
