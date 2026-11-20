@@ -35,7 +35,7 @@ La primera petición puede tardar unos segundos (arranque en frío de Vercel y A
 | Capa | Tecnologías |
 |------|-------------|
 | Front | Angular 22 (standalone, signals, Signal Forms, carga diferida), Chart.js, PWA con service worker, CSS propio |
-| API | NestJS 12, Mongoose, `class-validator`, JWT, Multer, Helmet y límite de intentos (`@nestjs/throttler`) |
+| API | NestJS 12, Mongoose, `class-validator`, JWT, Multer, Helmet y un guard propio de límite de intentos |
 | Datos | MongoDB Atlas (agregaciones para las estadísticas) |
 | Imágenes | Cloudinary |
 | Hosting | Vercel (front y API, dos proyectos) |
@@ -79,7 +79,7 @@ docs-tp/  documentación del trabajo práctico
 
 **Seguridad**
 - **Helmet** agrega cabeceras HTTP de seguridad. **CORS** con lista blanca de orígenes (`FRONT_URL`), nunca `*`.
-- **Límite de intentos**: login y registro admiten 5 pedidos por minuto y por IP (después, 429). El contador vive en la memoria de cada instancia serverless, así que es una protección básica y no un límite global exacto; para eso haría falta un almacén compartido (Redis).
+- **Límite de intentos**: login y registro admiten 5 pedidos por minuto y por IP (después, 429), con un guard propio: `@nestjs/throttler` es CommonJS y no arranca con Nest 12 (solo ESM) en Vercel. El contador vive en la memoria de cada instancia serverless, así que es una protección básica y no un límite global exacto; para eso haría falta un almacén compartido (Redis).
 - Secretos solo en variables de entorno; `back/.env.example` documenta cuáles.
 
 **Estadísticas**
