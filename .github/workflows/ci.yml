@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  back:
+    name: API (lint, build y tests e2e)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    env:
+      # Donde mongodb-memory-server guarda el binario de MongoDB, para poder cachearlo
+      MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.mongodb-binarios
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: back/package-lock.json
+      - name: Caché del binario de MongoDB
+        uses: actions/cache@v4
+        with:
+          path: .mongodb-binarios
+          key: mongodb-binarios-${{ runner.os }}-${{ hashFiles('back/package-lock.json') }}
+          restore-keys: mongodb-binarios-${{ runner.os }}-
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run test:e2e
+
+  front:
+    name: Front (build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - run: npm ci
+      - run: npm run build

@@ -1,5 +1,7 @@
 # 🚂 La Trochita
 
+[![CI](https://github.com/Daniel-Ceriana/redSocial/actions/workflows/ci.yml/badge.svg)](https://github.com/Daniel-Ceriana/redSocial/actions/workflows/ci.yml)
+
 **Red social de ferromodelismo.** Los usuarios publican sus maquetas con foto, dan «me gusta» y comentan; los administradores gestionan usuarios y ven estadísticas. Hecha de punta a punta: API REST con NestJS y MongoDB, front en Angular, imágenes en Cloudinary y todo desplegado en la nube.
 
 > **In short:** La Trochita is a full-stack social network for model-railway hobbyists. Users post their layouts with photos, like and comment; admins manage users and see charts. Angular 22 front end, NestJS + MongoDB Atlas REST API, JWT auth with session refresh, image uploads to Cloudinary, soft deletes, role-based access, Helmet and rate limiting, deployed on Vercel. Live demo and quick-login accounts below. The documentation is in Spanish.
@@ -163,6 +165,8 @@ npm run test:e2e
 
 La primera corrida descarga el binario de MongoDB (unos 100 MB).
 
+**Integración continua:** [GitHub Actions](.github/workflows/ci.yml) corre en cada push y pull request a `main`. Dos jobs en paralelo: la API (lint, build y los tests e2e, sin secretos) y el front (build). El binario de MongoDB se cachea entre corridas.
+
 ## Despliegue
 
 Dos proyectos de **Vercel** del mismo repositorio (*Root Directory* `back` y `front`), base en **MongoDB Atlas** e imágenes en **Cloudinary**. Se despliega solo con cada push.
@@ -172,7 +176,6 @@ Dos proyectos de **Vercel** del mismo repositorio (*Root Directory* `back` y `fr
 
 ## Qué mejoraría
 
-- Integración continua con GitHub Actions (build y tests en cada push).
 - Límite de intentos con almacén compartido (Redis) y *refresh token* en cookie `httpOnly`, en lugar del token en `localStorage`.
 
 ## Contexto académico
