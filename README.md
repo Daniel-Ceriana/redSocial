@@ -149,6 +149,20 @@ npm start                 # http://localhost:4200
 
 `npm run build` compila cada parte. La URL de la API del front está en `front/src/environments/`.
 
+## Tests
+
+```bash
+cd back
+npm run test:e2e
+```
+
+40 tests end-to-end (Vitest + Supertest) que levantan la app completa, con la misma configuración que producción, contra una **MongoDB en memoria** (`mongodb-memory-server`): no hace falta ninguna base ni clave, y no se toca Atlas. Cloudinary se reemplaza por un doble. Cubren:
+- **Autenticación:** registro y validaciones, login, 401 sin token o con token inválido, cuenta deshabilitada (403), refresco, vencimiento a 15 minutos, límite de intentos (429) y cabeceras de Helmet.
+- **Publicaciones:** crear con y sin imagen (y rechazo de archivos que no son imágenes), paginación, me gusta, comentarios y edición solo por el autor, bajas lógicas y restauración.
+- **Administración:** un usuario común recibe 403 en cada ruta de administrador, y al deshabilitar una cuenta su token deja de servir en la siguiente petición.
+
+La primera corrida descarga el binario de MongoDB (unos 100 MB).
+
 ## Despliegue
 
 Dos proyectos de **Vercel** del mismo repositorio (*Root Directory* `back` y `front`), base en **MongoDB Atlas** e imágenes en **Cloudinary**. Se despliega solo con cada push.
@@ -158,7 +172,6 @@ Dos proyectos de **Vercel** del mismo repositorio (*Root Directory* `back` y `fr
 
 ## Qué mejoraría
 
-- Tests automáticos: e2e de autenticación y publicaciones en la API.
 - Integración continua con GitHub Actions (build y tests en cada push).
 - Límite de intentos con almacén compartido (Redis) y *refresh token* en cookie `httpOnly`, en lugar del token en `localStorage`.
 
