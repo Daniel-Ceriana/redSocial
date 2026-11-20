@@ -4,9 +4,6 @@ import {
   form,
   FormField,
   required,
-  minLength,
-  maxLength,
-  pattern,
   submit,
 } from '@angular/forms/signals';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -41,13 +38,9 @@ export class Login {
     obligatorio(p.correo, 'El correo es obligatorio');
     correo(p.correo);
 
-    // Excepción acordada a la regla 8: el back del login solo pide que la contraseña no esté vacía, para que una
-    // contraseña equivocada siempre dé 401 "Correo o contraseña incorrectos" y no un 400 de formato.
+    // En el login solo se pide que la contraseña no esté vacía (igual que el back): no se revela el formato
+    // de las contraseñas, y una incorrecta siempre da 401 "Correo o contraseña incorrectos".
     required(p.contrasena, { message: 'La contraseña es obligatoria' });
-    minLength(p.contrasena, 8, { message: 'La contraseña debe tener al menos 8 caracteres' });
-    maxLength(p.contrasena, 64, { message: 'La contraseña puede tener hasta 64 caracteres' });
-    pattern(p.contrasena, /[A-Z]/, { message: 'La contraseña debe tener al menos una mayúscula' });
-    pattern(p.contrasena, /\d/, { message: 'La contraseña debe tener al menos un número' });
   });
 
   // Acceso rápido: solo completa el formulario; después se aprieta "Ingresar"

@@ -2,6 +2,8 @@
 
 **Red social de ferromodelismo.** Los usuarios publican sus maquetas con foto, dan «me gusta» y comentan; los administradores gestionan usuarios y ven estadísticas. Hecha de punta a punta: API REST con NestJS y MongoDB, front en Angular, imágenes en Cloudinary y todo desplegado en la nube.
 
+> 🇬🇧 **In short:** La Trochita is a full-stack social network for model-railway hobbyists. Users post their layouts with photos, like and comment; admins manage users and see charts. Angular 22 front end, NestJS + MongoDB Atlas REST API, JWT auth with session refresh, image uploads to Cloudinary, soft deletes, role-based access, Helmet and rate limiting, deployed on Vercel. Live demo and quick-login accounts below. The documentation is in Spanish.
+
 > Nació como el TP 2 de Programación IV (UTN FRA, 2026) y quedó como proyecto de portfolio. Detalles en [Contexto académico](#contexto-académico).
 
 ## Demo
