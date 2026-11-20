@@ -18,12 +18,12 @@ La primera petición puede tardar unos segundos (arranque en frío de Vercel y A
 
 <!-- CAPTURAS: guardarlas en docs/img/ con estos nombres -->
 <p align="center">
-  <img src="docs/img/login.png" width="45%" alt="Login con acceso rápido">
-  <img src="docs/img/publicaciones.png" width="45%" alt="Listado de publicaciones">
+  <img src="docs/img/login.png" height="300" alt="Login con acceso rápido">
+  <img src="docs/img/publicaciones.png" height="300" alt="Listado de publicaciones">
 </p>
 <p align="center">
-  <img src="docs/img/publicacion.png" width="45%" alt="Una publicación con comentarios">
-  <img src="docs/img/estadisticas.png" width="45%" alt="Dashboard de estadísticas del administrador">
+  <img src="docs/img/publicacion.png" height="300" alt="Una publicación con comentarios">
+  <img src="docs/img/estadisticas.png" height="300" alt="Dashboard de estadísticas del administrador">
 </p>
 
 ## Stack y arquitectura
